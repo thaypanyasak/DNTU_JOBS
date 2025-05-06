@@ -1,0 +1,78 @@
+﻿@page
+@model ConfirmEmailModel
+@{
+    ViewData["Title"] = "Xác nhận Email";
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .con {
+            background-color: #fff;
+            width: 600px;
+            padding: 20px 40px;
+            border-radius: 10px;
+            box-shadow: 0px 8px 24px rgba(149, 157, 165, 0.2);
+            text-align: center;
+            margin-top: 40px;
+        }
+
+            .con h1 {
+                color: #535353;
+            }
+
+            .con p {
+                color: #a0a0a0;
+                margin: 15px 0;
+            }
+
+            .con .email-button {
+                display: inline-block;
+                padding: 10px 20px;
+                background-color: #ff5b22;
+                color: #fff;
+                border: none;
+                border-radius: 5px;
+                text-decoration: none;
+                margin: 15px 0;
+            }
+
+        .email-button:hover {
+            background-color: #ff4000;
+        }
+
+        .con .login-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            margin: 15px 0;
+        }
+
+            .con .login-button:hover {
+                background-color: #0056b3;
+            }
+    </style>
+</head>
+<body class="bo">
+    <div class="container con">
+        <img src="https://cdn-icons-png.flaticon.com/128/5290/5290058.png" alt="" />
+        <h1>Xác nhận Email</h1>
+        <p>Cảm ơn bạn đã xác nhận email. Bạn có thể bắt đầu sử dụng tài khoản của mình ngay bây giờ.</p>
+        <a class="login-button" href="/Identity/Account/Login">Login</a>
+    </div>
+</body>
+</html>

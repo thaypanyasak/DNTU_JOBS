@@ -1,0 +1,277 @@
+﻿@model JobDetailViewModel
+@using DNTU_JOBS.Helper
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<div class="custom-container mt-5">
+    
+    <div class="job-header d-flex justify-content-between align-items-center mb-4">
+        <!-- Back Button -->
+        <a href="javascript:history.back()" class="btn btn-light mb-3" title="Back to Edited Jobs" style="text-decoration:none;">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+
+        <!-- Job Title and Category -->
+        <div class="text-center flex-grow-1">
+            <h2 class="job-title mb-1">@Model.JobTitle</h2>
+            <p class="job-category text-muted"><i class="fas fa-briefcase"></i> @Model.CategoryName</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Job Description Section -->
+            <div class="card mb-4 shadow">
+                <div class="card-header custom-header">
+                    <h5><i class="fas fa-file-alt"></i> Mô tả công việc</h5>
+                </div>
+                <div class="card-body">
+                    <div>@Html.Raw(Model.JobDescription)</div>
+                </div>
+            </div>
+
+            <!-- Job Requirements Section -->
+            <div class="card mb-4 shadow">
+                <div class="card-header custom-header">
+                    <h5><i class="fas fa-tasks"></i> Yêu cầu kỹ năng và kiến thức</h5>
+                </div>
+                <div class="card-body">
+                    <div>@Html.Raw(Model.JobRequirements)</div>
+                </div>
+            </div>
+
+            <!-- Education & Experience Section -->
+            <div class="card mb-4 shadow">
+                <div class="card-header custom-header">
+                    <h5><i class="fas fa-graduation-cap"></i> Trình độ học vấn & Kinh nghiệm</h5>
+                </div>
+                <div class="card-body">
+                    <div>
+                        @if (!string.IsNullOrEmpty(Model.Education))
+                        {
+                            @Html.Raw(Model.Education)
+                        }
+                        else
+                        {
+                            <p>Không có yêu cầu nào được liệt kê.</p>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Benefits Section -->
+            <div class="card mb-4 shadow">
+                <div class="card-header custom-header">
+                    <h5><i class="fas fa-gift"></i> Quyền lợi</h5>
+                </div>
+                <div class="card-body">
+                    <div>
+                        @if (!string.IsNullOrEmpty(Model.Benefits))
+                        {
+                            @Html.Raw(Model.Benefits)
+                        }
+                        else
+                        {
+                            <p>Không có thông tin về quyền lợi.</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <!-- Job Details Section -->
+            <div class="card mb-4 shadow">
+                <div class="card-header custom-header">
+                    <h5><i class="fas fa-info-circle"></i> Chi tiết công việc</h5>
+                </div>
+                <div class="card-body">
+                    <p>
+                        <strong><i class="fas fa-money-bill-wave"></i> Lương:</strong>
+                        @if (Model.SalaryMin.HasValue && Model.SalaryMax.HasValue)
+                        {
+                            @($"{Model.SalaryMin.Value:N0} - {Model.SalaryMax.Value:N0} VND")
+                        }
+                        else
+                        {
+                            <span>Chưa xác định</span>
+                        }
+                    </p>
+                    <p><strong><i class="fas fa-map-marker-alt"></i> Địa điểm:</strong> @Model.District, @Model.Ward</p>
+                    <p><strong><i class="fas fa-clock"></i> Thời gian làm việc:</strong> @Model.WorkingTime</p>
+                    <p><strong><i class="fas fa-users"></i> Số lượng cần tuyển:</strong> @Model.HiringQuantity</p>
+                    <p><strong><i class="fas fa-venus-mars"></i> Yêu cầu giới tính:</strong> @Model.Gender</p>
+                </div>
+            </div>
+
+            <!-- Status Section with Dynamic Colors -->
+            <div class="card shadow">
+                <div class="card-header custom-header">
+                    <h5><i class="fas fa-clipboard-check"></i> Trạng thái ứng tuyển</h5>
+                </div>
+                <div class="card-body">
+                    <p class="status">
+                        <strong>Trạng thái:</strong>
+                        <span class="@(Model.Status == ApprovalStatus.Approved ? "status-approved" : Model.Status == ApprovalStatus.Rejected ? "status-rejected" : Model.Status == ApprovalStatus.Pending ? "status-pending" : Model.Status == ApprovalStatus.PendingEdit ? "status-pending-edit" : Model.Status == ApprovalStatus.ApprovedEdit ? "status-approved-edit" : Model.Status == ApprovalStatus.RejectedEdit ? "status-rejected-edit" : "status-filled")">
+                            @switch (Model.Status)
+                            {
+                                case ApprovalStatus.Pending:
+                                    <span>Đang chờ duyệt <i class="fas fa-clock"></i></span>
+                                    break;
+                                case ApprovalStatus.Approved:
+                                    <span>Đã duyệt <i class="fas fa-check-circle"></i></span>
+                                    break;
+                                case ApprovalStatus.Rejected:
+                                    <span>Từ chối <i class="fas fa-times-circle"></i></span>
+                                    <p><strong>Lý do từ chối:</strong> @Model.RejectionReason</p>
+                                    break;
+                                case ApprovalStatus.Break:
+                                    <span>Tạm ngừng <i class="fas fa-times-circle"></i></span>
+                                    <p><strong>Lý do từ chối:</strong> @Model.RejectionReason</p>
+                                    break;
+
+                                case ApprovalStatus.PendingEdit:
+                                    <span>Đang chờ duyệt sửa <i class="fas fa-edit"></i></span>
+                                    break;
+
+                                case ApprovalStatus.Working:
+                                    <span>Đã Hoạt động <i class="fas fa-check-circle"></i></span>
+                                    break;
+
+                                case ApprovalStatus.ApprovedEdit:
+                                    <span>Đã duyệt bài sửa <i class="fas fa-check-circle"></i></span>
+                                    break;
+                                case ApprovalStatus.RejectedEdit:
+                                    <span>Từ chối bài sửa <i class="fas fa-times-circle"></i></span>
+                                    <p><strong>Lý do từ chối:</strong> @Model.RejectionReason</p>
+                                    break;
+                                case ApprovalStatus.Filled:
+                                    <span>Đã đủ số lượng tuyển <i class="fas fa-check-circle"></i></span>
+                                    break;
+                                default:
+                                    <span>Không xác định <i class="fas fa-question-circle"></i></span>
+                                    break;
+                            }
+                        </span>
+                    </p>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Apply Manrope font */
+    body {
+        font-family: 'Manrope', sans-serif;
+    }
+
+    h1, h2, h3 {
+        font-family: 'Manrope', sans-serif;
+    }
+
+    /* Custom Container Width */
+    .custom-container {
+        max-width: 1200px;
+        padding-left: 15px;
+        padding-right: 15px;
+        margin: 0 auto;
+    }
+
+    /* Universal Color */
+    .custom-header, .text-highlight {
+        background-color: #343a40;
+        color: white;
+    }
+
+    .job-title {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #C3171C;
+    }
+
+    .job-category {
+        font-size: 1.2rem;
+        color: #6c757d;
+    }
+
+    .status-approved {
+        color: #28a745;
+    }
+
+    .status-rejected {
+        color: #dc3545;
+    }
+
+    .status-pending {
+        color: #ffc107;
+    }
+
+    .status-pending-edit {
+        color: #17a2b8;
+    }
+
+    .status-approved-edit {
+        color: #28a745;
+    }
+
+    .status-rejected-edit {
+        color: #dc3545;
+    }
+
+    .status-filled {
+        color: #6c757d;
+    }
+
+
+    /* Card and List Styling */
+    .card {
+        border: none;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .card-header {
+        font-weight: bold;
+        font-size: 1.1rem;
+        padding: 0.75rem 1.25rem;
+    }
+
+    .card-body {
+        padding: 1.25rem;
+        font-size: 1rem;
+        line-height: 1.5;
+    }
+
+        /* List Style */
+        .card-body ul, .card-body ol {
+            padding-left: 1.5rem;
+            margin: 0;
+        }
+
+        .card-body li {
+            margin-bottom: 0.5rem;
+        }
+
+    /* Shadows */
+    .shadow {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+</style>
+
+
+
+
+
+

@@ -1,0 +1,447 @@
+﻿@model EmployerDashboardViewModel
+@{
+    Layout = null; // Loại bỏ Layout cho trang này
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employer Dashboard | DNTU | JOBS</title>
+    <link rel="icon" href="~/jd.png" type="image/x-icon">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome CDN -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="/js/jquery-3.3.1.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+
+    <!-- CSS Styles -->
+    <link rel="stylesheet" href="~/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/css/font-awesome.min.css">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container-fluid {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            padding: 0;
+            margin: 0;
+            margin-left: 0;
+            margin-right: 0;
+            padding-right: 0;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: #343a40;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            transition: width 0.3s;
+            position: relative;
+            height: 100%;
+        }
+
+            .sidebar form {
+                margin-top: auto;
+            }
+        .sidebar .user-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .sidebar .user-info img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+            object-fit: cover;
+        }
+
+            .sidebar ul li {
+                margin: 15px 0;
+                position: relative; /* Để có thể sử dụng pseudo-element */
+                padding-bottom: 10px;
+            }
+
+                .sidebar ul li::after {
+                    content: ''; /* Tạo ra một pseudo-element */
+                    position: absolute;
+                    bottom: 0; /* Đặt ở dưới cùng của mỗi mục */
+                    left: 0;
+                    width: 100%; /* Chiều rộng 100% */
+                    height: 2px; /* Độ dày của "border" */
+                    background: linear-gradient(to right, #A9A9A9, #2F4F4F); /* Gradient màu cam sang đỏ */
+                }
+
+                .sidebar ul li a {
+                    text-decoration: none; /* Loại bỏ gạch chân */
+                    color: #ffffff;
+                    display: flex;
+                    align-items: center;
+                    padding: 10px 15px;
+                    border-radius: 5px;
+                    transition: background 0.3s, transform 0.2s;
+                }
+
+                    .sidebar ul li a:hover,
+                    .sidebar ul li.active a {
+                        background: #C82333;
+                        transform: scale(1.05);
+                        color: #ffffff;
+                        text-decoration: none; /* Đảm bảo không có gạch chân khi hover */
+                    }
+
+            .sidebar ul {
+                list-style-type: none; /* Loại bỏ dấu chấm (marker) mặc định */
+                padding: 0;
+            }
+
+                .sidebar ul li {
+                    margin: 15px 0;
+                    position: relative; /* Để có thể sử dụng pseudo-element */
+                    padding-bottom: 10px;
+                }
+
+                    
+
+
+        .sidebar ul li a i {
+            margin-right: 10px;
+        }
+
+        /* Nút Logout */
+        form button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(45deg, #dc3545, #c82333); /* Tạo gradient tương tự */
+            color: white;
+            border: 2px solid transparent; /* Viền mặc định là trong suốt */
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.3s ease-in-out, box-shadow 0.3s ease, border-color 0.3s ease; /* Thêm border-color vào transition */
+            margin-top: 20px;
+        }
+
+            form button:hover {
+                background: linear-gradient(45deg, #23272b, #343A40); /* Đảo ngược gradient khi hover */
+                color: #fff; /* Đảm bảo màu chữ vẫn trắng khi hover */
+                transform: scale(1.05); /* Tăng kích thước nút một chút khi hover */
+                box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2); /* Đổ bóng mạnh hơn khi hover */
+                border-color: #DB3545; /* Màu border khi hover */
+                text-decoration: none;
+            }
+
+
+        .iframe-container {
+            flex: 1;
+            padding: 20px;
+            background: #ffffff;
+            overflow-y: auto;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin-left: 20px;
+            position: relative;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out; /* Điều chỉnh hiệu ứng fade */
+        }
+
+        /* Khi iframe đã được tải xong, set opacity = 1 */
+        .iframe-container.loaded {
+            opacity: 1;
+        }
+
+        .sidebar-toggle {
+            display: none;
+        }
+        @@media (max-width: 991px) {
+        .sidebar {
+            width: 0;
+            position: fixed;
+            height: 100%;
+            z-index: 1000;
+            overflow: hidden; 
+            display: none; 
+        }
+
+        .sidebar.open {
+            width: 250px;
+            display: block;
+        }
+
+        .sidebar-toggle {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 24px;
+            color: #343A40;
+            cursor: pointer;
+            z-index: 1001;
+            display: block;
+        }
+
+        /* Thay đổi màu của icon toggle khi sidebar mở */
+        .sidebar.open + .iframe-container {
+            margin-left: 250px;
+        }
+
+        /* Thay đổi màu của icon toggle khi sidebar mở */
+        .sidebar.open + .iframe-container .sidebar-toggle {
+            color: #fff;
+        }
+
+        .iframe-container {
+            margin-left: 0;
+            transition: margin-left 0.3s ease;
+        }
+
+        .iframe-container.with-sidebar {
+            margin-left: 250px;
+        }
+
+        .sidebar ul li a {
+            font-size: 14px;
+            padding: 10px;
+        }
+
+        .sidebar ul {
+            flex-grow: 1;
+        }
+    }
+
+        .sidebar ul li a i {
+            background: linear-gradient(to right, #C0C0C0, #F5F5F5);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            transition: background 0.3s ease;
+            font-size : 20px;
+        }
+
+        /* Khi mục li có lớp active, thay đổi gradient của icon */
+        .sidebar ul li.active a i {
+            color: white;
+        }
+
+        .sidebar .sidebar-bottom-buttons {
+            margin-top: auto; /* Tự động đẩy các nút xuống dưới cùng */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .view-home-button {
+            display: inline-block;
+            padding: 12px 25px;
+            font-size: 16px;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            background: linear-gradient(45deg, #28a745, #218838);
+            color: white;
+            border: 2px solid transparent; 
+            width: 100%; 
+            transition: all 0.3s ease-in-out; 
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
+        }
+
+            .view-home-button:hover {
+                background: linear-gradient(45deg, #23272b, #343A40);
+                color: #fff; /* Đảm bảo màu chữ vẫn trắng khi hover */
+                transform: scale(1.05); /* Tăng kích thước nút một chút khi hover */
+                box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2); /* Đổ bóng mạnh hơn khi hover */
+                border-color: #DB3545; /* Màu border khi hover */
+                text-decoration:none;
+            }
+
+
+        .badge-danger {
+            background-color: #dc3545;
+            color: #fff;
+            font-size: 12px;
+            padding: 5px 8px;
+            border-radius: 50%;
+            margin-left: 10px;
+        }
+
+
+
+
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <!-- User Info Section -->
+            <div class="user-info">
+                @if (Model.EmployerPhoto != null && Model.EmployerPhoto.Length > 0)
+                {
+                    <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.EmployerPhoto)" alt="Employer Photo" />
+                }
+                else
+                {
+                    <img src="~/img/default-avatar.png" alt="Default Avatar" />
+                }
+                <h4 style="text-align:center">Hello, @Model.EmployerName</h4>
+            </div>
+
+            <!-- Sidebar Links -->
+            <ul>
+                <li><a href="/Employer/EmployerProfile/Index?iframe=true" target="iframe"><i class="fas fa-user-circle"></i> Thông tin cá nhân</a></li>
+                <li data-notification-type="JobPost">
+                    <a href="/Employer/JobPost/Index?iframe=true" target="iframe">
+                        <i class="fas fa-briefcase"></i> Quản lý công việc
+                        @if (ViewBag.UnreadJobPostNotifications > 0)
+                        {
+                            <span class="badge badge-danger">@ViewBag.UnreadJobPostNotifications</span>
+                        }
+                    </a>
+                </li>
+                <li data-notification-type="JobApplication">
+                    <a href="/Employer/EmployerManageApplication/Index?iframe=true" target="iframe">
+                        <i class="fas fa-list-alt"></i> Quản lý đơn xin việc
+                        @if (ViewBag.UnreadApplicationNotifications > 0)
+                        {
+                            <span class="badge badge-danger">@ViewBag.UnreadApplicationNotifications</span>
+                        }
+                    </a>
+                </li>
+                <li data-notification-type="ChatMessages">
+                    <a href="/User/UserChat/Index?iframe=true" target="iframe">
+                        <i class="fas fa-comment-dots"></i> Tin nhắn
+                        @if (ViewBag.UnreadChatMessages > 0)
+                        {
+                            <span class="badge badge-danger">@ViewBag.UnreadChatMessages</span>
+                        }
+                    </a>
+                </li>
+            </ul>
+
+
+
+            <!-- Logout Button -->
+            <div class="sidebar-bottom-buttons">
+                <!-- "Xem trang chính" button -->
+                <a asp-area="User" asp-controller="UserJob" asp-action="Index" class="view-home-button">Xem trang chính</a>
+
+                <!-- Logout Button -->
+                <form asp-action="Logout" method="post">
+                    <button type="submit" class="button">Logout</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Sidebar Toggle Button -->
+        <i class="fas fa-bars sidebar-toggle" id="sidebar-toggle"></i>
+
+        <!-- Main Content (iframe) -->
+        <div class="iframe-container">
+            <iframe id="myIframe" name="iframe" style="width: 100%; height: calc(100% - 60px); border: none; border-radius: 8px;" src="/Admin/DashBoard/Index"></iframe>
+        </div>
+    </div>
+
+    <script src="~/js/jquery-3.3.1.min.js"></script>
+    <script src="~/js/bootstrap.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var sidebarItems = document.querySelectorAll(".sidebar ul li");
+            sidebarItems.forEach(item => {
+                item.addEventListener("click", function () {
+                    sidebarItems.forEach(i => i.classList.remove("active"));
+                    item.classList.add("active");
+
+                    // Fade-in animation for iframe content
+                    var iframeContainer = document.querySelector(".iframe-container");
+                    iframeContainer.classList.remove("loaded"); // Hide iframe
+                    setTimeout(function () {
+                        iframeContainer.classList.add("loaded"); // Show iframe with fade-in
+                    }, 200); // Delay for smooth transition
+                });
+            });
+
+            // Toggle sidebar
+            var sidebarToggle = document.getElementById("sidebar-toggle");
+            var sidebar = document.querySelector(".sidebar");
+            var iframeContainer = document.querySelector(".iframe-container");
+
+            sidebarToggle.addEventListener("click", function () {
+                sidebar.classList.toggle("open"); // Mở hoặc đóng sidebar
+                iframeContainer.classList.toggle("with-sidebar"); // Di chuyển nội dung iframe khi sidebar mở
+
+                // Change the icon color based on the sidebar state
+                if (sidebar.classList.contains("open")) {
+                    sidebarToggle.style.color = "#fff"; // White icon when sidebar is open
+                } else {
+                    sidebarToggle.style.color = "#343A40"; // Default icon color
+                }
+            });
+        });
+
+       
+
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Lắng nghe sự kiện khi bấm vào các mục trong sidebar
+        document.querySelectorAll(".sidebar ul li").forEach(function (item) {
+            item.addEventListener("click", function () {
+                var type = this.getAttribute("data-notification-type"); // Get notification type
+                var badge = this.querySelector(".badge-danger"); // Get badge element
+
+                // If the badge exists, hide it
+                if (badge) {
+                    badge.style.display = "none";
+                }
+
+                // Send a request to mark notifications as read
+                if (type === "JobPost") {
+                    markNotificationsAsRead("/Employer/EmployerDashboard/MarkJobPostNotificationsAsRead");
+                } else if (type === "JobApplication") {
+                    markNotificationsAsRead("/Employer/EmployerDashboard/MarkApplicationNotificationsAsRead");
+                } else if (type === "ChatMessages") {
+                    markNotificationsAsRead("/Employer/EmployerDashboard/MarkChatMessagesAsRead");
+                }
+            });
+        });
+
+        // Hàm đánh dấu thông báo đã đọc
+        function markNotificationsAsRead(url) {
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('input[name="__RequestVerificationToken"]').value
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Additional actions if needed
+                    }
+                })
+                .catch(error => console.error('Error marking notifications as read:', error));
+        }
+    });
+</script>
+
+
+</body>
+</html>

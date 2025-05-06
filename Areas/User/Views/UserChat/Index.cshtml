@@ -1,0 +1,2524 @@
+﻿@model DNTU_JOBS.ViewModel.UserChatViewModel
+@* @{
+    Layout = null;
+} *@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.13.216/pdf_viewer.min.css">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.13.216/pdf.min.js"></script>
+
+
+
+    <title>User Chat Room</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        section {
+            height: 100%;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: transparent;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #3498db, #9b59b6, #f1c40f, #2ecc71, #e74c3c, #34495e);
+            padding: 20px;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 1300px;
+            height: 90vh;
+            background-color: #fff;
+            border-radius: 20px;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.1);
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Sidebar - user list */
+        .user-list {
+            width: 30%;
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            border-radius: 20px 0 0 20px;
+        }
+
+            .user-list .search-box {
+                margin-bottom: 20px;
+            }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 30px;
+            border: none;
+            outline: none;
+            font-size: 1rem;
+            background-color: #34495e;
+            color: #ecf0f1;
+        }
+
+            .search-box input::placeholder {
+                color: #bdc3c7;
+            }
+
+        .users {
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+            .users ul {
+                list-style: none;
+            }
+
+            .users li {
+                display: flex;
+                align-items: center;
+                margin-bottom: 15px;
+                padding: 10px;
+                border-radius: 15px;
+                cursor: pointer;
+                transition: background 0.3s ease;
+            }
+
+                .users li:hover {
+                    background-color: #16a085;
+                }
+
+            .users img {
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                object-fit: cover;
+                margin-right: 15px;
+            }
+
+            .users p {
+                margin: 0;
+            }
+
+            .users .user-name {
+                font-weight: bold;
+                font-size: 1.2rem;
+            }
+
+            .users .last-message {
+                font-size: 0.9rem;
+                color: #bdc3c7;
+            }
+
+        /* Chat content area */
+        .chat-content {
+            width: 70%;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            background-color: #f7f9fc;
+        }
+
+            .chat-content .chat-header {
+                font-weight: bold;
+                font-size: 1.5rem;
+                color: #2c3e50;
+                margin-bottom: 20px;
+            }
+
+        .messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 10px;
+            margin-bottom: 20px;
+        }
+
+            .messages .message {
+                margin-bottom: 20px;
+                display: flex;
+                align-items: flex-end;
+                padding: 10px;
+                transition: transform 0.2s ease;
+            }
+
+                .messages .message:hover {
+                    transform: scale(1.02);
+                }
+
+        .message.received .message-bubble {
+            background-color: #dfe6e9;
+            border-radius: 15px 15px 15px 0;
+            padding: 15px;
+            /* color: #2d3436; */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .message.sent .message-bubble {
+            background-color: #0984e3;
+            color: white;
+            border-radius: 15px 15px 0 15px;
+            padding: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .message-bubble {
+            max-width: 65%;
+            word-wrap: break-word;
+        }
+
+        /* Chat footer */
+        .chat-footer input {
+            flex-grow: 1;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 20px;
+            background-color: #e0e0e5; /* Màu nền cho input xám nhẹ */
+            color: #333; /* Màu chữ đậm */
+            margin: 0 10px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+            .chat-footer input::placeholder {
+                color: #999; /* Màu placeholder nhạt hơn */
+            }
+
+        .chat-footer button {
+            background: none;
+            border: none;
+            color: #333; /* Màu nút xám đậm */
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .chat-footer .send-button {
+            background-color: #4db6ac; /* Màu xanh ngọc cho nút gửi */
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease;
+        }
+
+            .chat-footer .send-button:hover {
+                background-color: #009688; /* Xanh đậm hơn khi hover */
+            }
+
+        .chat-footer .attach-button,
+        .chat-footer .emoji-button {
+            color: #666; /* Màu icon xám đậm */
+            padding: 10px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+            .chat-footer .attach-button:hover,
+            .chat-footer .emoji-button:hover {
+                color: #333; /* Màu icon khi hover */
+            }
+
+        .users ul li:hover {
+            background-color: #34495e;
+            box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        
+
+
+
+        .emoji-picker {
+            background-color: #ffffff; 
+            border-radius: 15px; /* Bo góc mềm mại */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); /* Bóng đổ tinh tế */
+            padding: 15px; /* Khoảng cách bên trong */
+            max-width: 400px; /* Độ rộng tối đa */
+            width: 100%; /* Độ rộng đầy đủ */
+            z-index: 10000; /* Đảm bảo luôn nổi trên các phần tử khác */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Tùy chỉnh cho phần header của emoji picker */
+        .emoji-picker__header {
+            font-size: 18px;
+            font-weight: bold;
+            color: #3498db;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        /* Tùy chỉnh phần danh mục emoji */
+        .emoji-picker__categories {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            width: 100%;
+            padding: 0 10px;
+        }
+
+        /* Mỗi danh mục emoji */
+        .emoji-picker__category {
+            cursor: pointer;
+            font-size: 18px;
+            color: #bdc3c7;
+            transition: color 0.3s ease;
+        }
+
+            .emoji-picker__category:hover {
+                color: #2ecc71; /* Hiệu ứng hover */
+            }
+
+        /* Vùng hiển thị các emoji */
+        .emoji-picker__emojis {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+            gap: 10px;
+            padding: 10px;
+            justify-content: center;
+        }
+
+            /* Tùy chỉnh từng emoji */
+            .emoji-picker__emojis .emoji {
+                font-size: 24px;
+                cursor: pointer;
+                transition: transform 0.2s ease, background-color 0.2s ease;
+            }
+
+                .emoji-picker__emojis .emoji:hover {
+                    background-color: #ecf0f1;
+                    border-radius: 50%; /* Hiệu ứng khi hover làm mềm emoji */
+                    transform: scale(1.2); /* Phóng to emoji khi hover */
+                    padding: 5px;
+                }
+
+            /* Tùy chỉnh thanh cuộn cho emoji */
+            .emoji-picker__emojis::-webkit-scrollbar {
+                width: 8px;
+            }
+
+            .emoji-picker__emojis::-webkit-scrollbar-thumb {
+                background-color: #95a5a6; /* Màu của thanh cuộn */
+                border-radius: 10px;
+            }
+
+                .emoji-picker__emojis::-webkit-scrollbar-thumb:hover {
+                    background-color: #7f8c8d;
+                }
+
+        /* Tùy chỉnh container của ô tìm kiếm */
+        .emoji-picker__search-container {
+            width: 100%;
+            padding: 8px 15px;
+            background-color: #ecf0f1; /* Màu nền mềm mại */
+            border-radius: 30px; /* Bo góc thanh tìm kiếm */
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1); /* Bóng đổ nhẹ */
+            border: 1px solid #bdc3c7; /* Đường viền nhẹ */
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+            /* Tùy chỉnh input bên trong ô tìm kiếm */
+            .emoji-picker__search-container input {
+                flex-grow: 1;
+                padding: 10px;
+                border: none; /* Xóa đường viền mặc định */
+                outline: none; /* Xóa outline khi focus */
+                background-color: transparent; /* Nền trong suốt */
+                font-size: 16px;
+                color: #2c3e50; /* Màu chữ tối dễ đọc */
+            }
+
+                /* Placeholder của input */
+                .emoji-picker__search-container input::placeholder {
+                    color: #7f8c8d; /* Màu placeholder tinh tế */
+                }
+
+            /* Icon tìm kiếm bên trong ô tìm kiếm */
+            .emoji-picker__search-container .emoji-picker__search-icon {
+                font-size: 18px;
+                color: #95a5a6;
+                margin-right: 10px;
+            }
+
+            /* Hiệu ứng khi hover vào ô tìm kiếm */
+            .emoji-picker__search-container:hover {
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            }
+
+            /* Khi người dùng focus vào ô tìm kiếm */
+            .emoji-picker__search-container input:focus {
+                border: none;
+            }
+
+            /* Khi người dùng nhập văn bản, đổi màu icon tìm kiếm */
+            .emoji-picker__search-container input:not(:placeholder-shown) + .emoji-picker__search-icon {
+                color: #3498db; /* Màu của icon khi có văn bản */
+            }
+
+        .emoji-picker__preview {
+            display: none;
+        }
+
+        /* Thiết lập font và font-size cho tin nhắn đã tải và tin nhắn gửi */
+        .message-bubble p {
+            font-family: 'Poppins', sans-serif; /* Đảm bảo dùng cùng font với toàn bộ trang */
+            font-size: 1rem; /* Kích thước chữ chuẩn */
+            /* color: #333; /* Màu chữ chuẩn */ */
+            margin: 0; /* Loại bỏ khoảng cách mặc định */
+        }
+
+        /* Kích thước chữ cho phần thời gian gửi */
+        .message-bubble .small {
+            font-size: 0.75rem;
+            /* color: #999; */
+        }
+
+        .chat-footer {
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            background-color: #f5f7fa;
+            border-radius: 30px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 100%;
+        }
+
+        #image-preview {
+            display: none;
+            position: relative;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .image-item {
+            position: relative;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        #image-preview img {
+            width: 70px;
+            height: 70px;
+        }
+
+        .preview-img {
+            width: 70px;
+            height: 70px;
+            border-radius: 10px;
+            object-fit: cover;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .image-item:hover .trash-icon {
+            opacity: 1;
+        }
+
+        .image-item:hover .preview-img {
+            opacity: 0.6; /* Làm mờ hình ảnh khi hover */
+        }
+
+        #trash-icon {
+            position: relative; /* Thay đổi thành absolute */
+            top: -19px; /* Điều chỉnh vị trí dọc */
+            right: 22px; /* Điều chỉnh vị trí ngang */
+            color: #AD0514;
+            font-size: 20px;
+            cursor: pointer;
+            opacity: 0; /* Mặc định ẩn */
+            transition: opacity 0.3s ease; /* Thêm hiệu ứng chuyển đổi */
+        }
+
+
+
+        #modal {
+            display: none; 
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 180px;
+            top: 40px;
+            width: 80%; /* Giảm chiều rộng modal */
+            height: 93%; /* Giảm chiều cao modal */
+            overflow: hidden; /* Ẩn thanh cuộn */
+            background-color: rgba(0, 0, 0, 1);
+            justify-content: center;
+            align-items: center;
+        }
+
+        #modal-content {
+            position: relative;
+            width: 100%; /* Đặt chiều rộng của nội dung modal */
+            height: 100%; /* Đặt chiều cao của nội dung modal */
+        }
+
+            #modal-content img {
+                width: 100%; /* Chiếm đầy chiều rộng của modal nội dung */
+                height: auto; /* Đặt chiều cao tự động */
+                max-height: 100%; /* Đảm bảo chiều cao không vượt quá chiều cao của modal */
+                object-fit: contain; /* Giữ tỷ lệ và làm hình ảnh vừa với khung mà không bị cắt */
+                border-radius: 10px; /* Bo góc cho hình ảnh */
+            }
+
+        .close-button {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            padding: 5px 10px;
+            font-size: 16px;
+        }
+
+        .attach-button, .emoji-button, .send-button {
+            background: none;
+            border: none;
+            color: #7f8c8d;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        input[type="text"] {
+            flex-grow: 1;
+            padding: 10px 15px;
+            border-radius: 20px;
+            border: 1px solid #ddd;
+            background-color: #f0f2f5;
+        }
+
+        .send-button {
+            background-color: #26a69a;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+            .send-button:hover {
+                background-color: #1b8078;
+            }
+
+        .emoji-button i, .attach-button i {
+            color: #7f8c8d;
+        }
+
+        
+
+
+
+#modal-file .btn {
+    padding: 6px 10px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+
+#modal-file h5 {
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#pdf-canvas {
+    border-radius: 5px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+        .unread-badge {
+            background-color: #e74c3c !important; /* Màu đỏ nổi bật */
+            color: white;
+            font-size: 0.85rem;
+            padding: 5px 10px;
+            border-radius: 20px; /* Bo tròn để phù hợp với thiết kế */
+            transition: background-color 0.3s ease; /* Hiệu ứng mượt */
+        }
+
+        .sidebar-toggle {
+            display: none; /* Mặc định ẩn */
+        }
+               /* For tablet screens */
+/* For mobile and tablet */
+        @@media screen and (max-width: 768px) {
+            .chat-container {
+                position: relative;
+                display: flex;
+                flex-direction: column;
+                height: 100vh;
+                max-width: 768px;
+                margin: 0 auto;
+                box-sizing: border-box;
+            }
+
+            .chat-header {
+                margin-left: 60px;
+                margin-top: 5px;
+            }
+            /* Sidebar icon for mobile/tablet */
+            .sidebar-toggle {
+                display: block;
+                background-color: #1abc9c;
+                color: #fff;
+                border: none;
+                border-radius: 8px;
+                padding: 10px 15px;
+                cursor: pointer;
+                position: absolute;
+                top: 15px;
+                left: 15px;
+                z-index: 100;
+                box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+                font-size: 1.2rem;
+                transition: all 0.3s ease;
+            }
+
+                .sidebar-toggle:hover {
+                    background-color: #16a085;
+                    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.3);
+                    transform: scale(1.1);
+                }
+
+            .user-list {
+                display: none;
+                background-color: #34495e;
+                padding: 10px;
+                border-radius: 8px;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 250px;
+                height: 100%;
+                z-index: 50;
+                box-shadow: 2px 0px 10px rgba(0, 0, 0, 0.5);
+
+
+            }
+
+            .users li {
+                height: 130px;
+            }
+
+                .user-list .users img {
+                    width: 40px;
+                    height: 40px;
+                    margin-top: 100px;
+                }
+
+            .chat-content {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                overflow-y: auto;
+                padding: 10px;
+                background-color: #f9f9f9;
+                width:100%;
+            }
+
+            .messages {
+                flex: 1;
+                overflow-y: auto;
+                margin-bottom: 10px;
+            }
+            /* Chat footer */
+            .chat-footer {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 10px;
+                background-color: #fff;
+                border-top: 1px solid #ddd;
+                box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.1);
+                border-radius: 10px 10px 10px 10px;
+            }
+
+                .chat-footer input[type="text"] {
+                    flex-grow: 1;
+                    padding: 10px;
+                    border-radius: 25px;
+                    border: 1px solid #ddd;
+                    margin-right: 10px;
+                }
+
+                .chat-footer button {
+                    flex-shrink: 0;
+                    margin-left: 5px;
+                }
+
+            .user-list.show {
+                display: block;
+            }
+
+            .chat-content.shifted {
+                margin-left: 250px;
+            }
+
+            .user-list input {
+                margin-top: 80px;
+            }
+        }
+
+        /* For very small screens (phones) */
+        @@media screen and (max-width: 480px) {
+            .chat-container {
+                padding: 10px;
+            }
+
+            .chat-footer {
+                flex-direction: row;
+                align-items: center;
+                padding: 5px;
+            }
+
+                .chat-footer input[type="text"] {
+                    margin-right: 5px;
+                    width: calc(100% - 100px);
+                }
+
+            .chat-content {
+                height: auto;
+                padding-bottom: 10px;
+            }
+
+            .messages {
+                padding: 10px;
+                margin-bottom: 10px;
+            }
+        }
+
+        .message-text,
+        .message-file {
+            word-wrap: break-word; /* Bắt buộc xuống dòng khi từ quá dài */
+            word-break: break-word; /* Phá từ nếu không có khoảng trắng */
+            white-space: normal; /* Đảm bảo xuống dòng tự nhiên */
+            max-width: 250px; /* Giới hạn chiều rộng khung tin nhắn */
+            overflow-wrap: break-word; /* Xử lý xuống dòng cho các đoạn văn bản dài */
+            font-size: 1rem;
+            line-height: 1.5; /* Tăng khoảng cách giữa các dòng để dễ đọc */
+            text-align: left; /* Căn chỉnh nội dung tin nhắn */
+        }
+
+        /* Styles for file container */
+        .file-container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 8px; /* Khoảng cách giữa biểu tượng và tên tệp */
+            padding: 10px;
+            background-color: #E0E0E0;
+            border-radius: 8px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05);
+            max-width: 250px; /* Giới hạn chiều rộng */
+            word-break: break-word; /* Phá từ nếu quá dài */
+            text-align: left; /* Căn chỉnh nội dung */
+        }
+
+            /* Nếu muốn hỗ trợ thêm icon */
+            .file-container i {
+                flex-shrink: 0; /* Đảm bảo biểu tượng không bị co */
+                font-size: 20px; /* Kích thước biểu tượng */
+            }
+
+        /* Tên tệp */
+        .file-name {
+            flex-grow: 1;
+            overflow: hidden;
+            text-overflow: ellipsis; /* Hiển thị dấu "..." nếu quá dài */
+            white-space: nowrap; /* Không cho xuống dòng */
+        }
+
+
+        .employer-item {
+    background-color: #34495e; /* Màu nền tối vừa phải */
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease-in-out;
+    position: relative;
+}
+
+.employer-item:hover {
+    background-color: #1abc9c; /* Màu hover sáng hơn */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.employer-item .avatar {
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.badge-dot {
+    width: 12px;
+    height: 12px;
+    
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
+
+.more-options-btn,
+.delete-chat-btn {
+    color: white;
+    background-color: transparent;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.badge-dot:active {
+    outline: none; /* Nếu cần */
+}
+.more-options-btn:focus,
+.more-options-btn:active {
+    outline: none;      /* Xóa khung viền */
+    border: none;       /* Xóa border (nếu có) */
+    box-shadow: none;   /* Xóa box-shadow (nếu có) */
+}
+.more-options-btn:hover,
+.delete-chat-btn:hover {
+    opacity: 0.7;
+}
+
+.delete-chat-btn {
+    display: none;
+    position: absolute;
+    top: -18px;
+    left: 0;
+
+    font-size: 16px;
+}
+/* .fa-trash-alt:before {
+    content: "\f2ed";
+    position: absolute;
+    top: -16px;
+    left: -10px;
+} */
+
+.message-container {
+    position: relative;
+    max-width: 80%;
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
+    transition: all 0.3s ease-in-out;
+}
+
+.message-container.user-message {
+    justify-content: flex-end;
+}
+
+.message-container .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.05);
+}
+
+.message-container .content {
+    display: flex;
+    flex-direction: column;
+    margin-left: 10px;
+    margin-right: 10px;
+    align-items: flex-start;
+}
+
+.message-container.user-message .content {
+    align-items: flex-end;
+}
+
+.message-container .message-text {
+    background-color: #f1f1f1;
+    border-radius: 20px;
+    padding: 10px;
+    max-width: 80%;
+    font-size: 14px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    word-wrap: break-word;
+    word-break: break-word;
+    white-space: normal;
+}
+
+.message-container.user-message .message-text {
+    background-color: #007bff;
+    color: white;
+}
+
+.message-container .message-time {
+    font-size: 0.75rem;
+    color: #7f8c8d;
+    margin-top: 5px;
+}
+
+.message-container .message-image {
+    max-width: 200px;
+    border-radius: 10px;
+    margin: 5px 0;
+    cursor: pointer;
+    box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.message-container .file-link {
+    display: flex;
+    align-items: center;
+    max-width: 250px;
+    background-color: #f9f9f9;
+    padding: 8px 10px;
+    border-radius: 10px;
+    color: #333;
+    text-decoration: none;
+}
+
+.message-container .file-link i {
+    margin-right: 10px;
+}
+
+.message-container .delete-btn {
+    cursor: pointer;
+    color: #e74c3c;
+    font-size: 18px;
+    position: absolute;
+    top: 5px;
+    right: 10px;
+}
+
+.message-container .delete-btn:hover {
+    color: #c0392b;
+}
+
+
+
+
+/* Hiển thị ba chấm khi hover vào toàn bộ vùng tin nhắn (bao gồm cả phần tin nhắn và ba chấm) */
+.message-wrapper:hover .three-dots {
+    display: block;
+}
+
+/* Hiển thị menu khi nhấp vào ba chấm */
+.three-dots.active .dropdown-menu {
+    display: block;
+}
+
+/* Điều chỉnh kích thước của nút Recall để tự động điều chỉnh với nội dung */
+.dropdown-item {
+    width: fit-content;
+    padding: 5px 10px;
+    text-decoration: none;
+    color: #e74c3c;
+    display: flex;
+    align-items: center;
+}
+
+/* Nút recall sẽ có kích thước tự động và hiển thị icon */
+.dropdown-item i {
+    margin-right: 5px;
+}
+
+/* Khi hover vào item trong menu dropdown */
+.dropdown-item:hover {
+    background-color: #f8f8f8;
+}
+
+        .fa-ellipsis-v:before {
+            content: "\f142";
+            position: absolute;
+            left: 16px;
+        }
+
+        .fa-trash-alt:before {
+            content: "\f2ed";
+            position: absolute;
+            bottom: 30px;
+        }
+
+
+
+    </style>
+</head>
+<body>
+    
+    <section>
+        <div class="chat-container">
+            <!-- Sidebar icon (visible only on mobile/tablet) -->
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-bars"></i> <!-- Sidebar icon -->
+            </button>
+
+            <!-- Employer List Sidebar (hidden by default) -->
+            <div class="user-list" id="userList">
+                <div class="search-box">
+                    <input type="text" placeholder="Tìm kiếm ..." style="color:#000" >
+                </div>
+                <div class="users mt-3">
+                    <ul id="employer-list" style="list-style-type: none; padding: 0;">
+                        <!-- Danh sách nhà tuyển dụng sẽ được tải vào đây -->
+                    </ul>
+                </div>
+            </div>
+
+
+            <!-- Chat Content Area -->
+            <div class="chat-content">
+                <div class="chat-header">
+                    <span id="chat-header-text">Chat room</span>
+                    <small id="user-status" style="margin-left: 10px; color: gray;">Loading...</small>
+                </div>
+                <div class="messages" id="chat-content">
+                    <!-- Tin nhắn sẽ được tải vào đây -->
+                </div>
+                <div class="chat-footer">
+                    <div id="image-preview" style="display: none;">
+                        <img id="preview-img" src="" alt="Image Preview">
+                        <i id="trash-icon" class="fa-solid fa-trash"></i>
+                    </div>
+
+                    <div style="display: flex; align-items: center;">
+                        <input type="file" id="imageUpload" style="display: none;" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" multiple>
+
+                        <button id="attachButton" class="attach-button">
+                            <i class="fas fa-paperclip"></i>
+                        </button>
+
+                        <input type="text" id="chatMessage" placeholder="Type your message...">
+
+                        <button class="emoji-button">
+                            <i class="far fa-smile"></i>
+                        </button>
+
+                        <button id="sendMessageButton" class="send-button">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <div id="modal" style="display: none; position: fixed; top: 10%; left: 10%; width: 80%; height: 80%; background: #fff; z-index: 1000; border-radius: 8px; box-shadow: 0px 0px 10px rgba(0,0,0,0.2);">
+        <div id="modal-content" style="position: relative; height: 100%; display: flex; justify-content: center; align-items: center;">
+            <button class="close-button" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 1.5rem; color: #333; cursor: pointer;">&times;</button>
+            <img id="modal-img" src="" alt="Enlarged Image" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+        </div>
+    </div>
+
+
+    <!-- Modal để hiển thị file -->
+<div id="modal-file" style="display: none; position: fixed; top: 5%; left: 5%; width: 90%; height: 90%; background: #fff; z-index: 1000; border-radius: 8px; box-shadow: 0px 0px 10px rgba(0,0,0,0.2);">
+    <div style="padding: 10px; display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; border-bottom: 1px solid #ddd;">
+        <h5 style="margin: 0;"><i class="fas fa-file-pdf text-danger"></i> PDF Viewer</h5>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <button id="prev-page" class="btn btn-light btn-sm" title="Previous Page">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button id="next-page" class="btn btn-light btn-sm" title="Next Page">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <span style="font-size: 0.9rem;">
+                <i class="fas fa-file-alt"></i> <span id="current-page"></span> / <span id="total-pages"></span>
+            </span>
+            <button id="zoom-in" class="btn btn-light btn-sm" title="Zoom In">
+                <i class="fas fa-search-plus"></i>
+            </button>
+            <button id="zoom-out" class="btn btn-light btn-sm" title="Zoom Out">
+                <i class="fas fa-search-minus"></i>
+            </button>
+            <a id="download-pdf" href="#" class="btn btn-light btn-sm" download title="Download PDF">
+                <i class="fas fa-download"></i>
+            </a>
+            <button class="btn btn-light btn-sm" onclick="$('#modal-file').fadeOut();" title="Close">
+                <i class="fas fa-times text-danger"></i>
+            </button>
+        </div>
+    </div>
+    <div id="modal-file-content" style="height: calc(100% - 50px); overflow: auto; display: flex; justify-content: center; align-items: center;">
+        <div id="pdf-scroll-container" style="position: relative; overflow: auto; height: 100%; width: 100%;">
+            <canvas id="pdf-canvas" style="border: 1px solid #ccc; display: block; margin: 0 auto;"></canvas>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+    <!-- FontAwesome for icons -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/emoji-button@latest/dist/index.min.js"></script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.0/signalr.min.js"></script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.13.216/pdf.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.13.216/pdf_viewer.min.css">
+
+
+
+
+
+
+<script>
+        $(document).ready(function () {
+            // Toggle sidebar visibility when the sidebar icon is clicked
+            $('#sidebarToggle').on('click', function () {
+                var userList = $('#userList');
+                var chatContent = $('.chat-content');
+
+                // Toggle the sidebar visibility
+                userList.toggleClass('show');
+
+                // Shift chat content when sidebar is opened
+                if (userList.hasClass('show')) {
+                    chatContent.addClass('shifted');
+                } else {
+                    chatContent.removeClass('shifted');
+                }
+            });
+
+            // Close sidebar if clicked outside of the sidebar (optional behavior)
+            $(document).click(function (event) {
+                if (!$(event.target).closest('.user-list, #sidebarToggle').length) {
+                    $('.user-list').removeClass('show');
+                    $('.chat-content').removeClass('shifted');
+                }
+            });
+
+            // Close sidebar when a user is clicked
+            $('.user-list').on('click', 'li', function () {
+                // Add your logic here if you want to handle user selection
+
+                // Close the sidebar
+                $('#userList').removeClass('show');
+                $('.chat-content').removeClass('shifted');
+            });
+        });
+
+
+    </script>
+
+
+    <script>
+        $(document).ready(function () {
+            const connection = new signalR.HubConnectionBuilder().withUrl("/ChatHub").build();
+            let activeUserId = null;
+            function setActiveUser(userId) {
+                activeUserId = userId;
+                console.log("Active user set to:", activeUserId);
+            }
+            
+
+        // Bắt đầu kết nối với ChatHub
+        connection.start()
+            .then(() => {
+                console.log("Connected to SignalR for User");
+            })
+            .catch(err => {
+                console.error("SignalR Connection Error for User:", err);
+            });
+
+
+
+
+            connection.on("UpdateUnreadCount", function (receiverId) {
+            if (activeEmployerId === null || activeEmployerId !== receiverId) {
+                console.log("New message received, updating unread badge for:", receiverId);
+
+                var employerItem = $(`.employer-item[data-employer-id="${receiverId}"]`);
+                var unreadBadge = employerItem.find('.unread-badge');
+
+                if (employerItem.length) {
+                    if (unreadBadge.length) {
+                        var currentUnreadCount = parseInt(unreadBadge.text(), 10) || 0;
+                        unreadBadge.text(currentUnreadCount + 1).show();
+                    } else {
+                        employerItem.append(`
+                            <span class="badge bg-danger rounded-pill unread-badge" style="font-size: 0.85rem; padding: 5px 10px;">1</span>
+                        `);
+                    }
+
+                    // Đưa employer với tin nhắn mới lên đầu danh sách
+                    var employerList = $('#employer-list');
+                    employerList.prepend(employerItem);  // Đưa employerItem lên đầu
+                }
+            } else {
+                console.log("Message received for active user, no unread badge updated.");
+            }
+        });
+
+
+
+
+
+
+
+            connection.off("ReceiveMessage"); // Xóa sự kiện cũ để tránh trùng lặp
+            connection.on("ReceiveMessage", function (data) {
+                var employerItem = $(`.employer-item[data-employer-id="${data.senderId}"]`);
+                var lastMessage = employerItem.find('.last-message');
+                var unreadBadge = employerItem.find('.unread-badge');
+
+                // Kiểm tra nếu user đang ở trạng thái active
+                if (activeEmployerId === data.senderId) {
+                    displayReceivedMessage(data);
+                    markMessagesAsRead(data.senderId);
+                } else {
+                    lastMessage.text(data.message || "Tin nhắn mới");
+
+                    // Cập nhật badge tin nhắn chưa đọc
+                    if (unreadBadge.length) {
+                        var currentUnreadCount = parseInt(unreadBadge.text(), 10) || 0;
+                        unreadBadge.text(currentUnreadCount + 1).addClass('unread-badge').show();
+                    } else {
+                        employerItem.append(`
+                            <span class="badge bg-danger rounded-pill unread-badge" style="font-size: 0.85rem; padding: 5px 10px;">1</span>
+                        `);
+                    }
+
+                    // Đưa employer với tin nhắn mới lên đầu danh sách
+                    var employerList = $('#employer-list');
+                    employerList.prepend(employerItem);  // Đưa employerItem lên đầu
+                }
+            });
+
+
+
+            connection.on("UpdateUserStatus", function (status) {
+                console.log("Received status update:", status);  
+                const userId = status.UserId;
+                const isOnline = status.IsOnline;
+                const minutesAgo = status.MinutesAgo;
+
+                const statusElement = $(`.user-status[data-user-id="${userId}"]`);
+
+                if (statusElement.length) {
+                    if (isOnline) {
+                        statusElement.text("Online").css("color", "green");
+                    } else if (minutesAgo !== null) {
+                        statusElement.text(`Last active ${minutesAgo} minute${minutesAgo > 1 ? "s" : ""} ago`).css("color", "gray");
+                    } else {
+                        statusElement.text("Offline").css("color", "gray");
+                    }
+                } else {
+                    console.log("No element found for userId:", userId);  
+                }
+            });
+
+
+
+
+
+
+            function updateUserStatus(userId) {
+                $.get(`/api/ChatApi/GetUserStatus/${userId}`, function (data) {
+                    const isOnline = data.isOnline;
+                    const lastActivity = data.lastActivity ? new Date(data.lastActivity) : null; 
+                    const statusElement = $('#user-status'); 
+
+                    if (isOnline) {
+                        statusElement.text("Online").css("color", "green");
+                    } else if (lastActivity) {
+                        const now = new Date(); 
+                        const minutesAgo = Math.floor((now - lastActivity) / 60000); 
+
+                        let displayText = '';
+                        if (minutesAgo >= 60) {
+                            const hoursAgo = Math.floor(minutesAgo / 60); 
+                            displayText = `${hoursAgo} hour${hoursAgo > 1 ? 's' : ''} ago`;
+                        } else {
+                            displayText = `${minutesAgo} minute${minutesAgo > 1 ? 's' : ''} ago`;
+                        }
+
+                        statusElement.text(displayText).css("color", "gray");
+                    } else {
+                        statusElement.text("Offline").css("color", "gray");
+                    }
+                }).fail(function () {
+                    $('#user-status').text("Offline").css("color", "gray");
+                });
+            }
+
+
+
+
+
+
+
+
+
+
+function displayReceivedMessage(data, isMarkUnRead = false) {
+    var chatBox = $('#chat-content');
+    var isSenderUser = data.senderId === userId;
+    var sentAt = new Date(data.sentAt).toLocaleTimeString();
+
+    // Tạo container chính cho tin nhắn
+    var messageContainer = $('<div>')
+        .addClass(`message-container ${isSenderUser ? 'user-message' : ''}`)
+        .attr('data-sender-id', data.senderId);
+
+    // Avatar của người gửi
+    var avatarSrc = data.avatar || '/img/logo/default-avatar.png'; 
+
+    // Nội dung chính (tin nhắn văn bản, hình ảnh hoặc file)
+    var messageContent = ''; 
+
+    // Nếu có tin nhắn văn bản
+    if (data.message && data.message.trim() !== '') {
+        messageContent += `
+            <p class="small p-3 ${isSenderUser ? 'me-3' : 'ms-3'} mb-1 rounded-4"
+               style="background-color: ${isSenderUser ? '#E0E0E0' : '#FFFFFF'};
+                      color: #333;
+                      box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05);
+                      max-width: 250px;
+                      font-size: 1rem;
+                      border-radius: 20px;
+                      text-align: ${isSenderUser ? 'right' : 'left'};
+                      overflow-wrap: break-word; 
+                      word-break: break-word;   
+                      white-space: normal;">   
+                ${data.message}
+            </p>`;
+    }
+
+    // Xử lý hình ảnh nếu có
+    if (data.imageUrls && data.imageUrls.length > 0) {
+        data.imageUrls.forEach(function (imageUrl) {
+            messageContent += `
+                <div class="p-3 ${isSenderUser ? 'me-3' : 'ms-3'} mb-1">
+                    <img src="${imageUrl}" alt="Image" class="message-image" style="max-width: 200px; border-radius: 10px; box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.1); cursor: pointer;">
+                </div>`;
+        });
+
+        // Thêm sự kiện mở modal cho ảnh
+        setTimeout(() => {
+            $('.message-image').off('click').on('click', function () {
+                var src = $(this).attr('src');
+                if (src) {
+                    $('#modal-img').attr('src', src);
+                    $('#modal').fadeIn();
+                }
+            });
+        }, 0);
+    }
+
+    // Hiển thị file nếu có
+    if (data.fileUrls && data.fileUrls.length > 0) {
+        data.fileUrls.forEach(function (file) {
+            var iconHtml = '';
+            var actionHtml = ''; // This will hold the action to be performed for each file
+
+            // Determine the file type and create the corresponding icon and action
+            switch (file.fileType) {
+                case 'application/pdf':
+                    iconHtml = '<i class="fas fa-file-pdf" style="font-size: 20px; color: #e74c3c;"></i>';
+                    actionHtml = `<button class="btn btn-link" onclick="viewPDF('${file.url}')"
+                    style="text-decoration: none; color: #3498db; white-space: normal; word-break: break-word; max-width: 200px; text-align: left;">
+                    ${iconHtml} ${file.fileName}
+                  </button>`;
+                    break;
+
+                case 'application/msword':
+                case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+                    iconHtml = '<i class="fas fa-file-word" style="font-size: 20px; color: #3498db;"></i>';
+                    actionHtml = `<button class="btn btn-link" onclick="viewDocument('${file.url}')"
+                    style="text-decoration: none; color: #3498db; white-space: normal; word-break: break-word; max-width: 200px; text-align: left;">
+                    ${iconHtml} ${file.fileName}
+                  </button>`;
+                    break;
+
+                case 'application/vnd.ms-excel':
+                case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+                    iconHtml = '<i class="fas fa-file-excel" style="font-size: 20px; color: #27ae60;"></i>';
+                    actionHtml = `<button class="btn btn-link" onclick="viewDocument('${file.url}')"
+                    style="text-decoration: none; color: #27ae60; white-space: normal; word-break: break-word; max-width: 200px; text-align: left;">
+                    ${iconHtml} ${file.fileName}
+                  </button>`;
+                    break;
+
+                default:
+                    iconHtml = '<i class="fas fa-file" style="font-size: 20px; color: #7f8c8d;"></i>';
+                    actionHtml = `<a href="${file.url}" target="_blank"
+                    style="text-decoration: none; color: #3498db; white-space: normal; word-break: break-word; max-width: 200px; text-align: left;">
+                    ${iconHtml} ${file.fileName || 'Download File'}
+                  </a>`;
+            }
+
+            // Append the file action to the message content
+            messageContent += `
+            <p class="small p-3 ${isSenderUser ? 'me-3' : 'ms-3'} mb-1 rounded-4"
+               style="background-color: ${isSenderUser ? '#E0E0E0' : '#FFFFFF'}; color: #333;
+                      box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05); max-width: 250px;
+                      font-size: 1rem; border-radius:20px; text-align: ${isSenderUser ? 'right' : 'left'};">
+                ${actionHtml}
+            </p>`;
+        });
+    }
+
+    // Gắn avatar và nội dung tin nhắn vào container
+    if (isSenderUser) {
+        messageContainer.append(`
+            <div class="d-flex flex-row-reverse align-items-center">
+                <img src="${avatarSrc}" alt="avatar" class="rounded-circle" style="width: 40px; height: 40px; border: 2px solid #fff; box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.05);">
+                <div class="d-flex flex-column align-items-end" style="margin-right: 15px;">
+                    ${messageContent}
+                    <p class="small text-muted me-3 mb-0" style="font-size: 0.75rem;">${sentAt}</p>
+                </div>
+            </div>
+        `);
+    } else {
+        messageContainer.append(`
+            <div class="d-flex flex-row align-items-center">
+                <img src="${avatarSrc}" alt="avatar" class="rounded-circle" style="width: 40px; height: 40px; border: 2px solid #fff; box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.05);">
+                <div class="d-flex flex-column align-items-start" style="margin-left: 15px;">
+                    ${messageContent}
+                    <p class="small text-muted ms-3 mb-0" style="font-size: 0.75rem;">${sentAt}</p>
+                </div>
+            </div>
+        `);
+    }
+
+    // Đặt tin nhắn chưa đọc ở cuối của các tin nhắn đã đọc
+    if (isMarkUnRead) {
+        const senderMessages = chatBox.find(`.message-container[data-sender-id="${data.senderId}"]`);
+        if (senderMessages.length > 0) {
+            senderMessages.last().after(messageContainer);
+        } else {
+            chatBox.append(messageContainer);
+        }
+    } else {
+        // Đảm bảo tin nhắn mới được thêm vào cuối danh sách
+        chatBox.append(messageContainer);
+    }
+
+    // Cuộn xuống cuối khi có tin nhắn mới
+    chatBox.scrollTop(chatBox.prop("scrollHeight"));
+}
+
+
+
+
+
+
+            var userId = '@Model.ApplicationUserId';  
+
+            $('#chatMessage').on('keypress', function (e) {
+                if (e.which === 13 && !e.shiftKey) { 
+                    e.preventDefault(); // Prevent default newline behavior
+                    $('#sendMessageButton').click(); // Trigger the send button click event
+                }
+            });
+
+            var selectedFiles = []; // Tạm lưu trữ ảnh khi người dùng chọn
+
+            // Mở file picker khi nhấn nút attach
+            var selectedFiles = []; // Tạm lưu trữ ảnh khi người dùng chọn
+
+            // Mở file picker khi nhấn nút attach
+            $('#attachButton').on('click', function () {
+                $('#imageUpload').click();
+            });
+
+            // Display selected image preview
+            // Xử lý sự kiện khi chọn ảnh
+            $('#imageUpload').on('change', function (event) {
+                var files = event.target.files;
+
+                // Clear existing previews and selected files array
+                $('#image-preview').empty();
+                selectedFiles = [];
+
+                if (files.length > 0) {
+                    // Show the image preview section if there are files
+                    $('#image-preview').show();
+
+                    for (var i = 0; i < files.length; i++) {
+                        selectedFiles.push(files[i]);
+                        var file = files[i];
+                        var reader = new FileReader();
+
+                        // Use FileReader to display image preview or file icon
+                        reader.onload = (function (file) {
+                            return function (e) {
+                                var previewElement = '';
+
+                                // Determine the file type and create appropriate HTML
+                                if (file.type.startsWith('image/')) {
+                                    // If it's an image file, display it as an image
+                                    previewElement = `
+                                            <div class="image-item" style="position: relative; display: inline-block;">
+                                                <img src="${e.target.result}" class="preview-img" alt="Image Preview" style="width: 70px; height: 70px; border-radius: 10px; object-fit: cover; cursor: pointer;">
+                                                <i class="fa-solid fa-trash trash-icon" style="position: absolute; top: 5px; right: 5px; color: #AD0514; font-size: 18px; cursor: pointer; display: none;"></i>
+                                            </div>`;
+                                } else {
+                                    // If it's a non-image file, display its name and icon
+                                    var iconHtml = '';
+                                    switch (file.type) {
+                                        case 'application/pdf':
+                                            iconHtml = '<i class="fas fa-file-pdf" style="font-size: 40px; color: #e74c3c;"></i>';
+                                            break;
+                                        case 'application/msword':
+                                        case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+                                            iconHtml = '<i class="fas fa-file-word" style="font-size: 40px; color: #3498db;"></i>';
+                                            break;
+                                        case 'application/vnd.ms-excel':
+                                        case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+                                            iconHtml = '<i class="fas fa-file-excel" style="font-size: 40px; color: #27ae60;"></i>';
+                                            break;
+                                        default:
+                                            iconHtml = '<i class="fas fa-file" style="font-size: 40px; color: #7f8c8d;"></i>';
+                                    }
+
+                                    previewElement = `
+                                            <div class="image-item" style="position: relative; display: inline-block;">
+                                                <div style="display: flex; align-items: center;">
+                                                    ${iconHtml}
+                                                    <span style="margin-left: 10px;">${file.name}</span>
+                                                </div>
+                                                <i class="fa-solid fa-trash trash-icon" style="position: absolute; top: 5px; right: 5px; color: #AD0514; font-size: 18px; cursor: pointer; display: none;"></i>
+                                            </div>`;
+                                }
+
+                                $('#image-preview').append(previewElement);
+                            };
+                        })(file);
+                        reader.readAsDataURL(file);
+                    }
+                } else {
+                    // Hide the image preview section if no files are selected
+                    $('#image-preview').hide();
+                }
+            });
+
+            // Show trash icon on hover and hide it when not hovering
+            $('#image-preview').on('mouseenter', '.image-item', function () {
+                $(this).find('.trash-icon').show();
+            });
+
+            $('#image-preview').on('mouseleave', '.image-item', function () {
+                $(this).find('.trash-icon').hide();
+            });
+
+            // Handle trash icon click to remove the image
+            $('#image-preview').on('click', '.trash-icon', function () {
+                var index = $(this).closest('.image-item').index();
+                selectedFiles.splice(index, 1); // Remove the image from the array
+                $(this).closest('.image-item').remove(); // Remove the image preview from the DOM
+
+                // Reset the file input to allow re-selection of images
+                $('#imageUpload').val('');
+
+                // Hide the image preview section if no more images are left
+                if (selectedFiles.length === 0) {
+                    $('#image-preview').hide();
+                }
+            });
+
+            // Handle image click to enlarge it in a modal
+            $('#image-preview').on('click', '.preview-img', function () {
+                var src = $(this).attr('src'); // Get the image source
+                $('#modal-img').attr('src', src); // Set the modal image source
+                $('#modal').fadeIn(); // Show the modal
+            });
+
+            // Close modal on button click
+            $('.close-button').on('click', function () {
+                $('#modal').fadeOut(); // Hide the modal
+            });
+            // Close modal when clicking outside the modal content
+            $(window).on('click', function (event) {
+                if ($(event.target).is('#modal')) {
+                    $('#modal').fadeOut(); // Hide the modal
+                }
+            });
+
+
+            loadEmployerList();
+
+            const emojiButton = document.querySelector('.emoji-button');
+            const chatMessageInput = document.querySelector('#chatMessage');
+
+            // Khởi tạo Emoji Picker với tùy chọn theme và hàng/columns của emoji
+            const picker = new EmojiButton({
+                theme: 'light',
+                position: 'top-end',
+                autoHide: false,
+                rows: 6,
+                emojisPerRow: 8,
+                zIndex: 10000,
+                search: true,
+                searchPlaceholder: 'Tìm kiếm emoji...',
+            });
+
+
+            let isPickerVisible = false;
+
+            // Hiển thị hoặc ẩn Emoji Picker khi nhấn vào nút emoji
+            emojiButton.addEventListener('click', () => {
+                if (isPickerVisible) {
+                    picker.hidePicker();
+                } else {
+                    picker.showPicker(emojiButton); 
+                }
+                isPickerVisible = !isPickerVisible; // Đảo ngược trạng thái
+            });
+
+            // Khi chọn emoji, chỉ thêm vào input chat mà không đóng picker
+            picker.on('emoji', emoji => {
+                chatMessageInput.value += emoji;
+            });
+
+            // Ngăn không cho picker tự đóng khi nhấn vào input để gõ tin nhắn
+            chatMessageInput.addEventListener('mousedown', function (event) {
+                event.stopPropagation(); // Ngăn sự kiện lan truyền và ảnh hưởng tới picker
+            });
+
+            // Đóng picker khi nhấn ra ngoài khu vực picker
+            document.addEventListener('click', function (event) {
+                if (isPickerVisible && !event.target.closest('.emoji-button') && !event.target.closest('.emoji-picker')) {
+                    picker.hidePicker();
+                    isPickerVisible = false; // Cập nhật trạng thái khi picker bị ẩn
+                }
+            });
+            let activeEmployerId = null;
+            // Function to load employer list
+           function loadEmployerList() {
+                $.get('/api/ChatApi/GetEmployersForUser', function (employers) {
+                    var employerList = $('#employer-list');
+                    employerList.empty();  // Xóa danh sách cũ
+
+                    // Sắp xếp danh sách employer theo thời gian tin nhắn mới nhất
+                    employers.sort(function (a, b) {
+                        var timeA = a.lastMessageTime ? new Date(a.lastMessageTime) : new Date(0);
+                        var timeB = b.lastMessageTime ? new Date(b.lastMessageTime) : new Date(0);
+                        return timeB - timeA;  // Sắp xếp giảm dần theo thời gian
+                    });
+
+                    // Duyệt qua từng employer và hiển thị
+                    employers.forEach(function (employer) {
+                        var unreadBadge = employer.unreadMessages > 0
+                            ? `<span class="badge bg-danger rounded-pill unread-badge" style="font-size: 0.85rem; padding: 5px 10px;">${employer.unreadMessages}</span>`
+                            : '';
+
+                        employerList.append(`
+                            <li class="employer-item" data-employer-id="${employer.id}">
+                                <div class="d-flex justify-content-between align-items-center w-100">
+                                    <div class="d-flex align-items-center">
+                                        <div class="position-relative me-3">
+                                            <img src="${employer.photo}" alt="avatar" class="avatar">
+                                            <span class="badge bg-success badge-dot position-absolute"></span>
+                                        </div>
+                                        <div class="pt-1">
+                                            <p class="fw-bold mb-0" style="color: white;">${employer.name}</p>
+                                            <p class="small text-muted mb-0 last-message" style="color: #bdc3c7;">Nhấp để xem tin nhắn...</p>
+                                        </div>
+                                    </div>
+                                    <div class="position-relative">
+                                        ${unreadBadge}
+                                        <!-- Ba dấu chấm -->
+                                        <button class="more-options-btn">
+                                            <i class="fas fa-ellipsis-h"></i> <!-- Dấu ba chấm -->
+                                        </button>
+                                        <!-- Nút Xóa (Thùng rác) -->
+                                        <button class="delete-chat-btn">
+                                            <i class="fas fa-trash-alt"></i> <!-- Biểu tượng thùng rác -->
+                                        </button>
+                                    </div>
+                                </div>
+                            </li>
+                        `);
+                    });
+
+                    $('.delete-chat-btn').on('click', function (event) {
+                        event.stopPropagation();  
+
+                        var employerItem = $(this).closest('.employer-item');
+                        var employerId = employerItem.data('employer-id');
+
+                        $.ajax({
+                        url: `/api/ChatApi/DeleteChatHistory?employerId=${employerId}`, 
+                        type: 'DELETE',
+                        success: function (response) {
+                            employerItem.remove();
+                            alert('Chat history deleted successfully');
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("Error deleting chat history: " + error);
+                            alert("Error deleting chat history: " + xhr.responseText);
+                        }
+                    });
+
+
+                    });
+
+                    $('.employer-item').on('click', function (event) {
+                        if ($(event.target).closest('.delete-chat-btn').length > 0) {
+                            return; 
+                        }
+
+                        var employerId = $(this).data('employer-id');
+                        var employerName = $(this).find('.fw-bold').text();
+
+                        $('#chat-header-text').text(employerName);
+
+                        loadMessages(employerId);
+
+                        markMessagesAsRead(employerId);
+
+
+                        $(this).find('.unread-badge').remove();
+
+                        $(this).find('.last-message').text('');
+
+                        $('.employer-item').css('background-color', '#34495e');
+                        $(this).css('background-color', '#2980b9');
+
+                        activeEmployerId = employerId;
+
+                        updateUserStatus(employerId);
+                    });
+
+                    $('.more-options-btn').on('click', function (event) {
+                        event.stopPropagation();
+
+                        var deleteBtn = $(this).next('.delete-chat-btn');
+
+                        if (deleteBtn.is(':visible')) {
+                            deleteBtn.hide();
+                        } else {
+                            $('.delete-chat-btn').hide();
+                            deleteBtn.show();
+                        }
+                    });
+
+                }).fail(function (xhr, status, error) {
+                    console.error("Error loading employer list: " + status);
+                    alert("Error loading employer list: " + xhr.responseText);
+                });
+            }
+
+
+
+            $('.search-box input').on('input', function () {
+                var searchValue = $(this).val().toLowerCase(); // Lấy giá trị tìm kiếm và chuyển về chữ thường
+                $('#employer-list li').each(function () {
+                    var employerName = $(this).find('.fw-bold').text().toLowerCase(); // Lấy tên nhà tuyển dụng
+                    if (employerName.includes(searchValue)) {
+                        $(this).show(); // Hiển thị nếu khớp
+                    } else {
+                        $(this).hide(); // Ẩn nếu không khớp
+                    }
+                });
+            });
+
+
+            function markMessagesAsRead(employerId) {
+                $.post(`/api/ChatApi/MarkMessagesAsRead/${employerId}`, function () {
+                    console.log("Marked all messages as read.");
+
+                    // Xóa badge tin nhắn chưa đọc
+                    var employerItem = $(`.employer-item[data-employer-id="${employerId}"]`);
+                    if (employerItem.length) {
+                        employerItem.find('.unread-badge').text('').removeClass('unread-badge').hide();
+                    }
+                }).fail(function (xhr, status, error) {
+                    console.error("Error marking messages as read: " + status);
+                });
+            }
+
+
+
+
+            function recallFile(fileId) {
+                if (typeof fileId !== 'number' || fileId <= 0) {
+                    console.error("Invalid FileId:", fileId);
+                    alert('Có lỗi khi thu hồi tệp: ID không hợp lệ');
+                    return;
+                }
+
+                $.ajax({
+                    type: "POST",
+                    url: "/api/ChatApi/RecallFile",
+                    data: JSON.stringify({ FileId: fileId }),
+                    contentType: "application/json",
+                    success: function (response) {
+                        console.log("File recalled successfully:", response);
+
+                        var fileElement = $(`[data-file-id="${response.fileId}"]`).closest('.file-wrapper');
+                        if (fileElement.length > 0) {
+                            fileElement.find('p').text('Tệp đã được thu hồi');
+                            fileElement.css({
+                                color: '#B5B5B5', 
+                                fontStyle: 'italic',
+                            });
+                            recallMessage.css({
+                                color: '#B5B5B5',  
+                                fontStyle: 'italic',
+                            });
+
+                            // Xóa menu ba chấm
+                            fileElement.find('.three-dots').remove();
+                        }
+
+                        // alert('Tệp đã được thu hồi!');
+                    },
+                    error: function (xhr, status, error) {
+                        console.log("Error recalling file:", xhr.responseText);
+                        alert('Có lỗi khi thu hồi tệp');
+                    }
+                });
+            }
+
+            function recallMessage(messageId) {
+                if (!messageId) {
+                    console.error("Invalid MessageId:", messageId);
+                    alert('Có lỗi khi thu hồi tin nhắn: ID không hợp lệ');
+                    return;
+                }
+
+                $.ajax({
+                    type: "POST",
+                    url: "/api/ChatApi/RecallMessage",
+                    data: JSON.stringify({ MessageId: messageId }),
+                    contentType: "application/json",
+                    success: function (response) {
+                        console.log("Message recalled successfully:", response);
+
+                        // Tìm phần tử tin nhắn theo messageId
+                        var messageElement = $(`[data-message-id="${messageId}"]`).closest('.message-wrapper');
+                        if (messageElement.length > 0) {
+                            // Thay đổi nội dung tin nhắn thành "Tin nhắn đã được thu hồi"
+                            messageElement.find('p').text('Tin nhắn đã được thu hồi');
+                            messageElement.find('p').css({
+                                color: '#B5B5B5',   // Màu xám nhạt
+                                fontStyle: 'italic' // Chữ nghiêng
+                            });
+
+                            // Xóa menu ba chấm (nếu cần)
+                            messageElement.find('.three-dots').remove();
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error recalling message:", xhr.responseText);
+                        alert('Có lỗi khi thu hồi tin nhắn');
+                    }
+                });
+            }
+
+
+
+
+            function recallImage(imageId) {
+                // Kiểm tra giá trị của imageId trước khi gửi
+                if (typeof imageId !== 'number' || imageId <= 0) {
+                    console.error("Invalid ImageId:", imageId);
+                    alert('Có lỗi khi thu hồi hình ảnh: ID không hợp lệ');
+                    return;
+                }
+
+                $.ajax({
+                    type: "POST",
+                    url: "/api/ChatApi/RecallImage", // API endpoint để thu hồi hình ảnh
+                    data: JSON.stringify({ ImageId: imageId }),
+                    contentType: "application/json",
+                    success: function (response) {
+                        console.log("Image recalled successfully:", response);
+
+                        // Tìm phần tử hình ảnh trong giao diện và cập nhật nội dung
+                        var imageElement = $(`[data-image-id="${response.imageId}"]`).closest('.image-wrapper');
+                        if (imageElement.length > 0) {
+                            // Ẩn hình ảnh
+                            imageElement.find('.message-image').hide();
+
+                            // Tạo một khung (box) xung quanh thông báo "Ảnh đã được thu hồi" tương tự như recall message
+                            var recallMessage = $('<p class="small p-3 text-muted" style="font-style: italic; box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05); max-width: 250px; font-size: 1rem; border-radius: 20px; background-color: #E0E0E0;">Tin nhắn được thu hồi</p>');
+
+                            // Thêm khung này vào phần tử
+                            imageElement.append(recallMessage);
+
+                            // Thay đổi màu sắc và kiểu chữ
+                            recallMessage.css({
+                                color: '#B5B5B5',   // Màu xám cho thông báo thu hồi
+                                fontStyle: 'italic', // In nghiêng cho thông báo thu hồi
+                            });
+
+                            // Thêm alert (tùy chọn)
+                            // alert('Ảnh đã được thu hồi!');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.log("Error recalling image:", xhr.responseText);
+                        alert('Có lỗi khi thu hồi hình ảnh');
+                    }
+                });
+            }
+
+
+
+
+
+
+
+            function loadMessages(employerId) {
+                console.log("Loading messages for employer: " + employerId);
+                $.get('/api/ChatApi/GetMessageForUser/' + employerId, function (messages) {
+                    console.log(messages);
+
+                    var chatBox = $('#chat-content');
+                    chatBox.empty();  // Clear the chat box before appending new messages
+
+                    if (messages.length === 0) {
+                        chatBox.append('<p class="text-muted">Hãy bắt đầu tạo trò chuyện!!.</p>');
+                    }
+
+                    messages.forEach(function (message) {
+                        console.log("isRecalled: ", message.isRecalled);
+                        var isSenderUser = message.senderId === userId;  // Check if the current message is sent by the user
+                        var avatarSrc = message.avatar || '/img/logo/AdminLogo.png';  // Default avatar if not present
+                        var sentAt = new Date(message.sentAt).toLocaleTimeString();  // Format the sent time
+                        var messageContent = '';  // This will hold the message content
+                        var isRecalled = message.isRecalled === 1 || message.isRecalled === true;
+
+
+                        // Handling text content
+                        if (message.content) {
+                            messageContent += `
+                            <div class="message-wrapper" style="position: relative;">
+                                <p class="small p-3 ${isSenderUser ? 'me-3' : 'ms-3'} mb-1 rounded-4 message-bubble"
+                                   style="background-color: ${isSenderUser ? '#E0E0E0' : '#FFFFFF'};
+                                          color: ${isRecalled ? '#B5B5B5' : '#333'}; 
+                                          font-style: ${isRecalled ? 'italic' : 'normal'}; 
+                                          box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05);
+                                          max-width: 250px; font-size: 1rem; border-radius: 20px;
+                                          text-align: ${isSenderUser ? 'right' : 'left'};
+                                          overflow-wrap: break-word; word-break: break-word; white-space: normal;">
+                                    ${isRecalled ? 'Tin nhắn đã được thu hồi' : message.content}
+                                </p>
+                                ${isSenderUser && !isRecalled ? `
+                                    <div class="three-dots" style="position: absolute; top: 5px; right: 5px; cursor: pointer;">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                        <div class="dropdown-menu" style="display: none; position: absolute; right: 0; top: 20px; background: transparent; border: none; padding: 5px; min-width: fit-content;">
+                                            <button class="dropdown-item btn btn-link recall-message"
+                                                style="text-decoration: none; color: #e74c3c;"
+                                                data-message-id="${message.id}">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                ` : ''}
+                            </div>
+                            `;
+                        }
+
+
+
+
+
+
+                        // Handling image content
+                        // Handling image content
+                        if (message.images && message.images.length > 0) {
+                            message.images.forEach(function (image) {
+                                // Nếu hình ảnh đã bị thu hồi, hiển thị thông báo "Hình ảnh đã bị thu hồi"
+                                if (image.isRecalled) {
+                                    messageContent += `
+                                    <div class="image-wrapper" style="position: relative; margin-bottom: 10px;">
+                                        <p class="small p-3 ${isSenderUser ? 'me-3' : 'ms-3'} mb-1 rounded-4"
+                                           style="background-color: ${isSenderUser ? '#E0E0E0' : '#FFFFFF'}; color: #B5B5B5;
+                                                  font-style: italic; box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05); max-width: 250px;
+                                                  font-size: 1rem; border-radius: 20px; text-align: ${isSenderUser ? 'right' : 'left'};">
+                                             Tin nhắn đã được thu hồi
+                                        </p>
+                                    </div>
+                                    `;
+                                                } else {
+                                                    messageContent += `
+                                    <div class="image-wrapper" style="position: relative; margin-bottom: 10px;">
+                                        <img src="${image.imageUrl}" alt="Image" class="message-image"
+                                             style="max-width: 200px; border-radius: 10px; box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.1); cursor: pointer;">
+
+                                        ${isSenderUser && !image.isRecalled ? `
+                                        <div class="three-dots" style="position: absolute; top: 5px; right: 5px; cursor: pointer;">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                                    <div class="dropdown-menu" style="display: none; position: absolute; right: 0; top: 20px; background: transparent; border: none; padding: 5px; min-width: fit-content;">
+                                                <button class="dropdown-item btn btn-link recall-image"
+                                                        style="text-decoration: none; color: #e74c3c;"
+                                                        data-image-id="${image.id}">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        ` : ''}
+                                    </div>
+                                    `;
+                                }
+                            });
+                        }
+
+
+
+
+                        // Handling file attachments
+                        if (message.files && message.files.length > 0) {
+                            message.files.forEach(function (file) {
+                                let fileContent = '';
+
+                                // Kiểm tra xem tệp đã thu hồi chưa
+                                if (file.isRecalled) {
+                                    fileContent = `
+                                <div class="file-wrapper" style="position: relative; margin-bottom: 10px;">
+                                    <p class="small p-3 ${isSenderUser ? 'me-3' : 'ms-3'} mb-1 rounded-4"
+                                       style="background-color: ${isSenderUser ? '#E0E0E0' : '#FFFFFF'}; color: #B5B5B5;
+                                              font-style: italic; box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05); max-width: 250px;
+                                              font-size: 1rem; border-radius: 20px; text-align: ${isSenderUser ? 'right' : 'left'};">
+                                        Tin nhắn đã được thu hồi 
+                                    </p>
+                                </div>
+                                `;
+                                            } else {
+                                                let iconHtml = '';
+                                                let actionHtml = ''; // Nội dung liên kết hoặc hành động tệp
+
+                                                // Xác định loại tệp và tạo biểu tượng phù hợp
+                                                switch (file.fileType) {
+                                                    case 'application/pdf':
+                                                        iconHtml = '<i class="fas fa-file-pdf" style="font-size: 20px; color: #e74c3c;"></i>';
+                                                        actionHtml = `<button class="btn btn-link" onclick="viewPDF('${file.fileUrl}')"
+                                                                        style="text-decoration: none; color: #3498db; white-space: normal; word-break: break-word; max-width: 200px; text-align: left;">
+                                                                        ${iconHtml} ${file.fileName}
+                                                                      </button>`;
+                                                        break;
+                                                    case 'application/msword':
+                                                    case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+                                                        iconHtml = '<i class="fas fa-file-word" style="font-size: 20px; color: #3498db;"></i>';
+                                                        actionHtml = `<button class="btn btn-link" onclick="viewDocument('${file.fileUrl}')"
+                                                                        style="text-decoration: none; color: #3498db; white-space: normal; word-break: break-word; max-width: 200px; text-align: left;">
+                                                                        ${iconHtml} ${file.fileName}
+                                                                      </button>`;
+                                                        break;
+                                                    case 'application/vnd.ms-excel':
+                                                    case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+                                                        iconHtml = '<i class="fas fa-file-excel" style="font-size: 20px; color: #27ae60;"></i>'; // Icon cho Excel
+                                                        actionHtml = `<button class="btn btn-link" onclick="viewDocument('${file.fileUrl}')"
+                                                                        style="text-decoration: none; color: #27ae60; white-space: normal; word-break: break-word; max-width: 200px; text-align: left;">
+                                                                        ${iconHtml} ${file.fileName}
+                                                                      </button>`;
+                                                        break;
+                                                    default:
+                                                        iconHtml = '<i class="fas fa-file" style="font-size: 20px; color: #7f8c8d;"></i>';
+                                                        actionHtml = `<a href="${file.fileUrl}" target="_blank"
+                                                                        style="text-decoration: none; color: #3498db; white-space: normal; word-break: break-word; max-width: 200px; text-align: left;">
+                                                                        ${iconHtml} ${file.fileName || 'Download File'}
+                                                                      </a>`;
+                                                }
+
+                                                fileContent = `
+                                                            <div class="file-wrapper" style="position: relative; margin-bottom: 10px;">
+                                                                <p class="small p-3 ${isSenderUser ? 'me-3' : 'ms-3'} mb-1 rounded-4"
+                                                                   style="background-color: ${isSenderUser ? '#E0E0E0' : '#FFFFFF'}; color: #333;
+                                                                          box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05); max-width: 250px;
+                                                                          font-size: 1rem; border-radius: 20px; text-align: ${isSenderUser ? 'right' : 'left'};">
+                                                                    ${actionHtml}
+                                                                </p>
+                                                                ${isSenderUser ? `
+                                                                <div class="three-dots" style="position: absolute; top: 5px; right: 5px; cursor: pointer;">
+                                                                    <i class="fas fa-ellipsis-v"></i>
+                                                                            <div class="dropdown-menu" style="display: none; position: absolute; right: 0; top: 20px; background: transparent; border: none; padding: 5px; min-width: fit-content;">
+                                                                        <button class="dropdown-item btn btn-link recall-file"
+                                                                                style="text-decoration: none; color: #e74c3c;"
+                                                                                data-file-id="${file.id}">
+                                                                            <i class="fas fa-trash-alt"></i> 
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                                ` : ''}
+                                                            </div>
+                                                            `;
+                                                            }
+
+                                // Append nội dung tệp vào messageContent
+                                messageContent += fileContent;
+                            });
+                        }
+
+
+                        // Append the message content to the chat box
+                        if (messageContent) {
+                            chatBox.append(`
+                            <div class="d-flex flex-row justify-content-${isSenderUser ? 'end' : 'start'} mb-3">
+                                ${isSenderUser ? `
+                                <div class="d-flex flex-row-reverse align-items-center">
+                                    <img src="${avatarSrc}" alt="avatar" class="rounded-circle" style="width: 40px; height: 40px; border: 2px solid #fff; box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.05);">
+                                    <div class="d-flex flex-column align-items-end" style="margin-right: 15px;">
+                                        ${messageContent}
+                                        <p class="small text-muted me-3 mb-0" style="font-size: 0.75rem;">${sentAt}</p>
+                                    </div>
+                                </div>
+                                ` : `
+                                <div class="d-flex flex-row align-items-center">
+                                    <img src="${avatarSrc}" alt="avatar" class="rounded-circle" style="width: 40px; height: 40px; border: 2px solid #fff; box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.05);">
+                                    <div class="d-flex flex-column align-items-start" style="margin-left: 15px;">
+                                        ${messageContent}
+                                        <p class="small text-muted ms-3 mb-0" style="font-size: 0.75rem;">${sentAt}</p>
+                                    </div>
+                                </div>
+                                `}
+                            </div>
+                        `);
+                        }
+                    });
+
+                    // Event listener for image clicks
+                    $('.message-image').on('click', function () {
+                        var src = $(this).attr('src');
+                        $('#modal-img').attr('src', src);
+                        $('#modal').fadeIn();
+                    });
+
+                    // Event listener for dropdown menu
+                    $('.three-dots').on('click', function (e) {
+                        e.stopPropagation(); // Ngăn chặn sự kiện lan ra ngoài
+                        var dropdownMenu = $(this).find('.dropdown-menu');
+                        $('.dropdown-menu').not(dropdownMenu).hide(); // Ẩn các menu khác
+                        dropdownMenu.toggle();
+                    });
+
+                    // Event listener for recalling an image
+                    $('.recall-image').on('click', function () {
+                        var imageId = $(this).data('image-id');
+                        if (imageId) {
+                            recallImage(imageId);
+                        } else {
+                            console.error("Image ID is undefined or invalid");
+                            alert("Có lỗi khi thu hồi hình ảnh: ID không hợp lệ");
+                        }
+                    });
+
+                    // Event listener for recalling a file
+                    $('.recall-file').on('click', function () {
+                        var fileId = $(this).data('file-id');
+                        if (fileId) {
+                            recallFile(fileId);
+                        } else {
+                            console.error("File ID is undefined or invalid");
+                            alert("Có lỗi khi thu hồi tệp: ID không hợp lệ");
+                        }
+                    });
+
+                    // Event listener for recalling a message
+                    $('.recall-message').on('click', function () {
+                        var messageId = $(this).data('message-id');
+                        console.log("MessageId:", messageId); // Log kiểm tra giá trị
+                        if (messageId) {
+                            recallMessage(messageId);
+                        } else {
+                            console.error("Message ID is undefined or invalid");
+                            alert("Có lỗi khi thu hồi tin nhắn: ID không hợp lệ");
+                        }
+                    });
+
+
+
+
+                    chatBox.scrollTop(chatBox.prop("scrollHeight"));
+
+                }).fail(function (xhr, status, error) {
+                    console.error("Error loading messages: " + xhr.responseText);
+                    alert("Error loading messages: " + xhr.responseText);
+                });
+
+            }
+
+         // ກູ້ຄືນຂໍ້ຄວາມ
+           // Khi click vào ba chấm, toggle dropdown menu
+
+
+
+
+
+
+           
+
+
+            // Send message
+            $('#sendMessageButton').on('click', function () {
+                var message = $('#chatMessage').val().trim();
+                var employerId = activeEmployerId;
+                var userAvatar = '@Model.UserPhoto';
+
+
+
+                if (!message && selectedFiles.length === 0) {
+                    alert("Please enter a message or select an image before sending.");
+                    return;
+                }
+
+                var formData = new FormData();
+                formData.append('receiverId', employerId);
+                formData.append('message', message || '');
+
+                if (selectedFiles.length > 0) {
+                    for (var i = 0; i < selectedFiles.length; i++) {
+                        formData.append('files', selectedFiles[i]);
+                    }
+                }
+
+                $.ajax({
+                    url: '/api/ChatApi/UploadImages',
+                    method: 'POST',
+                    contentType: false,
+                    processData: false,
+                    data: formData,
+                    success: function (response) {
+                        var sentAt = new Date().toLocaleTimeString();
+                        var messageHtml = `
+                <div class="d-flex flex-row justify-content-end mb-3">
+                    <div class="d-flex flex-row-reverse align-items-center">
+                        <img src="${userAvatar}" alt="avatar" class="rounded-circle" style="width: 40px; height: 40px; border: 2px solid #fff; box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.05);">
+                        <div class="d-flex flex-column align-items-end" style="margin-right: 15px;">`;
+
+
+                        // Text message content
+                        if (response.message) {
+                            messageHtml += `
+            <div class="message-wrapper" style="position: relative;">
+                <p class="small p-3 me-3 mb-1 rounded-4"
+                    style="background-color: #E0E0E0; color: #333; box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05);
+                    max-width: 250px; font-size: 1rem; border-radius:20px; text-align: right; word-wrap: break-word;
+                    white-space: normal; overflow-wrap: break-word; word-break: break-word;">
+                    ${response.message}
+                </p>
+                <div class="three-dots" style="position: absolute; top: 5px; right: 5px; cursor: pointer;">
+                    <i class="fas fa-ellipsis-v"></i>
+                    <div class="dropdown-menu" style="display: none; position: absolute; right: 0; top: 20px; background: transparent; border: none; padding: 5px; min-width: fit-content;">
+                        <button class="dropdown-item btn btn-link recall-message" style="color: #e74c3c;"
+                            data-message-id="${response.messageId}">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>`;
+                        }
+
+
+
+                        // Display images
+                        if (response.imageUrls && response.imageUrls.length > 0) {
+                            console.log("Image URLs:", response.imageUrls);
+                            console.log("Image IDs:", response.imageIds);
+                            response.imageUrls.forEach(function (url, index) {
+                                if (response.imageIds && response.imageIds[index] !== undefined) {
+                                    console.log(`Adding image with ID: ${response.imageIds[index]}`);
+                                    messageHtml += `
+                    <div class="image-wrapper p-3 me-3 mb-1" data-image-id="${response.imageIds[index]}">
+                        <img src="${url}" alt="Image" class="message-image"
+                             style="max-width: 200px; border-radius: 10px; box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.1); cursor: pointer;">
+                        <div class="three-dots" style="position: absolute; top: 5px; right: 5px; cursor: pointer;">
+                            <i class="fas fa-ellipsis-v"></i>
+                            <div class="dropdown-menu" style="display: none; position: absolute; right: 0; top: 20px;
+                                background: white; border: 1px solid #ddd; padding: 5px; min-width: fit-content;">
+                                <button class="dropdown-item btn btn-link recall-image" style="color: #e74c3c;"
+                                    data-image-id="${response.imageIds[index]}">
+                                    <i class="fas fa-trash-alt"></i> Thu hồi
+                                </button>
+                            </div>
+                        </div>
+                    </div>`;
+                                } else {
+                                    console.warn("Missing image ID for URL:", url);
+                                }
+                            });
+                        }
+
+
+
+
+
+                        // Display non-image files
+                        response.fileUrls.forEach(function (file) {
+                        var iconHtml = '';
+                        var actionHtml = '';
+
+
+                        var isSenderUser = file.senderId === userId; // Make sure file object contains senderId or update accordingly
+
+                            switch (file.fileType) {
+                                case 'application/pdf':
+                                    iconHtml = '<i class="fas fa-file-pdf" style="font-size: 20px; color: #e74c3c;"></i>';
+                                    actionHtml = `<button class="btn btn-link" onclick="viewPDF('${file.url}')"
+                                style="display: flex; align-items: center; word-wrap: break-word;
+                                       word-break: break-word; white-space: normal; overflow-wrap: break-word;">
+                                ${iconHtml} <span style="margin-left: 10px;">${file.fileName}</span>
+                              </button>`;
+                                    break;
+                                case 'application/msword':
+                                case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+                                    iconHtml = '<i class="fas fa-file-word" style="font-size: 20px; color: #3498db;"></i>';
+                                    actionHtml = `<a href="${file.url}" download="${file.fileName}" class="btn btn-link"
+                                style="display: flex; align-items: center; word-wrap: break-word;
+                                       word-break: break-word; white-space: normal; overflow-wrap: break-word;">
+                                ${iconHtml} <span style="margin-left: 10px;">${file.fileName}</span>
+                              </a>`;
+                                    break;
+                                case 'application/vnd.ms-excel':
+                                case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+                                    iconHtml = '<i class="fas fa-file-excel" style="font-size: 20px; color: #27ae60;"></i>'; // Icon Excel
+                                    actionHtml = `<a href="${file.url}" download="${file.fileName}" class="btn btn-link"
+                                style="display: flex; align-items: center; word-wrap: break-word;
+                                       word-break: break-word; white-space: normal; overflow-wrap: break-word;">
+                                ${iconHtml} <span style="margin-left: 10px;">${file.fileName}</span>
+                              </a>`;
+                                    break;
+                                default:
+                                    iconHtml = '<i class="fas fa-file" style="font-size: 20px; color: #7f8c8d;"></i>';
+                                    actionHtml = `<a href="${file.url}" target="_blank"
+                                style="display: flex; align-items: center; word-wrap: break-word;
+                                       word-break: break-word; white-space: normal; overflow-wrap: break-word;">
+                                ${iconHtml} <span style="margin-left: 10px;">${file.fileName}</span>
+                              </a>`;
+                            }
+
+                            // Add the background color and styles to the file container
+                            messageHtml += `
+                                <div class="file-wrapper" style="position: relative;">
+                                    <p class="small p-3 me-3 mb-1 rounded-4"
+                                        style="background-color: #E0E0E0; color: #333; box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05);
+                                        max-width: 250px; font-size: 1rem; border-radius:20px; text-align: right; word-wrap: break-word;">
+                                        ${actionHtml}
+                                    </p>
+                                    <div class="three-dots" style="position: absolute; top: 5px; right: 5px; cursor: pointer;">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                                <div class="dropdown-menu" style="display: none; position: absolute; right: 0; top: 20px; background: transparent; border: none; padding: 5px; min-width: fit-content;">
+                                            <button class="dropdown-item btn btn-link recall-file" style="color: #e74c3c;"
+                                                data-file-id="${file.fileId}">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>`;
+
+
+                    });
+
+
+
+
+                        messageHtml += `
+                                    <p class="small text-muted me-3 mb-0" style="font-size: 0.75rem;">${sentAt}</p>
+                                </div>
+                            </div>`;
+
+                        // Append the message to the chat
+                        $('#chat-content').append(messageHtml);
+                        $('#chat-content').scrollTop($('#chat-content').prop("scrollHeight"));
+
+                        // Thêm sự kiện click cho nút three-dots
+                        $('.three-dots').off('click').on('click', function (e) {
+                            e.stopPropagation(); // Ngăn chặn sự kiện lan ra ngoài
+                            var dropdownMenu = $(this).find('.dropdown-menu');
+                            $('.dropdown-menu').not(dropdownMenu).hide(); // Ẩn các menu khác
+                            dropdownMenu.toggle(); // Hiển thị hoặc ẩn menu hiện tại
+                        });
+
+                        $('.recall-image').off('click').on('click', function () {
+                            var imageId = $(this).data('image-id');
+                            if (imageId) {
+                                recallImage(imageId);
+                            } else {
+                                console.error("Image ID is undefined or invalid");
+                                alert("Có lỗi khi thu hồi hình ảnh: ID không hợp lệ");
+                            }
+                        });
+
+
+                        $('.recall-message').off('click').on('click', function () {
+                            var messageId = $(this).data('message-id');
+                            if (messageId) {
+                                recallMessage(messageId);
+                            } else {
+                                console.error("Message ID is undefined or invalid");
+                                alert("Có lỗi khi thu hồi tin nhắn: ID không hợp lệ");
+                            }
+                        });
+
+
+                        // Gán sự kiện thu hồi file
+                        $('.recall-file').off('click').on('click', function () {
+                            var fileId = $(this).data('file-id');
+                            if (fileId) {
+                                recallFile(fileId);
+                            } else {
+                                console.error("File ID is undefined or invalid");
+                                alert("Có lỗi khi thu hồi tệp: ID không hợp lệ");
+                            }
+                        });
+
+                        // Add click event for images to show in modal
+                        $('.message-image').on('click', function () {
+                            var src = $(this).attr('src');
+                            $('#modal-img').attr('src', src);
+                            $('#modal').fadeIn();
+                        });
+
+                        // Clear input fields and reset file previews
+                        $('#chatMessage').val('');
+                        $('#imageUpload').val('');
+                        $('#image-preview').hide();
+                        $('#preview-img').attr('src', '');
+                        selectedFiles = [];
+
+                        
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error sending message: " + xhr.responseText);
+                        alert("Error sending message: " + xhr.responseText);
+                    }
+                });
+            });
+
+
+        });
+
+    </script>
+
+    <script>
+            function viewPDF(url) {
+    const canvas = document.getElementById('pdf-canvas');
+    const ctx = canvas.getContext('2d');
+    let pdfDoc = null;
+    let currentPage = 1;
+    let totalPages = 0;
+    let zoom = 1;
+
+    const updatePageDisplay = () => {
+        $('#current-page').text(currentPage);
+        $('#total-pages').text(totalPages);
+    };
+
+    const renderPage = (pageNum) => {
+        pdfDoc.getPage(pageNum).then((page) => {
+            const viewport = page.getViewport({ scale: zoom });
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+
+            const renderContext = {
+                canvasContext: ctx,
+                viewport: viewport
+            };
+            page.render(renderContext);
+        });
+    };
+
+    const loadingTask = pdfjsLib.getDocument(url);
+    loadingTask.promise.then((pdf) => {
+        pdfDoc = pdf;
+        totalPages = pdf.numPages;
+        updatePageDisplay();
+        renderPage(currentPage);
+    }).catch((error) => {
+        console.error("Error loading PDF:", error);
+        $('#modal-file-content').html('<p>Error loading PDF.</p>');
+    });
+
+    $('#prev-page').off('click').on('click', () => {
+        if (currentPage > 1) {
+            currentPage--;
+            renderPage(currentPage);
+            updatePageDisplay();
+        }
+    });
+
+    $('#next-page').off('click').on('click', () => {
+        if (currentPage < totalPages) {
+            currentPage++;
+            renderPage(currentPage);
+            updatePageDisplay();
+        }
+    });
+
+    $('#zoom-in').off('click').on('click', () => {
+        zoom += 0.2;
+        renderPage(currentPage);
+    });
+
+    $('#zoom-out').off('click').on('click', () => {
+        if (zoom > 0.4) {
+            zoom -= 0.2;
+            renderPage(currentPage);
+        }
+    });
+
+    $('#download-pdf').attr('href', url);
+    $('#modal-file').fadeIn();
+}
+
+
+
+
+
+
+
+       function viewDocument(url) {
+    window.location.href = url; // Tải file về máy
+}
+
+
+
+
+
+
+
+</script>
+
+</body>
+</html>

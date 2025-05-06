@@ -1,0 +1,1077 @@
+﻿@model DNTU_JOBS.ViewModel.UserProfileViewModel
+
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+<link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;700&family=Lexend:wght@400;700&family=Nunito+Sans:wght@400;700&family=Quicksand:wght@400;700&family=Manrope:wght@400;700&display=swap" rel="stylesheet">
+
+
+<style type="text/css">
+    body {
+        margin-top: 20px;
+        background-color: #f2f6fc;
+        color: #69707a;
+        font-family: 'Manrope', sans-serif;
+    }
+
+    .img-account-profile {
+        height: 10rem;
+    }
+
+    .rounded-circle {
+        border-radius: 50% !important;
+    }
+
+    .card {
+        box-shadow: 0 0.15rem 1.75rem 0 rgb(33 40 50 / 15%);
+    }
+
+        .card .card-header {
+            font-weight: 500;
+        }
+
+    .card-header:first-child {
+        border-radius: 0.35rem 0.35rem 0 0;
+    }
+
+    .nav-borders .Profile-Text {
+        cursor: pointer;
+        color: #69707a;
+        padding: 0.5rem 1rem;
+        margin-right: 1rem;
+        border-bottom: 2px solid transparent;
+        transition: color 0.3s, border-color 0.3s;
+    }
+
+        .nav-borders .Profile-Text.active {
+            color: #0061f2;
+            border-bottom-color: #0061f2;
+        }
+
+    .section-content {
+        display: none;
+    }
+
+        .section-content.active {
+            display: block;
+        }
+
+    .card-header {
+        background-color: #0061f2;
+        color: white;
+        font-weight: bold;
+        font-size: 1.2rem;
+        padding: 10px 20px;
+        border-top-left-radius: 0.25rem;
+        border-top-right-radius: 0.25rem;
+    }
+
+    /* Table Styling */
+    .table {
+        margin-bottom: 0;
+        border: 1px solid #ddd;
+    }
+
+        .table th, .table td {
+            vertical-align: middle;
+            text-align: center;
+        }
+
+    .table-hover tbody tr:hover {
+        background-color: #f7faff;
+    }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: #f9f9f9;
+    }
+
+    /* Button Styling */
+    .btn {
+        padding: 5px 10px;
+        font-size: 0.9rem;
+        margin: 2px;
+    }
+
+    .btn-sm {
+        padding: 5px 12px;
+        font-size: 0.85rem;
+    }
+
+    /* Button Colors */
+    .btn-primary {
+        background-color: #0061f2;
+        border-color: #0061f2;
+        color: white;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+        color: white;
+        margin-top:15px;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+        color: white;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+        color: white;
+    }
+
+    /* Hide elements by default */
+    /* .d-none {
+        display: none !important;
+    } */
+
+    #navigation{
+        display: none !important;
+    }
+
+
+    /* Form Styling */
+    .form-group label {
+        font-weight: 500;
+        color: #495057;
+        font-size: 1rem;
+    }
+
+    .form-group input, .form-group select {
+        border-radius: 5px;
+        padding: 10px;
+        font-size: 0.95rem;
+    }
+
+    /* Table Action Button Alignment */
+    .action-buttons {
+        display: flex;
+        justify-content: center;
+    }
+
+    /* Editing Row Highlight */
+    .editing-row {
+        background-color: #eaf2ff !important;
+    }
+
+    .container-fluid {
+        max-width: 100%;
+    }
+
+    .card {
+        border-radius: 0.5rem;
+    }
+
+    .card-header {
+        font-weight: bold;
+        font-size: 1.5rem;
+        border-radius: 0.5rem 0.5rem 0 0;
+    }
+
+    .box {
+        border: 1px solid #e0e0e0;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+        min-height: 200px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .box-title {
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: #007bff;
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .box p {
+        margin-bottom: 0.5rem;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+    .text-muted {
+        color: #6c757d !important;
+    }
+
+    .cert-box {
+        border: 1px solid #e0e0e0;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        background-color: #fff;
+    }
+
+    .cert-box-title {
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: #007bff;
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .cert-item {
+        padding: 1rem;
+        border: 1px solid #ddd;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background-color: #f9f9f9;
+        height: 100%;
+    }
+
+    .cert-number {
+        font-size: 1.2rem;
+        font-weight: bold;
+        background-color: #007bff;
+        color: white;
+        padding: 0.3rem 0.6rem;
+        border-radius: 50%;
+        display: inline-block;
+        margin-bottom: 0.5rem;
+    }
+
+    .cert-image {
+        width: 80px;
+        height: auto;
+        margin-top: 0.5rem;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .text-muted {
+        color: #6c757d !important;
+    }
+
+    .card-header {
+        background-color: #0061f2;
+        color: white;
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+
+    .table {
+        margin-bottom: 0;
+        border: 1px solid #ddd;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f7faff;
+    }
+
+    .nav {
+        display: flex;
+        align-items: center;
+    }
+
+    .reset-button {
+        margin-left: auto; 
+    }
+
+    .job-category-container {
+        width: 100%; 
+        max-height: 200px; 
+        overflow-y: auto; 
+        border: 1px solid #ddd;
+        padding: 10px; 
+        border-radius: 5px; 
+        background-color: #f9f9f9; 
+    }
+
+        .job-category-container .form-check {
+            margin-bottom: 5px; 
+        }
+
+    .security-card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .security-card-header {
+        background-color: #f8f9fa;
+        padding: 1rem;
+        font-size: 1.25rem;
+        font-weight: bold;
+    }
+
+    .security-card-body {
+        padding: 1.5rem;
+    }
+
+    /* Bố cục nội dung */
+    .security-password-reset,
+    .security-two-factor-auth {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+    }
+
+    /* Nút bấm đều nhau */
+    .security-card-body .row .btn {
+        margin-top: 10px;
+    }
+
+    /* Media Queries for Responsiveness */
+    @@media (max-width: 576px) {
+        .reset-button {
+            position: static; 
+            margin-top: 1rem; 
+            width: 100%; 
+            text-align: center; 
+        }
+    }
+</style>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+
+<div class="container-xl px-4 mt-4">
+    <nav class="nav nav-borders align-items-center">
+        <a class="Profile-Text active" onclick="showSection('profile')"><i class="fas fa-user-circle"></i> Thông tin cá nhân</a>
+        <a class="Profile-Text" onclick="showSection('saved-jobs')"><i class="fas fa-bookmark"></i> Công việc đã lưu</a>
+        <a class="Profile-Text" onclick="showSection('applications')"><i class="fas fa-briefcase"></i> Đơn xin việc</a>
+        <a class="Profile-Text" onclick="showSection('security')"><i class="fas fa-shield-alt"></i> Bảo mật</a>
+@*         <button type="button" class="btn btn-secondary ms-auto reset-button" id="resetPasswordButton">
+            <i class="fas fa-key"></i> Đặt lại mật khẩu
+        </button> *@
+    </nav>
+
+    <hr class="mt-0 mb-4">
+
+    <!-- Profile Section -->
+    <div id="profile" class="section-content active">
+        <div class="row">
+            <div class="col-xl-4">
+                <!-- Profile Picture -->
+                <div class="card mb-4">
+                    <div class="card-header"><i class="fas fa-image"></i> Ảnh đại diện</div>
+                    <div class="card-body text-center">
+                        @if (Model.Photo != null)
+                        {
+                            <img class="img-account-profile rounded-circle mb-2" src="data:image/png;base64,@(Convert.ToBase64String(Model.Photo))" alt="Ảnh đại diện" />
+                        }
+                        else
+                        {
+                            <img class="img-account-profile rounded-circle mb-2" src="/images/default-avatar.png" alt="Ảnh đại diện mặc định" />
+                        }
+                        <div class="small font-italic text-muted mb-4">Chỉ JPG hoặc PNG, kích thước tối đa 5 MB</div>
+                        <form asp-action="UploadProfileImage" method="post" enctype="multipart/form-data">
+                            <input type="file" name="uploadedImage" class="form-control mb-3" />
+                            <button class="btn btn-primary" type="submit"><i class="fas fa-upload"></i> Tải ảnh lên</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Social Links -->
+                <div class="card mb-4">
+                    <div class="card-header"><i class="fas fa-share-alt"></i> Liên kết mạng xã hội</div>
+                    <div class="card-body">
+                        <form asp-action="UpdateSocialLinks" method="post">
+                            <input type="hidden" name="Id" value="@Model.Id" />
+                            <div class="form-group mb-3">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fab fa-facebook"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" name="FacebookLink" value="@Model.FacebookLink" placeholder="Liên kết Facebook" />
+                                </div>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fab fa-twitter"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" name="TwitterLink" value="@Model.TwitterLink" placeholder="Liên kết Twitter" />
+                                </div>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fab fa-linkedin"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" name="LinkedInLink" value="@Model.LinkedInLink" placeholder="Liên kết LinkedIn" />
+                                </div>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fab fa-instagram"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" name="InstagramLink" value="@Model.InstagramLink" placeholder="Liên kết Instagram" />
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100"><i class="fas fa-save"></i> Lưu các liên kết</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Information -->
+            <div class="col-xl-8">
+                <div class="card mb-4">
+                    <div class="card-header"><i class="fas fa-user"></i> Thông tin tài khoản</div>
+                    <div class="card-body">
+                        <form asp-action="UpdateProfile" method="post">
+                            <input type="hidden" name="Id" value="@Model.Id" />
+
+                            <div class="mb-3">
+                                <label class="small mb-1" for="inputName"><i class="fas fa-user"></i> Họ và tên</label>
+                                <input class="form-control" id="inputName" name="Name" type="text" value="@Model.Name" />
+                            </div>
+
+                            <div class="row gx-3 mb-3">
+                                <div class="col-md-6">
+                                    <label class="small mb-1" for="inputEmail"><i class="fas fa-envelope"></i> Email</label>
+                                    <input class="form-control" id="inputEmail" name="Email" type="email" value="@Model.Email" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="small mb-1" for="inputPhone"><i class="fas fa-phone"></i> Số điện thoại</label>
+                                    <input class="form-control" id="inputPhone" name="Phone" type="tel" value="@Model.Phone" />
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="small mb-1" for="inputAddress"><i class="fas fa-map-marker-alt"></i> Địa chỉ</label>
+                                <input class="form-control" id="inputAddress" name="Address" type="text" value="@Model.Address" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="small mb-1" for="inputNationality"><i class="fas fa-flag"></i> Quốc tịch</label>
+                                <input class="form-control" id="inputNationality" name="Nationality" type="text" value="@Model.Nationality" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="small mb-1" for="inputGender">Giới tính</label>
+                                <select class="form-control" id="inputGender" name="Gender">
+                                    @if (Model.Gender == null)
+                                    {
+                                        <option value="" selected>Chọn giới tính</option>
+                                    }
+                                    @if (Model.Gender == Gender.Male)
+                                    {
+                                        <option value="Male" selected>Nam</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="Male">Nam</option>
+                                    }
+
+                                    @if (Model.Gender == Gender.Female)
+                                    {
+                                        <option value="Female" selected>Nữ</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="Female">Nữ</option>
+                                    }
+
+                                    @if (Model.Gender == Gender.Other)
+                                    {
+                                        <option value="Other" selected>Khác</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="Other">Khác</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="small mb-1" for="inputDateOfBirth"><i class="fas fa-birthday-cake"></i> Ngày sinh</label>
+                                <input class="form-control" id="inputDateOfBirth" name="DateOfBirth" type="date" value="@(Model.DateOfBirth?.ToString("yyyy-MM-dd"))" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="small mb-1" for="inputQualification"><i class="fas fa-graduation-cap"></i> Trình độ học vấn</label>
+                                <input class="form-control" id="inputQualification" name="Qualification" type="text" value="@Model.Qualification" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="small mb-1" for="inputDescription"><i class="fas fa-info-circle"></i> Mô tả</label>
+                                <textarea class="form-control" id="inputDescription" name="Description">@Model.Description</textarea>
+                            </div>
+
+                            <button class="btn btn-primary" type="submit"><i class="fas fa-save"></i> Lưu thay đổi</button>
+                        </form>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header"><i class="fas fa-list-alt"></i> Chọn loại công việc mong muốn </div>
+
+                        <div class="card-body">
+                            <form asp-action="UpdateUserCategories" method="post">
+                                <input type="hidden" name="userId" value="@Model.Id" />
+
+                                <div class="mb-3">
+                                    <label class="form-label">Chọn danh mục công việc</label>
+                                    <!-- Container cuộn -->
+                                    <div class="job-category-container">
+                                        @foreach (var category in (IEnumerable<JobCategoryTable>)ViewBag.JobCategories)
+                                        {
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                       id="jobCategory_@category.Id"
+                                                       name="selectedJobCategoryIds"
+                                                       value="@category.Id"
+                                                @(Model.SelectedJobCategoryIds.Contains(category.Id) ? "checked" : "") />
+                                                <label class="form-check-label" for="jobCategory_@category.Id">
+                                                    @category.CategoryName
+                                                </label>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Cập nhật</button>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="saved-jobs" class="section-content">
+        <div class="card mb-4">
+            <div class="card-header"><i class="fas fa-bookmark"></i> Công việc đã lưu</div>
+            <div class="card-body">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-briefcase"></i> Tên công việc</th>
+                            <th><i class="fas fa-building"></i> Công ty</th>
+                            <th><i class="fas fa-calendar-alt"></i> Ngày lưu</th>
+                            <th><i class="fas fa-cog"></i> Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.FavoriteJobs?.Any() == true)
+                        {
+                            @foreach (var job in Model.FavoriteJobs)
+                            {
+                                <tr>
+                                    <td>
+                                        <a href="@Url.Action("JobDetail", "UserJob", new { area = "User", id = job.Job.Id })">
+                                            @(job.Job?.JobTitle ?? "N/A")
+                                        </a>
+                                    </td>
+                                    <td>@(job.ApplicationUser?.Name ?? "Chưa cập nhật")</td>
+                                    <td>@job.AddedDate.ToString("dd/MM/yyyy")</td>
+                                    <td>
+                                        <button type="button" class="btn btn-danger btn-sm" onclick="removeFromFavorites(@job.JobId)">
+                                            <i class="fas fa-trash"></i> Xóa
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center"><i class="fas fa-info-circle"></i> Chưa có công việc nào được lưu.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="security" class="section-content">
+    <div class="security-card">
+        <div class="security-card-header text-center">
+            <i class="fas fa-user-shield"></i> Quản lý bảo mật tài khoản
+        </div>
+        <div class="security-card-body">
+            <div class="row mb-4 align-items-stretch">
+                <!-- Đặt lại mật khẩu -->
+                <div class="col-md-6 d-flex">
+                    <div class="security-password-reset flex-fill d-flex flex-column text-center">
+                        <i class="fas fa-key fa-2x mb-3 text-primary"></i>
+                        <h5>Đặt lại mật khẩu</h5>
+                        <p class="text-muted">Thay đổi mật khẩu của bạn để đảm bảo an toàn.</p>
+                    </div>
+                </div>
+
+                <!-- Xác thực hai yếu tố -->
+                <div class="col-md-6 d-flex">
+                    <div class="security-two-factor-auth flex-fill d-flex flex-column text-center">
+                        <i class="fas fa-lock fa-2x mb-3 text-warning"></i>
+                        <h5>Xác thực hai yếu tố (2FA)</h5>
+                        <p class="text-muted">Tăng cường bảo mật với xác thực hai lớp.</p>
+                        @if (Model.IsTwoFactorEnabled)
+                        {
+                            <p><i class="fas fa-check-circle text-success"></i> 2FA đã được kích hoạt.</p>
+                        }
+                        else
+                        {
+                            <p><i class="fas fa-exclamation-circle text-warning"></i> 2FA chưa được kích hoạt.</p>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row cho các nút -->
+            <div class="row">
+                <div class="col-md-6">
+                    <button type="button" class="btn btn-primary w-100" id="resetPasswordButton">
+                        <i class="fas fa-key"></i> Đặt lại mật khẩu
+                    </button>
+
+                </div>
+                <div class="col-md-6">
+                    @if (Model.IsTwoFactorEnabled)
+                    {
+                        <button class="btn btn-danger w-100" onclick="disableTwoFactorAuthentication()">
+                            <i class="fas fa-times-circle"></i> Hủy kích hoạt 2FA
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-primary w-100" onclick="setupTwoFactorAuthentication()">
+                            <i class="fas fa-shield-alt"></i> Kích hoạt 2FA
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+    <!-- Applications Section -->
+    <div id="applications" class="section-content">
+        <div class="card mb-4">
+            <div class="card-header"><i class="fas fa-clipboard-list"></i> Đơn xin việc của bạn</div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-briefcase"></i> Thông tin công việc</th>
+                            <th><i class="fas fa-building"></i> Nhà tuyển dụng</th>
+                            <th><i class="fas fa-money-bill-wave"></i> Mức lương</th>
+                            <th><i class="fas fa-calendar-alt"></i> Ngày nộp</th>
+                            <th><i class="fas fa-info-circle"></i> Trạng thái</th>
+                            <th><i class="fas fa-cog"></i> Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Applications?.Any() == true)
+                        {
+                            @foreach (var application in Model.Applications)
+                            {
+                                <tr>
+                                    <td>
+                                        <a href="@Url.Action("JobDetail", "UserJob", new { area = "User", id = application.Job.Id })">
+                                            @(application.Job?.JobTitle ?? "N/A")
+                                        </a>
+                                    </td>
+                                    <td>@(application.Job?.ApplicationUser?.Name ?? "N/A")</td>
+                                    <td>
+                                        @if (application.Job?.SalaryMin.HasValue == true && application.Job?.SalaryMax.HasValue == true)
+                                        {
+                                            @($"{application.Job.SalaryMin.Value:N0} - {application.Job.SalaryMax.Value:N0} VND")
+                                        }
+                                        else
+                                        {
+                                            <span>Chưa xác định</span>
+                                        }
+                                    </td>
+                                    <td> @application.ApplicationDate.ToString("dd/MM/yyyy")</td>
+                                    <td>
+                                        @switch (application.Status)
+                                        {
+                                            case ApplicationStatus.Pending:
+                                                <span class="text-warning"><i class="fas fa-hourglass-half"></i> Đang chờ xử lý</span>
+                                                break;
+                                            case ApplicationStatus.Accepted:
+                                                <span class="text-success"><i class="fas fa-check-circle"></i> Đã chấp nhận</span>
+                                                break;
+                                            case ApplicationStatus.Rejected:
+                                                <span class="text-danger"><i class="fas fa-times-circle"></i> Đã từ chối</span>
+                                                <p><strong>Lý do từ chối:</strong> @Model.RejectionReason</p>
+                                                break;
+                                            case ApplicationStatus.Cancelled:
+                                                <span class="text-muted"><i class="fas fa-ban"></i> Đã hủy</span>
+                                                break;
+                                            default:
+                                                <span>Không xác định</span>
+                                                break;
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (application.Status != ApplicationStatus.Cancelled)
+                                        {
+                                            <button type="button" class="btn btn-danger btn-sm" onclick="cancelApplication(@application.Id)">
+                                                <i class="fas fa-times"></i> Hủy đơn
+                                            </button>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center"><i class="fas fa-info-circle"></i> Chưa có đơn xin việc nào</td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+    function setupTwoFactorAuthentication() {
+        fetch('/User/UserProfile/GetTwoFactorSetup')
+            .then(response => response.json())
+            .then(data => {
+                Swal.fire({
+                    title: 'Kích hoạt 2FA',
+                    html: `
+                        <p>Quét mã QR bằng ứng dụng xác thực (e.g., Google Authenticator, Microsoft Authenticator):</p>
+                        <img src="${data.qrCodeUri}" alt="QR Code" style="margin: 10px auto; display: block; width: 200px; height: 200px;">
+                        <p>Hoặc nhập mã khóa thủ công vào ứng dụng của bạn:</p>
+                        <pre>${data.sharedKey}</pre>
+                        <div class="form-group">
+                            <label for="verificationCode">Nhập mã từ ứng dụng của bạn:</label>
+                            <input type="text" id="verificationCode" class="form-control" placeholder="Mã xác minh">
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: 'Xác minh',
+                    cancelButtonText: 'Hủy',
+                    preConfirm: () => {
+                        const verificationCode = document.getElementById('verificationCode').value.trim(); // Xử lý khoảng trắng
+                        if (!verificationCode) {
+                            Swal.showValidationMessage('Vui lòng nhập mã xác minh.');
+                        } else if (!/^\d{6}$/.test(verificationCode)) {
+                            Swal.showValidationMessage('Mã xác minh phải là 6 chữ số.');
+                        }
+                        return verificationCode;
+                    }
+                }).then(result => {
+                    if (result.isConfirmed) {
+                        const verificationCode = result.value;
+                        verifyTwoFactorAuthentication(verificationCode);
+                    }
+                });
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function verifyTwoFactorAuthentication(verificationCode) {
+        console.log('Mã xác minh người dùng nhập:', verificationCode);
+
+        fetch('/User/UserProfile/VerifyTwoFactorAuthentication', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ verificationCode }) // Đúng định dạng JSON
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Dữ liệu từ server:', data);
+                if (data.success) {
+                    Swal.fire('Thành công', data.message, 'success').then(() => location.reload());
+                } else {
+                    Swal.fire('Thất bại', data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire('Thất bại', 'Đã xảy ra lỗi. Vui lòng thử lại.', 'error');
+            });
+    }
+
+    function disableTwoFactorAuthentication() {
+        Swal.fire({
+            title: 'Xác nhận hủy kích hoạt 2FA',
+            html: `
+                <p>Vui lòng nhập mã xác minh từ ứng dụng xác thực của bạn để hủy kích hoạt 2FA:</p>
+                <input type="text" id="verificationCode" class="form-control" placeholder="Nhập mã xác minh">
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Hủy kích hoạt',
+            cancelButtonText: 'Hủy',
+            preConfirm: () => {
+                const verificationCode = document.getElementById('verificationCode').value.trim();
+                if (!verificationCode) {
+                    Swal.showValidationMessage('Vui lòng nhập mã xác minh.');
+                } else if (!/^\d{6}$/.test(verificationCode)) {
+                    Swal.showValidationMessage('Mã xác minh phải là 6 chữ số.');
+                }
+                return verificationCode;
+            }
+        }).then(result => {
+            if (result.isConfirmed) {
+                const verificationCode = result.value;
+                sendDisableTwoFactorRequest(verificationCode);
+            }
+        });
+    }
+
+    function sendDisableTwoFactorRequest(verificationCode) {
+        Swal.fire({
+            title: 'Đang xử lý...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        fetch('/User/UserProfile/DisableTwoFactorAuthentication', { 
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ verificationCode })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire('Thành công', data.message, 'success').then(() => location.reload());
+                } else {
+                    Swal.fire('Thất bại', data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire('Thất bại', 'Đã xảy ra lỗi. Vui lòng thử lại.', 'error');
+            });
+
+    }
+
+
+
+
+
+</script>
+
+<script>
+    document.getElementById('resetPasswordButton').addEventListener('click', () => {
+        Swal.fire({
+            title: 'Đặt lại mật khẩu',
+            html: `
+                <div style="text-align: left; max-width: 400px;">
+                    <div style="margin-bottom: 15px;">
+                        <label for="currentPassword" style="font-weight: bold;">Mật khẩu hiện tại</label>
+                        <div style="position: relative;">
+                            <input type="password" id="currentPassword" class="swal2-input" style="width: 100%; margin-top: 5px;" placeholder="Nhập mật khẩu hiện tại">
+                                <i class="fas fa-eye toggle-password" style="position: absolute; right: -25px; top: 22px; cursor: pointer;"></i>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label for="newPassword" style="font-weight: bold;">Mật khẩu mới</label>
+                        <div style="position: relative;">
+                            <input type="password" id="newPassword" class="swal2-input" style="width: 100%; margin-top: 5px;" placeholder="Nhập mật khẩu mới">
+                                <i class="fas fa-eye toggle-password" style="position: absolute; right: -25px; top: 22px; cursor: pointer;"></i>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label for="confirmNewPassword" style="font-weight: bold;">Xác nhận mật khẩu mới</label>
+                        <div style="position: relative;">
+                            <input type="password" id="confirmNewPassword" class="swal2-input" style="width: 100%; margin-top: 5px;" placeholder="Nhập lại mật khẩu mới">
+                                <i class="fas fa-eye toggle-password" style="position: absolute; right: -25px; top: 22px; cursor: pointer;"></i>
+                        </div>
+                    </div>
+                    <div style="margin-top: 10px; text-align: center;">
+                        <a href="/Identity/Account/ForgotPassword" class="forgot-password" style="color: #007bff; text-decoration: underline; font-size: 14px;">Quên mật khẩu?</a>
+                    </div>
+                </div>
+            `,
+
+            showCancelButton: true,
+            confirmButtonText: 'Xác nhận',
+            cancelButtonText: 'Hủy',
+            focusConfirm: false,
+            preConfirm: () => {
+                const currentPassword = Swal.getPopup().querySelector('#currentPassword').value;
+                const newPassword = Swal.getPopup().querySelector('#newPassword').value;
+                const confirmNewPassword = Swal.getPopup().querySelector('#confirmNewPassword').value;
+
+                if (!currentPassword || !newPassword || !confirmNewPassword) {
+                    Swal.showValidationMessage(`Vui lòng điền đầy đủ thông tin.`);
+                    return false;
+                } else if (newPassword !== confirmNewPassword) {
+                    Swal.showValidationMessage(`Mật khẩu mới và xác nhận mật khẩu không khớp.`);
+                    return false;
+                }
+
+                return { currentPassword, newPassword };
+            },
+            didOpen: () => {
+                // Thêm sự kiện cho các biểu tượng hiển thị/ẩn mật khẩu
+                const toggleIcons = Swal.getPopup().querySelectorAll('.toggle-password');
+                toggleIcons.forEach(icon => {
+                    icon.addEventListener('click', function () {
+                        const input = this.previousElementSibling;
+                        if (input.type === 'password') {
+                            input.type = 'text';
+                            this.classList.remove('fa-eye');
+                            this.classList.add('fa-eye-slash');
+                        } else {
+                            input.type = 'password';
+                            this.classList.remove('fa-eye-slash');
+                            this.classList.add('fa-eye');
+                        }
+                    });
+                });
+            }
+        }).then((result) => {
+            if (result.isConfirmed && result.value) {
+                const { currentPassword, newPassword } = result.value;
+                resetPassword(currentPassword, newPassword);
+            }
+        });
+    });
+
+
+    function resetPassword(currentPassword, newPassword) {
+        Swal.fire({
+            title: 'Đang xử lý...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        fetch('/User/UserProfile/ResetPassword', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ currentPassword, newPassword })
+        })
+            .then(response => {
+                if (response.ok) {
+                    Swal.fire('Thành công!', 'Mật khẩu đã được cập nhật.', 'success');
+                } else {
+                    return response.text().then(text => {
+                        throw new Error(text || "Có lỗi xảy ra. Vui lòng thử lại.");
+                    });
+                }
+            })
+            .catch(error => {
+                Swal.fire('Thất bại!', error.message, 'error');
+            });
+    }
+
+    // Hàm toggle hiển thị/ẩn mật khẩu
+    function togglePassword(id) {
+        const passwordInput = document.getElementById(id);
+        const toggleIcon = passwordInput.nextElementSibling;
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            toggleIcon.innerHTML = '&#128064;'; // Mắt mở
+        } else {
+            passwordInput.type = "password";
+            toggleIcon.innerHTML = '&#128065;'; // Mắt đóng
+        }
+    }
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Handles navigation between sections
+        function showSection(sectionId) {
+            // Hide all sections and deactivate nav links
+            document.querySelectorAll('.section-content').forEach(section => section.classList.remove('active'));
+            document.querySelectorAll('.nav-borders .Profile-Text').forEach(link => link.classList.remove('active'));
+
+            // Show selected section and activate the respective nav link
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelector(`.nav-borders .Profile-Text[onclick="showSection('${sectionId}')"]`).classList.add('active');
+        }
+
+        // Cancel Application
+        function cancelApplication(applicationId) {
+            Swal.fire({
+                title: 'Bạn có chắc chắn muốn hủy đơn này?',
+                text: "Hành động này không thể hoàn tác!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Có, hủy đơn',
+                cancelButtonText: 'Hủy',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Create and submit the form to cancel the application
+                    var form = document.createElement('form');
+                    form.method = 'POST'; // The form method is POST
+                    form.action = '/User/UserProfile/CancelApplication'; // URL to submit the form to
+                    var input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'applicationId'; // The parameter to send
+                    input.value = applicationId; // Set the application ID value
+                    form.appendChild(input); // Append the input field to the form
+                    document.body.appendChild(form); // Append the form to the body
+                    form.submit(); // Submit the form
+                }
+            });
+        }
+
+
+
+
+
+
+
+
+        // Remove Job from Favorites
+        function removeFromFavorites(jobId) {
+            if (confirm("Bạn có chắc chắn muốn xóa công việc này khỏi danh sách đã lưu không?")) {
+                fetch(`/User/UserProfile/RemoveFromFavorites`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ jobId: jobId })
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            alert("Công việc đã được xóa khỏi danh sách đã lưu.");
+                            location.reload();
+                        } else {
+                            return response.text().then(text => {
+                                throw new Error(text || "Không thể xóa công việc này. Vui lòng thử lại.");
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        alert("Đã xảy ra lỗi khi xóa công việc. " + error.message);
+                    });
+            }
+        }
+
+        // Attach functions to the global scope for inline event handlers
+        window.showSection = showSection;
+        window.cancelApplication = cancelApplication;
+        window.removeFromFavorites = removeFromFavorites;
+    });
+</script>

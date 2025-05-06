@@ -1,0 +1,550 @@
+﻿@model EmployerProfileViewModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <title>Chỉnh sửa thông tin tài khoản</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&display=swap" rel="stylesheet" />
+
+    <style type="text/css">
+        body {
+            margin-top: 20px;
+            background-color: #f2f6fc;
+            color: #69707a;
+            font-family: 'Manrope', sans-serif;
+        }
+
+        .container-xl {
+            max-width: 900px;
+        }
+
+        .img-account-profile {
+            height: 10rem;
+            border: 2px solid #ddd;
+            padding: 5px;
+        }
+
+        .rounded-circle {
+            border-radius: 50% !important;
+        }
+
+        .card {
+            box-shadow: 0 0.15rem 1.75rem 0 rgb(33 40 50 / 15%);
+            border: none;
+        }
+
+        .card-header {
+            font-weight: 500;
+            font-size: 1.1rem;
+            background-color: #343A40;
+            color: #fff;
+            padding: 1rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+            background-color: #fff;
+        }
+
+        .form-control {
+            border-radius: 0.35rem;
+            border: 1px solid #c5ccd6;
+            font-size: 0.9rem;
+            color: #69707a;
+            transition: box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+
+        .form-control:focus {
+            box-shadow: 0 0 0 0.2rem rgba(0, 97, 242, 0.25);
+            border-color: #0061f2;
+        }
+
+        .btn-primary {
+            background-color: #343A40;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            font-size: 0.9rem;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #0053c0;
+        }
+
+        .nav-borders .nav-link.active {
+            color: #0061f2;
+            border-bottom-color: #0061f2;
+            font-weight: 500;
+        }
+
+        .nav-borders .nav-link {
+            color: #69707a;
+            border-bottom-width: 0.125rem;
+            padding: 0.5rem;
+            margin: 0 1rem;
+            transition: color 0.2s ease;
+        }
+
+        .nav-borders .nav-link:hover {
+            color: #0053c0;
+        }
+
+        .small-font {
+            font-size: 0.85rem;
+        }
+
+        .nav {
+            display: flex; 
+            align-items: center; 
+        }
+
+        .reset-button {
+            margin-left: auto; 
+        }
+
+        @@media (max-width: 576px) {
+            .reset-button {
+                position: static; 
+                margin-top: 1rem; 
+                width: 100%; 
+                text-align: center; 
+            }
+        }
+
+        /* Additional spacing for buttons */
+        .mt-2 {
+            margin-top: 0.5rem;
+        }
+        /* Ensure the parent container uses flexbox for alignment */
+        .security-password-reset,
+        .security-two-factor-auth {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Align buttons at the bottom if needed */
+            align-items: center;
+            text-align: center;
+        }
+
+            /* Style the buttons consistently */
+            .security-password-reset button,
+            .security-two-factor-auth button {
+                width: 100%; /* Ensure buttons span the full width of their container */
+                max-width: 220px; /* Optional: Set a maximum width for buttons */
+                margin-top: auto; /* Push the button to the bottom */
+            }
+
+        /* Optional: Add spacing between sections */
+        .security-password-reset,
+        .security-two-factor-auth {
+            padding: 1rem;
+        }
+
+
+
+    </style>
+</head>
+<body>
+    <div class="container-xxl px-4 mt-4">
+        <nav class="nav nav-borders">
+            <a class="nav-link active ms-0" style="color:#DB3545 ">
+                <i class="fas fa-user"></i> Hồ sơ cá nhân
+            </a>
+        </nav>
+        <hr class="mt-0 mb-4">
+        <div class="row">
+            <!-- Left Column: Profile Image and Social Links -->
+            <div class="col-xl-4">
+                <!-- Profile Image Card -->
+                <div class="card mb-4">
+                    <div class="card-header"><i class="fas fa-camera"></i> Ảnh đại diện</div>
+                    <div class="card-body text-center">
+                        @if (Model.Employer.Photo != null)
+                        {
+                            <img class="img-account-profile rounded-circle mb-2" src="data:image/png;base64,@(Convert.ToBase64String(Model.Employer.Photo))" alt="Ảnh đại diện" />
+                        }
+                        else
+                        {
+                            <img class="img-account-profile rounded-circle mb-2" src="/images/default-avatar.png" alt="Ảnh đại diện mặc định" />
+                        }
+                        <div class="small font-italic text-muted mb-4">JPG hoặc PNG, kích thước không quá 5 MB</div>
+                        <form asp-action="UploadProfileImage" method="post" enctype="multipart/form-data">
+                            <input type="file" name="uploadedImage" class="form-control mb-3" />
+                            <button class="btn btn-primary" type="submit"><i class="fas fa-upload"></i> Tải ảnh lên</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Social Links Card -->
+                <div class="card mb-4">
+                    <div class="card-header"><i class="fas fa-share-alt"></i> Liên kết mạng xã hội</div>
+                    <div class="card-body">
+                        <form asp-action="UpdateSocialLinks" method="post">
+                            <input type="hidden" name="Employer.Id" value="@Model.Employer.Id" />
+                            <div class="form-group mb-3">
+                                <label for="FacebookLink"><i class="fab fa-facebook"></i> Facebook <span class="text-muted small-font"> </span></label>
+                                <input type="text" id="FacebookLink" class="form-control" name="Employer.FacebookLink" value="@Model.Employer.FacebookLink" placeholder="Link Facebook" />
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="TwitterLink"><i class="fab fa-twitter"></i> Twitter <span class="text-muted small-font"> </span></label>
+                                <input type="text" id="TwitterLink" class="form-control" name="Employer.TwitterLink" value="@Model.Employer.TwitterLink" placeholder="Link Twitter" />
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="LinkedInLink"><i class="fab fa-linkedin"></i> LinkedIn <span class="text-muted small-font"> </span></label>
+                                <input type="text" id="LinkedInLink" class="form-control" name="Employer.LinkedInLink" value="@Model.Employer.LinkedInLink" placeholder="Link LinkedIn" />
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="InstagramLink"><i class="fab fa-instagram"></i> Instagram <span class="text-muted small-font"> </span></label>
+                                <input type="text" id="InstagramLink" class="form-control" name="Employer.InstagramLink" value="@Model.Employer.InstagramLink" placeholder="Link Instagram" />
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100"><i class="fas fa-save"></i> Lưu liên kết</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Account Information and Security Settings -->
+            <div class="col-xl-8">
+                <!-- Account Information Card -->
+                <div class="card mb-4">
+                    <div class="card-header"><i class="fas fa-user-cog"></i> Thông tin tài khoản</div>
+                    <div class="card-body">
+                        <form asp-action="UpdateProfileDetails" method="post">
+                            <input type="hidden" name="Employer.Id" value="@Model.Employer.Id" />
+                            <div class="mb-3">
+                                <label class="small mb-1" for="inputName"><i class="fas fa-user"></i> Họ tên <span class="text-muted small-font"> </span></label>
+                                <input class="form-control" id="inputName" name="Employer.Name" type="text" value="@Model.Employer.Name" />
+                            </div>
+                            <div class="row gx-3 mb-3">
+                                <div class="col-md-6">
+                                    <label class="small mb-1" for="inputEmail"><i class="fas fa-envelope"></i> Email <span class="text-muted small-font"> </span></label>
+                                    <input class="form-control" id="inputEmail" name="Employer.Email" type="email" value="@Model.Employer.Email" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="small mb-1" for="inputPhone"><i class="fas fa-phone"></i> Điện thoại <span class="text-muted small-font"> </span></label>
+                                    <input class="form-control" id="inputPhone" name="Employer.Phone" type="tel" value="@Model.Employer.Phone" />
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="small mb-1" for="inputAddress"><i class="fas fa-map-marker-alt"></i> Địa chỉ <span class="text-muted small-font"> </span></label>
+                                <input class="form-control" id="inputAddress" name="Employer.Address" type="text" value="@Model.Employer.Address" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="small mb-1" for="inputDescription"><i class="fas fa-info-circle"></i> Mô tả <span class="text-muted small-font"> </span></label>
+                                <textarea class="form-control" id="inputDescription" name="Employer.Description" rows="3">@Model.Employer.Description</textarea>
+                            </div>
+                            <button class="btn btn-primary" type="submit"><i class="fas fa-save"></i> Lưu thay đổi</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="col-xl-12">
+                    <div class="card mb-4">
+                        <div class="card-header text-center">
+                            <i class="fas fa-user-shield"></i> Quản lý bảo mật tài khoản
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-4 align-items-stretch">
+                                <!-- Password Reset Section -->
+                                <div class="col-md-6 d-flex">
+                                    <div class="security-password-reset flex-fill d-flex flex-column text-center">
+                                        <i class="fas fa-key fa-2x mb-3 text-primary"></i>
+                                        <h5>Đặt lại mật khẩu</h5>
+                                        <p class="text-muted">Thay đổi mật khẩu của bạn để đảm bảo an toàn.</p>
+                                        <button type="button" class="btn btn-primary w-100 mt-2" id="resetPasswordButton">
+                                            <i class="fas fa-key"></i> Đặt lại mật khẩu
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Two-Factor Authentication Section -->
+                                <div class="col-md-6 d-flex">
+                                    <div class="security-two-factor-auth flex-fill d-flex flex-column text-center">
+                                        <i class="fas fa-lock fa-2x mb-3 text-warning"></i>
+                                        <h5>Xác thực hai yếu tố (2FA)</h5>
+                                        <p class="text-muted">Tăng cường bảo mật với xác thực hai lớp.</p>
+
+                                        @if (Model.IsTwoFactorEnabled)
+                                        {
+                                            <p><i class="fas fa-check-circle text-success"></i> 2FA đã được kích hoạt.</p>
+                                            <button class="btn btn-danger w-100 mt-2" onclick="disableTwoFactorAuthentication()">
+                                                <i class="fas fa-times-circle"></i> Hủy kích hoạt 2FA
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <p><i class="fas fa-exclamation-circle text-warning"></i> 2FA chưa được kích hoạt.</p>
+                                            <button class="btn btn-primary w-100 mt-2" onclick="setupTwoFactorAuthentication()">
+                                                <i class="fas fa-shield-alt"></i> Kích hoạt 2FA
+                                            </button>
+                                        }
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Removed the separate Action Buttons Row to prevent duplication -->
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+            </div>
+        </div>
+
+        <!-- jQuery and Bootstrap JS (Ensure jQuery is loaded before Bootstrap) -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- SweetAlert2 JS -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        <!-- Custom JavaScript for 2FA and Password Reset -->
+        <script>
+            // Function to set up 2FA
+            function setupTwoFactorAuthentication() {
+                console.log("setupTwoFactorAuthentication triggered");
+                fetch('/Employer/EmployerProfile/GetTwoFactorSetup')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log("2FA Setup Data:", data);
+                        Swal.fire({
+                            title: 'Kích hoạt 2FA',
+                            html: `
+                                <p>Quét mã QR bằng ứng dụng xác thực (e.g., Google Authenticator, Microsoft Authenticator):</p>
+                                <img src="${data.qrCodeUri}" alt="QR Code" style="margin: 10px auto; display: block; width: 200px; height: 200px;">
+                                <p>Hoặc nhập mã khóa thủ công vào ứng dụng của bạn:</p>
+                                <pre>${data.sharedKey}</pre>
+                                <div class="form-group mt-3">
+                                    <label for="verificationCode">Nhập mã từ ứng dụng của bạn:</label>
+                                    <input type="text" id="verificationCode" class="form-control" placeholder="Mã xác minh">
+                                </div>
+                            `,
+                            showCancelButton: true,
+                            confirmButtonText: 'Xác minh',
+                            cancelButtonText: 'Hủy',
+                            preConfirm: () => {
+                                const verificationCode = Swal.getPopup().querySelector('#verificationCode').value.trim();
+                                if (!verificationCode) {
+                                    Swal.showValidationMessage('Vui lòng nhập mã xác minh.');
+                                } else if (!/^\d{6}$/.test(verificationCode)) {
+                                    Swal.showValidationMessage('Mã xác minh phải là 6 chữ số.');
+                                }
+                                return verificationCode;
+                            }
+                        }).then(result => {
+                            if (result.isConfirmed) {
+                                const verificationCode = result.value;
+                                verifyTwoFactorAuthentication(verificationCode);
+                            }
+                        });
+                    })
+                    .catch(error => {
+                        console.error("Error during 2FA setup:", error);
+                        Swal.fire('Thất bại', 'Không thể lấy thông tin thiết lập 2FA. Vui lòng thử lại.', 'error');
+                    });
+            }
+
+            // Function to verify 2FA setup
+            function verifyTwoFactorAuthentication(verificationCode) {
+                console.log('Mã xác minh người dùng nhập:', verificationCode);
+
+                Swal.fire({
+                    title: 'Đang xử lý...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                fetch('/Employer/EmployerProfile/VerifyTwoFactorAuthentication', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ verificationCode }) // Correct JSON format
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Dữ liệu từ server:', data);
+                        if (data.success) {
+                            Swal.fire('Thành công', data.message, 'success').then(() => location.reload());
+                        } else {
+                            Swal.fire('Thất bại', data.message, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire('Thất bại', 'Đã xảy ra lỗi. Vui lòng thử lại.', 'error');
+                    });
+            }
+
+            // Function to disable 2FA
+            function disableTwoFactorAuthentication() {
+                Swal.fire({
+                    title: 'Xác nhận hủy kích hoạt 2FA',
+                    html: `
+                        <p>Vui lòng nhập mã xác minh từ ứng dụng xác thực của bạn để hủy kích hoạt 2FA:</p>
+                        <input type="text" id="verificationCode" class="form-control" placeholder="Nhập mã xác minh">
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: 'Hủy kích hoạt',
+                    cancelButtonText: 'Hủy',
+                    preConfirm: () => {
+                        const verificationCode = Swal.getPopup().querySelector('#verificationCode').value.trim();
+                        if (!verificationCode) {
+                            Swal.showValidationMessage('Vui lòng nhập mã xác minh.');
+                        } else if (!/^\d{6}$/.test(verificationCode)) {
+                            Swal.showValidationMessage('Mã xác minh phải là 6 chữ số.');
+                        }
+                        return verificationCode;
+                    }
+                }).then(result => {
+                    if (result.isConfirmed) {
+                        const verificationCode = result.value;
+                        sendDisableTwoFactorRequest(verificationCode);
+                    }
+                });
+            }
+
+            // Function to send disable 2FA request
+            function sendDisableTwoFactorRequest(verificationCode) {
+                Swal.fire({
+                    title: 'Đang xử lý...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                fetch('/Employer/EmployerProfile/DisableTwoFactorAuthentication', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ verificationCode })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire('Thành công', data.message, 'success').then(() => location.reload());
+                        } else {
+                            Swal.fire('Thất bại', data.message, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire('Thất bại', 'Đã xảy ra lỗi. Vui lòng thử lại.', 'error');
+                    });
+            }
+
+            // Event listener for Reset Password button
+            document.addEventListener('DOMContentLoaded', function () {
+                document.getElementById('resetPasswordButton').addEventListener('click', () => {
+                    Swal.fire({
+                        title: 'Đặt lại mật khẩu',
+                        html: `
+                            <div style="text-align: left; max-width: 400px;">
+                                <div style="margin-bottom: 15px;">
+                                    <label for="currentPassword" style="font-weight: bold;">Mật khẩu hiện tại</label>
+                                    <input type="password" id="currentPassword" class="swal2-input" style="width: 100%; margin-top: 5px;" placeholder="Nhập mật khẩu hiện tại">
+                                </div>
+                                <div style="margin-bottom: 15px;">
+                                    <label for="newPassword" style="font-weight: bold;">Mật khẩu mới</label>
+                                    <input type="password" id="newPassword" class="swal2-input" style="width: 100%; margin-top: 5px;" placeholder="Nhập mật khẩu mới">
+                                </div>
+                                <div style="margin-bottom: 15px;">
+                                    <label for="confirmNewPassword" style="font-weight: bold;">Xác nhận mật khẩu mới</label>
+                                    <input type="password" id="confirmNewPassword" class="swal2-input" style="width: 100%; margin-top: 5px;" placeholder="Nhập lại mật khẩu mới">
+                                </div>
+                                <div style="margin-top: 10px; text-align: center;">
+                                    <a href="/Identity/Account/ForgotPassword" class="forgot-password" style="color: #007bff; text-decoration: underline; font-size: 14px;">Quên mật khẩu?</a>
+                                </div>
+                            </div>
+                        `,
+
+                        showCancelButton: true,
+                        confirmButtonText: 'Xác nhận',
+                        cancelButtonText: 'Hủy',
+                        focusConfirm: false,
+                        preConfirm: () => {
+                            const currentPassword = Swal.getPopup().querySelector('#currentPassword').value;
+                            const newPassword = Swal.getPopup().querySelector('#newPassword').value;
+                            const confirmNewPassword = Swal.getPopup().querySelector('#confirmNewPassword').value;
+
+                            if (!currentPassword || !newPassword || !confirmNewPassword) {
+                                Swal.showValidationMessage(`Vui lòng điền đầy đủ thông tin.`);
+                                return false;
+                            } else if (newPassword !== confirmNewPassword) {
+                                Swal.showValidationMessage(`Mật khẩu mới và xác nhận mật khẩu không khớp.`);
+                                return false;
+                            }
+
+                            return { currentPassword, newPassword };
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed && result.value) {
+                            const { currentPassword, newPassword } = result.value;
+                            resetPassword(currentPassword, newPassword);
+                        }
+                    });
+                });
+            });
+
+            // Function to reset password
+            function resetPassword(currentPassword, newPassword) {
+                Swal.fire({
+                    title: 'Đang xử lý...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                fetch('/Employer/EmployerProfile/ResetPassword', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ currentPassword, newPassword })
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            Swal.fire('Thành công!', 'Mật khẩu đã được cập nhật.', 'success').then(() => location.reload());
+                        } else {
+                            return response.text().then(text => {
+                                throw new Error(text || "Có lỗi xảy ra. Vui lòng thử lại.");
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire('Thất bại!', error.message, 'error');
+                    });
+            }
+
+            // Optional: Function to toggle password visibility (if you add toggle icons)
+            function togglePassword(id) {
+                const passwordInput = document.getElementById(id);
+                const toggleIcon = passwordInput.nextElementSibling;
+                if (passwordInput.type === "password") {
+                    passwordInput.type = "text";
+                    if (toggleIcon) toggleIcon.innerHTML = '&#128064;'; // Mắt mở
+                } else {
+                    passwordInput.type = "password";
+                    if (toggleIcon) toggleIcon.innerHTML = '&#128065;'; // Mắt đóng
+                }
+            }
+        </script>
+    </body>
+</html>

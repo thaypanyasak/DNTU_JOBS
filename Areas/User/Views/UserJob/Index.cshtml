@@ -1,0 +1,1003 @@
+﻿@model IEnumerable<UserJobViewModel>
+@using DNTU_JOBS.Helper
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&display=swap" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ion-rangeslider@2.3.1/css/ion.rangeSlider.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/ion-rangeslider@2.3.1/js/ion.rangeSlider.min.js"></script>
+
+
+<style>
+    main {
+        font-family: 'Manrope', sans-serif;
+    }
+
+
+    h1,
+    h2,
+    h3 {
+        font-family: 'Manrope', sans-serif;
+    }
+
+    .job-listings-container .single-job-items {
+        width: 100%;
+        max-width: 1200px;
+        /* Các thuộc tính khác */
+        padding: 20px;
+
+    }
+
+    .container-fluid {
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+        padding: 0;
+        margin: 0;
+        margin-left: 0;
+        margin-right: 0;
+        padding-right: 0;
+    }
+
+    .single-job-items {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        border-radius: 12px;
+        box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        background: linear-gradient(145deg, #f9f9fa, #ffffff);
+        border: 1px solid #e0e0e0;
+        position: relative;
+        padding: 20px;
+
+    }
+
+
+
+    /* Hover Effect */
+    .single-job-items:hover {
+        transform: scale(1.02);
+        box-shadow: 0px 12px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Company Logo */
+    .company-logo {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border: 2px solid #ddd;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        transition: box-shadow 0.3s ease;
+    }
+
+    .company-logo:hover {
+        box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Job Title */
+    .job-title {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 0.2rem;
+        transition: color 0.3s ease;
+    }
+
+    .job-title:hover {
+        color: #007bff;
+    }
+
+    /* Company and Address Details */
+    .company-details i,
+    .salary-details i {
+        color: #6c757d;
+    }
+
+    .company-details,
+    .salary-details {
+        font-size: 1rem;
+        color: #5a5a5a;
+        line-height: 1.5;
+    }
+
+    /* Icon and Text Alignment */
+    .company-details i,
+    .salary-details i {
+        margin-right: 6px;
+        font-size: 1.1rem;
+    }
+
+    /* Posted Time Styling */
+    .posted-time {
+        font-size: 0.8rem;
+        font-weight: 500;
+        padding: 8px 14px;
+
+        border-radius: 20px;
+        position: absolute;
+        right: 20px;
+        top: 15px;
+        color: #6c757d;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        transition: background-color 0.3s ease;
+    }
+
+    .posted-time:hover {
+        background-color: #e2e3e5;
+    }
+
+    /* Additional Text Styling for Smooth Readability */
+    .text-muted {
+        color: #868e96;
+        font-weight: 500;
+    }
+
+    /* Subtle Hover Animations for Links */
+    a.text-decoration-none:hover {
+        text-decoration: underline;
+    }
+
+    /* Job Item Transition */
+    .transition-all {
+        transition: all 0.3s ease;
+    }
+
+    /* Responsive dưới 768px */
+/* For medium screens (Tablets and below) */
+@@media (max-width: 768px) {
+    .single-job-items {
+        flex-direction: column; /* Stack job items vertically */
+        padding: 15px;
+    }
+
+    .job-items {
+        flex-direction: column; /* Stack company logo and job info vertically */
+        align-items: flex-start; /* Align items to the start */
+    }
+
+    .job-info {
+        margin-top: 10px;
+        font-size: 0.9rem; /* Adjust font size for smaller screens */
+    }
+
+    .company-img {
+        margin-bottom: 10px;
+    }
+
+    .posted-time {
+        right: 10px;
+        top: 10px;
+        font-size: 0.75rem; /* Adjust font size for posted time */
+    }
+
+    .badge-danger {
+        font-size: 0.85rem; /* Smaller badge size for medium screens */
+    }
+}
+
+/* For extra small screens (Phones and below) */
+@@media (max-width: 480px) {
+    .single-job-items {
+        padding: 8px; /* Smaller padding for small screens */
+    }
+
+    .job-info h4 {
+        font-size: 1rem; /* Smaller font size for job title */
+    }
+
+    .company-details,
+    .salary-details {
+        font-size: 0.8rem; /* Smaller font size for company and salary details */
+    }
+
+    .posted-time {
+        font-size: 0.7rem; /* Adjust posted time font size */
+    }
+
+    .badge-danger {
+        font-size: 0.75rem; /* Adjust badge size */
+    }
+
+    .job-info {
+        font-size: 0.85rem; /* Smaller text on smaller screens */
+    }
+}
+
+/* Additional responsive behavior for adjusting layout */
+
+
+
+/* Từ 992px trở lên */
+@@media (max-width: 992px) {
+    
+
+            .single-job-items .company-img img {
+                overflow: hidden;
+                float: right;
+                margin-right: 280px;
+            }
+
+    .job-items {
+        flex-direction: row;
+        text-align: left;
+    }
+
+    .company-img {
+        margin-bottom: 0;
+        margin-right: 20px;
+    }
+
+    .job-info {
+        text-align: left;
+    }
+
+    .posted-time {
+        position: absolute;
+        right: 20px;
+        top: 10px;
+        font-size: 0.85rem;
+    }
+
+        .company-details, .salary-details {
+            font-size: 1rem;
+            color: #5a5a5a;
+            line-height: 1.5;
+            float: left;
+            word-wrap: break-word; /* Ensure these text fields wrap as well */
+            word-break: break-word;
+            text-wrap: auto;
+        }
+}
+
+    .search-job-items .input-container {
+        position: relative;
+        width: 100%;
+        min-width: 270px; 
+    }
+
+    #searchJobInput {
+        width: 100%; /* Make input field take full width of its parent container */
+        padding-left: 35px; /* Add space for the icon */
+        font-size: 14px;
+        border-radius: 30px; /* Optional: rounded corners */
+        border: 1px solid #ddd;
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 10px; /* Position the icon inside the input */
+        top: 50%;
+        transform: translateY(-50%); /* Center the icon vertically */
+        font-size: 16px;
+        color: #aaa; /* Light color for the icon */
+    }
+
+
+
+    .section-overly::before {
+        /* background-color: transparent; */
+        background: rgba(0, 0, 0, 0.7)
+
+    }
+    
+    .slider-area .hero-cap h2 {
+        font-size: 55px; 
+        font-family: 'Poppins', sans-serif; 
+        font-weight: 700; 
+        color: #ffffff; 
+
+        line-height: 1.3; 
+        text-align: center; 
+        margin: 0; 
+        padding: 20px 0; 
+        border-radius: 5px; 
+        max-width: 90%; 
+        margin-left: auto;
+        margin-right: auto;
+        animation: shadowPulse 1s infinite;
+    }
+</style>
+<main>
+
+    <!-- Hero Area Start-->
+    <div class="slider-area ">
+        <div class="single-slider section-overly slider-height2 d-flex align-items-center"
+            data-background="/img/hero/about13.png">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xl-12">
+                        <div class="hero-cap text-center">
+                            <h2 >Tìm kiếm công việc</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Hero Area End -->
+    <!-- Job List Area Start -->
+    <div class="job-listing-area pt-120 pb-120">
+        <div class="container">
+            <div class="row">
+                <!-- Left content -->
+                <div class="col-xl-3 col-lg-3 col-md-4">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="small-section-tittle2 mb-45">
+                                <div class="ion">
+                                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                                        width="20px" height="12px">
+                                        <path fill-rule="evenodd" fill="rgb(27, 207, 107)"
+                                            d="M7.778,12.000 L12.222,12.000 L12.222,10.000 L7.778,10.000 L7.778,12.000 ZM-0.000,-0.000 L-0.000,2.000 L20.000,2.000 L20.000,-0.000 L-0.000,-0.000 ZM3.333,7.000 L16.667,7.000 L16.667,5.000 L3.333,5.000 L3.333,7.000 Z" />
+                                    </svg>
+                                </div>
+                                <h4>Filter Jobs</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Job Category Listing start -->
+                    <div class="job-category-listing mb-50">
+                        <!-- single one -->
+                        <div class="single-listing">
+                            <div class="small-section-tittle2">
+                                <h4>Job Category</h4>
+                            </div>
+                            <!-- Select job items start -->
+
+
+                            <div class="select-job-items2">
+                                <select name="category" id="categoryDropdown" class="form-select" onchange="filterJobsByCategory(this.value)">
+                                    <option value="">All Categories</option>
+                                    @foreach (var category in ViewBag.JobCategories)
+                                    {
+                                        <option value="@category.CategoryName">@category.CategoryName</option>
+                                    }
+                                </select>
+                            </div>
+
+
+                            <!--  Select job items End-->
+                            <!-- select-Categories start -->
+                            <div class="select-Categories pt-80 pb-50">
+                                <div class="small-section-tittle2">
+                                    <h4>Thời gian</h4>
+                                </div>
+                                <label class="container">
+                                    <input type="checkbox" class="working-time-filter" value=""> Tất cả ca
+                                    <span class="checkmark"></span>
+                                </label>
+                                <label class="container">
+                                    <input type="checkbox" class="working-time-filter" value="Ca sáng (8:00 - 12:00)"> Ca sáng
+                                    <span class="checkmark"></span>
+                                </label>
+                                <label class="container">
+                                    <input type="checkbox" class="working-time-filter" value="Ca chiều (13:00 - 17:00)"> Ca chiều
+                                    <span class="checkmark"></span>
+                                </label>
+                                <label class="container">
+                                    <input type="checkbox" class="working-time-filter" value="Ca tối (18:00 - 22:00)"> Ca tối
+                                    <span class="checkmark"></span>
+                                </label>
+                            </div>
+
+
+
+
+
+                            <!-- select-Categories End -->
+                        </div>
+                        <!-- single two -->
+                        <div class="single-listing">
+                            <div class="small-section-tittle2">
+                                <h4>Địa điểm</h4>
+                            </div>
+                            <!-- Select job items start -->
+                            
+                            <div class="select-job-items2" >
+                                <select id="districtDropdown" class="form-select" onchange="filterJobs(this.value)">
+                                    <option value="">Tất cả địa điểm</option>
+                                    @foreach (var district in ViewBag.Districts)
+                                    {
+                                        <option value="@district.Name">@district.Name</option>
+                                    }
+                                </select>
+                            </div>
+
+
+
+                            <!--  Select job items End-->
+                            <!-- select-Categories start -->
+                            @* <div class="select-Categories pt-80 pb-50">
+                                <div class="small-section-tittle2">
+                                    <h4>Experience</h4>
+                                </div>
+                                <label class="container">
+                                    1-2 Years
+                                    <input type="checkbox">
+                                    <span class="checkmark"></span>
+                                </label>
+                                <label class="container">
+                                    2-3 Years
+                                    <input type="checkbox" checked="checked active">
+                                    <span class="checkmark"></span>
+                                </label>
+                                <label class="container">
+                                    3-6 Years
+                                    <input type="checkbox">
+                                    <span class="checkmark"></span>
+                                </label>
+                                <label class="container">
+                                    6-more..
+                                    <input type="checkbox">
+                                    <span class="checkmark"></span>
+                                </label>
+                            </div> *@
+                            <!-- select-Categories End -->
+                        </div>
+
+
+                        <!-- single three -->
+                        @* <div class="single-listing">
+                            <!-- select-Categories start -->
+                            <div class="select-Categories pb-50">
+                                <div class="small-section-tittle2">
+                                    <h4>Thời gian đăng</h4>
+                                </div>
+                                <label class="container">
+                                    Tất cả
+                                    <input type="radio" name="postedWithin" value="any" >
+                                    <span class="checkmark"></span>
+                                </label>
+                                <label class="container">
+                                    Hôm nay
+                                    <input type="radio" name="postedWithin" value="1">
+                                    <span class="checkmark"></span>
+                                </label>
+                                <label class="container">
+                                    Trong 2 ngày qua
+                                    <input type="radio" name="postedWithin" value="2">
+                                    <span class="checkmark"></span>
+                                </label>
+                                <label class="container">
+                                    Trong 3 ngày qua
+                                    <input type="radio" name="postedWithin" value="3">
+                                    <span class="checkmark"></span>
+                                </label>
+                                <label class="container">
+                                    Trong 5 ngày qua
+                                    <input type="radio" name="postedWithin" value="5">
+                                    <span class="checkmark"></span>
+                                </label>
+                                <label class="container">
+                                    Trong 10 ngày qua
+                                    <input type="radio" name="postedWithin" value="10">
+                                    <span class="checkmark"></span>
+                                </label>
+                            </div>
+                        </div> *@
+
+
+
+
+                        <div style="margin-top: 100px">
+                        <div class="single-listing" style="margin-top: 20px">
+                            <!-- Range Slider Start -->
+                            <aside class="left_widgets p_filter_widgets price_rangs_aside sidebar_box_shadow">
+                                <div class="small-section-tittle2">
+                                    <h4>Filter Jobs by Salary</h4>
+                                </div>
+                                <div class="widgets_inner">
+                                    <div class="range_item">
+                                        <input type="text" id="salaryRange" class="js-range-slider" value="" />
+                                        <div class="d-flex align-items-center mt-3">
+                                            <div class="price_text">
+                                                <p>Từ:</p>
+                                            </div>
+                                            <div class="price_value d-flex justify-content-center">
+                                                <input type="text" id="minSalary" class="js-input-from" readonly />
+                                                <span class="mx-2">to</span>
+                                                <input type="text" id="maxSalary" class="js-input-to" readonly />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </aside>
+                            <!-- Range Slider End -->
+                        </div>
+                        </div>
+                    </div>
+                    <!-- Job Category Listing End -->
+                </div>
+                <!-- Right content -->
+                <div class="col-xl-9 col-lg-9 col-md-8">
+                    <!-- Featured_job_start -->
+                    <section class="featured-job-area">
+                        <div class="container">
+                            <!-- Count of Job list Start -->
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="count-job mb-35 d-flex justify-content-between align-items-center">
+                                        <span>@ViewBag.ApprovedJobCount công việc được tìm thấy</span>
+
+                                        <!-- Search bar start -->
+                                        <div class="search-job-items">
+                                            <div class="input-container">
+                                                <input type="text" id="searchJobInput" class="form-control" placeholder="Tìm kiếm theo tên công việc..." oninput="searchJobsByName()" />
+                                                <i class="fas fa-search search-icon"></i> 
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+
+                            <div id="jobContainer">
+                                @foreach (var job in Model)
+                                {
+                                    <div class="single-job-items mb-4 p-4 rounded-3 shadow-sm hover-scale transition-all" data-district="@job.DistrictName">
+                                        <div class="job-items d-flex align-items-center">
+                                            <!-- Company Logo - Centered Left -->
+                                            <div class="company-img text-center">
+                                                <a asp-controller="UserJob" asp-action="JobDetail" asp-route-id="@job.Id">
+                                                    @if (job.CompanyLogo != null && job.CompanyLogo.Length > 0)
+                                                    {
+                                                        <img src="data:image/png;base64,@Convert.ToBase64String(job.CompanyLogo)"
+                                                             alt="Company Logo"
+                                                             class="img-fluid rounded-circle shadow-sm company-logo">
+                                                    }
+                                                    else
+                                                    {
+                                                        <img src="/img/logo/DefaultLogo.png" alt="Default Company Logo"
+                                                             class="img-fluid rounded-circle shadow-sm company-logo">
+                                                    }
+                                                </a>
+                                            </div>
+
+                                            <!-- Job Information - Aligned Right -->
+                                            <div class="job-info flex-grow-1 ms-4">
+                                                <!-- Row 1: Job Title -->
+                                                <a asp-controller="UserJob" asp-action="JobDetail" asp-route-id="@job.Id"
+                                                   class="text-decoration-none">
+                                                    <h4 class="job-title mb-2 fw-bold text-dark">@job.JobTitle</h4>
+                                                </a>
+
+                                                <!-- Row 2: Company Name and Address -->
+                                                <div class="d-flex align-items-center text-muted mb-1 company-details">
+                                                    <i class="fas fa-building me-2"></i>@job.CompanyName
+                                                    <span class="mx-2">|</span>
+                                                    <i class="fas fa-map-marker-alt me-2"></i>
+                                                    @if (!string.IsNullOrEmpty(job.DistrictName) &&
+                                                   !string.IsNullOrEmpty(job.WardName))
+                                                    {
+                                                        @($"{job.DistrictName}, {job.WardName}")
+                                                    }
+                                                    else if (!string.IsNullOrEmpty(job.DistrictName))
+                                                    {
+                                                        @job.DistrictName
+                                                    }
+                                                    else if (!string.IsNullOrEmpty(job.WardName))
+                                                    {
+                                                        @job.WardName
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">Địa điểm không xác định</span>
+                                                    }
+                                                </div>
+
+                                                <!-- Row 3: Salary -->
+                                                <div class="text-muted salary-details">
+                                                    <i class="fas fa-dollar-sign me-2"></i>
+                                                    @if (job.SalaryMin.HasValue && job.SalaryMax.HasValue)
+                                                    {
+                                                        @($"{job.SalaryMin.Value:n0} - {job.SalaryMax.Value:n0} VND")
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">Liên hệ để biết mức lương</span>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Post Date -->
+                                        <div class="posted-time position-absolute" style="right: 20px; top: 10px; z-index: 10;">
+                                            <span class="text-muted p-2 rounded-pill"
+                                                  style="font-size: 0.85rem;">
+                                                @job.CreationDate.ToRelativeTime()
+                                            </span>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+
+
+
+                        </div>
+                    </section>
+                    <!-- Featured_job_end -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Job List Area End -->
+    <!--Pagination Start  -->
+    <!-- Pagination Area -->
+    <div class="pagination-area pb-115 text-center">
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-12">
+                    <div class="single-wrap d-flex justify-content-center">
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination justify-content-start">
+                                <!-- Page Numbers -->
+                                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                                {
+                                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                        <a class="page-link" href="?page=@i">@i</a>
+                                    </li>
+                                }
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Pagination End  -->
+</main>
+
+<script>
+    function filterJobs(district) {
+        // Thực hiện logic lọc công việc
+        $.ajax({
+            url: '/User/UserJob/FilterJobsByDistrict',
+            type: 'GET',
+            data: { district: district },
+            success: function (response) {
+                $('#jobContainer').empty();
+
+                if (response.length > 0) {
+                    response.forEach(job => {
+                        const jobHtml = `
+                                <div class="single-job-items mb-4 p-4 rounded-3 shadow-sm hover-scale transition-all">
+                                    <div class="job-items d-flex align-items-center">
+                                        <div class="company-img text-center">
+                                            <a href="/User/UserJob/JobDetail/${job.id}">
+                                                <img src="${job.companyLogo || '/img/logo/DefaultLogo.png'}" alt="Company Logo" class="img-fluid rounded-circle shadow-sm company-logo">
+                                            </a>
+                                        </div>
+                                        <div class="job-info flex-grow-1 ms-4">
+                                            <a href="/User/UserJob/JobDetail/${job.id}" class="text-decoration-none">
+                                                <h4 class="job-title mb-2 fw-bold text-dark">${job.jobTitle}</h4>
+                                            </a>
+                                                <div class="d-flex align-items-center text-muted mb-1 company-details">
+                                                <i class="fas fa-building me-2"></i>${job.companyName}
+                                                <span class="mx-2">|</span>
+                                                    <i class="fas fa-map-marker-alt me-2"></i>${job.districtName}, , ${job.wardName}
+                                            </div>
+                                            <div class="text-muted salary-details">
+                                                <i class="fas fa-dollar-sign me-2"></i>
+                                                ${job.salaryMin && job.salaryMax
+                                ? `${job.salaryMin.toLocaleString()} - ${job.salaryMax.toLocaleString()} VND`
+                                : "Contact for salary"}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="posted-time position-absolute" style="right: 20px; top: 10px; z-index: 10;">
+                                        <span class="text-muted bg-light p-2 rounded-pill shadow-sm" style="font-size: 0.85rem;">
+                                                ${job.creationDateRelativeTime}
+                                        </span>
+                                    </div>
+                                </div>`;
+                        $('#jobContainer').append(jobHtml);
+                    });
+                } else {
+                    $('#jobContainer').append('<p class="text-muted text-center">No jobs found for this district.</p>');
+                }
+            },
+            error: function () {
+                alert("An error occurred while filtering jobs.");
+            }
+        });
+    }
+</script>
+
+<script>
+    function filterJobsByCategory(category) {
+        // Gửi AJAX request đến FilterJobsByCategory
+        $.ajax({
+            url: '/User/UserJob/FilterJobsByCategory',
+            type: 'GET',
+            data: { category: category },
+            success: function (response) {
+                $('#jobContainer').empty();
+
+                if (response.length > 0) {
+                    response.forEach(job => {
+                        const jobHtml = `
+                                    <div class="single-job-items mb-4 p-4 rounded-3 shadow-sm hover-scale transition-all">
+                                        <div class="job-items d-flex align-items-center">
+                                            <div class="company-img text-center">
+                                                <a href="/User/UserJob/JobDetail/${job.id}">
+                                                    <img src="${job.companyLogo || '/img/logo/DefaultLogo.png'}" alt="Company Logo" class="img-fluid rounded-circle shadow-sm company-logo">
+                                                </a>
+                                            </div>
+                                            <div class="job-info flex-grow-1 ms-4">
+                                                <a href="/User/UserJob/JobDetail/${job.id}" class="text-decoration-none">
+                                                    <h4 class="job-title mb-2 fw-bold text-dark">${job.jobTitle}</h4>
+                                                </a>
+                                                        <div class="d-flex align-items-center text-muted mb-1 company-details">
+                                                            <i class="fas fa-building me-2"></i>${job.companyName}
+                                                            <span class="mx-2">|</span>
+                                                            <i class="fas fa-tags me-2"></i>${job.categoryName}
+                                                        </div>
+                                                <div class="text-muted salary-details">
+                                                    <i class="fas fa-dollar-sign me-2"></i>
+                                                    ${job.salaryMin && job.salaryMax
+                                ? `${job.salaryMin.toLocaleString()} - ${job.salaryMax.toLocaleString()} VND`
+                                : "Contact for salary"}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="posted-time position-absolute" style="right: 20px; top: 10px; z-index: 10;">
+                                            <span class="text-muted bg-light p-2 rounded-pill shadow-sm" style="font-size: 0.85rem;">
+                                                    ${job.creationDateRelativeTime}
+                                            </span>
+                                        </div>
+                                    </div>`;
+                        $('#jobContainer').append(jobHtml);
+                    });
+                } else {
+                    $('#jobContainer').append('<p class="text-muted text-center">No jobs found for this category.</p>');
+                }
+            },
+            error: function () {
+                alert("An error occurred while filtering jobs.");
+            }
+        });
+    }
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Bắt sự kiện click trên các checkbox với class 'working-time-filter'
+        const checkboxes = document.querySelectorAll(".working-time-filter");
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener("change", function () {
+                // Bỏ chọn tất cả các checkbox khác
+                checkboxes.forEach(cb => {
+                    if (cb !== this) cb.checked = false;
+                });
+
+                // Lấy giá trị của checkbox được chọn
+                const selectedTime = this.checked ? this.value : "";
+
+                // Gọi hàm lọc công việc
+                filterJobsByWorkingTime(selectedTime);
+            });
+        });
+    });
+
+    function filterJobsByWorkingTime(workingTime) {
+        $.ajax({
+            url: '/User/UserJob/FilterJobsByWorkingTime',
+            type: 'GET',
+            data: { workingTime: workingTime }, // Gửi giá trị thời gian làm việc
+            success: function (response) {
+                $('#jobContainer').empty(); // Xóa danh sách công việc cũ
+
+                if (response.length > 0) {
+                    response.forEach(job => {
+                        const jobHtml = `
+                                    <div class="single-job-items mb-4 p-4 rounded-3 shadow-sm hover-scale transition-all">
+                                        <div class="job-items d-flex align-items-center">
+                                            <div class="company-img text-center">
+                                                <a href="/User/UserJob/JobDetail/${job.id}">
+                                                    <img src="${job.companyLogo || '/img/logo/DefaultLogo.png'}" alt="Company Logo" class="img-fluid rounded-circle shadow-sm company-logo">
+                                                </a>
+                                            </div>
+                                            <div class="job-info flex-grow-1 ms-4">
+                                                <a href="/User/UserJob/JobDetail/${job.id}" class="text-decoration-none">
+                                                    <h4 class="job-title mb-2 fw-bold text-dark">${job.jobTitle}</h4>
+                                                </a>
+                                                        <div class="d-flex align-items-center text-muted mb-1 company-details">
+                                                <i class="fas fa-building me-2"></i>${job.companyName}
+                                                <span class="mx-2">|</span>
+                                                <i class="fas fa-clock me-2"></i>${job.workingTime}
+                                            </div>
+                                                <div class="text-muted salary-details">
+                                                    <i class="fas fa-dollar-sign me-2"></i>
+                                                    ${job.salaryMin && job.salaryMax
+                                ? `${job.salaryMin.toLocaleString()} - ${job.salaryMax.toLocaleString()} VND`
+                                : "Contact for salary"}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="posted-time position-absolute" style="right: 20px; top: 10px; z-index: 10;">
+                                            <span class="text-muted bg-light p-2 rounded-pill shadow-sm" style="font-size: 0.85rem;">
+                                                    ${job.creationDateRelativeTime}
+                                            </span>
+                                        </div>
+                                    </div>`;
+                        $('#jobContainer').append(jobHtml); // Thêm công việc vào container
+                    });
+                } else {
+                    $('#jobContainer').append('<p class="text-muted text-center">No jobs found for this time slot.</p>');
+                }
+            },
+            error: function () {
+                console.error("Error fetching jobs.");
+                alert("An error occurred while filtering jobs.");
+            }
+        });
+    }
+
+
+</script>
+
+
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Khởi tạo range slider
+        $("#salaryRange").ionRangeSlider({
+            type: "double",
+            min: 0,
+            max: 20000000,
+            from: 0,
+            to: 20000000,
+            grid: true,
+            step: 500000, // Bước nhảy mỗi lần kéo (0,5 triệu)
+            prettify: function (num) {
+                // Chuyển số sang định dạng "tr" (triệu)
+                if (num >= 1000000) {
+                    return (num / 1000000).toFixed(num % 1000000 === 0 ? 0 : 1) + "tr";
+                }
+                return num;
+            },
+            onChange: function (data) {
+                // Cập nhật giá trị khi người dùng kéo slider
+                $("#minSalary").val(formatSalary(data.from));
+                $("#maxSalary").val(formatSalary(data.to));
+            },
+            onFinish: function (data) {
+                // Gửi yêu cầu lọc khi người dùng thả slider
+                filterJobsBySalary(data.from, data.to);
+            }
+        });
+
+        // Lấy giá trị khởi đầu
+        const range = $("#salaryRange").data("ionRangeSlider");
+        $("#minSalary").val(formatSalary(range.options.from));
+        $("#maxSalary").val(formatSalary(range.options.to));
+    });
+
+    // Định dạng số lương theo triệu
+    function formatSalary(num) {
+        if (num >= 1000000) {
+            return (num / 1000000).toFixed(num % 1000000 === 0 ? 0 : 1) + "tr";
+        }
+        return num;
+    }
+
+    // Gửi yêu cầu lọc công việc theo lương
+    function filterJobsBySalary(minSalary, maxSalary) {
+        $.ajax({
+            url: '/User/UserJob/FilterJobsBySalary',
+            type: 'GET',
+            data: { minSalary: minSalary, maxSalary: maxSalary },
+            success: function (response) {
+                $('#jobContainer').empty();
+
+                if (response.length > 0) {
+                    response.forEach(job => {
+                        const jobHtml = `
+                                        <div class="single-job-items mb-4 p-4 rounded-3 shadow-sm hover-scale transition-all">
+                                            <div class="job-items d-flex align-items-center">
+                                                <div class="company-img text-center">
+                                                    <a href="/User/UserJob/JobDetail/${job.id}">
+                                                        <img src="${job.companyLogo || '/img/logo/DefaultLogo.png'}" alt="Company Logo" class="img-fluid rounded-circle shadow-sm company-logo">
+                                                    </a>
+                                                </div>
+                                                <div class="job-info flex-grow-1 ms-4">
+                                                    <a href="/User/UserJob/JobDetail/${job.id}" class="text-decoration-none">
+                                                        <h4 class="job-title mb-2 fw-bold text-dark">${job.jobTitle}</h4>
+                                                    </a>
+                                                            <div class="d-flex align-items-center text-muted mb-1 company-details">
+                                                                <i class="fas fa-building me-2"></i>${job.companyName}
+                                                                <span class="mx-2">|</span>
+                                                                <i class="fas fa-tags me-2"></i>${job.categoryName}
+                                                            </div>
+                                                    <div class="text-muted salary-details">
+                                                        <i class="fas fa-dollar-sign me-2"></i>
+                                                        ${job.salaryMin && job.salaryMax
+                                ? `${job.salaryMin.toLocaleString()} - ${job.salaryMax.toLocaleString()} VND`
+                                : "Contact for salary"}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="posted-time position-absolute" style="right: 20px; top: 10px; z-index: 10;">
+                                                <span class="text-muted bg-light p-2 rounded-pill shadow-sm" style="font-size: 0.85rem;">
+                                                        ${job.creationDateRelativeTime}
+                                                </span>
+                                            </div>
+                                        </div>`;
+                        $('#jobContainer').append(jobHtml);
+                    });
+                } else {
+                    $('#jobContainer').append('<p class="text-muted text-center">No jobs found for this salary range.</p>');
+                }
+            },
+            error: function () {
+                console.error("Error fetching jobs.");
+                alert("An error occurred while filtering jobs.");
+            }
+        });
+    }
+
+</script>
+
+<script>
+    function searchJobsByName() {
+        const jobName = document.getElementById("searchJobInput").value;
+
+        $.ajax({
+            url: '/User/UserJob/SearchJobsByName',
+            type: 'GET',
+            data: { jobName: jobName },
+            success: function (response) {
+                $('#jobContainer').empty(); // Xóa danh sách công việc hiện tại
+
+                if (response.length > 0) {
+                    response.forEach(job => {
+                        const jobHtml = `
+                                        <div class="single-job-items mb-4 p-4 rounded-3 shadow-sm hover-scale transition-all">
+                                            <div class="job-items d-flex align-items-center">
+                                                <div class="company-img text-center">
+                                                    <a href="/User/UserJob/JobDetail/${job.id}">
+                                                        <img src="${job.companyLogo || '/img/logo/DefaultLogo.png'}" alt="Company Logo" class="img-fluid rounded-circle shadow-sm company-logo">
+                                                    </a>
+                                                </div>
+                                                <div class="job-info flex-grow-1 ms-4">
+                                                    <a href="/User/UserJob/JobDetail/${job.id}" class="text-decoration-none">
+                                                        <h4 class="job-title mb-2 fw-bold text-dark">${job.jobTitle}</h4>
+                                                    </a>
+                                                            <div class="d-flex align-items-center text-muted mb-1 company-details">
+                                                                <i class="fas fa-building me-2"></i>${job.companyName}
+                                                                <span class="mx-2">|</span>
+                                                                <i class="fas fa-tags me-2"></i>${job.categoryName}
+                                                            </div>
+                                                    <div class="text-muted salary-details">
+                                                        <i class="fas fa-dollar-sign me-2"></i>
+                                                        ${job.salaryMin && job.salaryMax
+                                ? `${job.salaryMin.toLocaleString()} - ${job.salaryMax.toLocaleString()} VND`
+                                : "Contact for salary"}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="posted-time position-absolute" style="right: 20px; top: 10px; z-index: 10;">
+                                                <span class="text-muted bg-light p-2 rounded-pill shadow-sm" style="font-size: 0.85rem;">
+                                                        ${job.creationDateRelativeTime}
+                                                </span>
+                                            </div>
+                                        </div>`;
+                        $('#jobContainer').append(jobHtml);
+                    });
+                } else {
+                    $('#jobContainer').append('<p class="text-muted text-center">Không tìm thấy công việc nào.</p>');
+                }
+            },
+            error: function () {
+                console.error("Error fetching jobs.");
+                alert("Có lỗi xảy ra khi tìm kiếm công việc.");
+            }
+        });
+    }
+
+</script>

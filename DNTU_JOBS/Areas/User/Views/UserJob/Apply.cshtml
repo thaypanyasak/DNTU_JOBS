@@ -1,0 +1,81 @@
+﻿@model DNTU_JOBS.ViewModel.ApplyJobViewModel
+@{
+    ViewData["Title"] = "Nộp Đơn Xin Việc";
+}
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<div style="max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);">
+    <h2 style="text-align: center; color: #333;">📋 Nộp Đơn Xin Việc</h2>
+    <h4 style="text-align: center; color: #555;">📌 @Model.JobTitle</h4>
+
+    <form asp-action="Apply" enctype="multipart/form-data" method="post">
+        <input type="hidden" name="JobId" value="@Model.JobId" />
+
+        <div style="margin-bottom: 15px;">
+            <label for="fullName" style="display: block; font-weight: bold; margin-bottom: 5px;">👤 Tên đầy đủ:</label>
+            <input type="text"
+                   id="fullName"
+                   name="FullName"
+                   style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"
+                   placeholder="Nhập tên đầy đủ của bạn"
+                   required />
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label for="email" style="display: block; font-weight: bold; margin-bottom: 5px;">✉️ Email:</label>
+            <input type="email"
+                   id="email"
+                   name="Email"
+                   style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"
+                   placeholder="Nhập email của bạn"
+                   required />
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label for="phone" style="display: block; font-weight: bold; margin-bottom: 5px;">📞 Số điện thoại:</label>
+            <input type="text"
+                   id="phone"
+                   name="Phone"
+                   style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;"
+                   placeholder="Nhập số điện thoại"
+                   required />
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label for="CV" style="display: block; font-weight: bold; margin-bottom: 5px;">📁 Tải lên CV (PDF):</label>
+            <input type="file"
+                   id="CV"
+                   name="pdfFile"
+                   accept="application/pdf"
+                   style="width: 100%; padding: 5px;"
+                   required />
+            <small style="display: block; margin-top: 5px; color: #777;">Chỉ chấp nhận định dạng PDF. Tối đa 5MB.</small>
+        </div>
+
+        <div style="text-align: center;">
+            <button type="submit"
+                    style="background-color: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; font-size: 16px; cursor: pointer;">
+                ➡️ Gửi Đơn
+            </button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Hiển thị thông báo nếu có
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <text>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Thành công!',
+                    text: '@TempData["SuccessMessage"]',
+                    confirmButtonText: 'OK'
+                });
+            </text>
+        }
+    </script>
+}

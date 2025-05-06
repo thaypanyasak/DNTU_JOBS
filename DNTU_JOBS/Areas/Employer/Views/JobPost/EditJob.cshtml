@@ -1,0 +1,338 @@
+﻿@model JobViewModel
+@{
+    Layout = null;
+}
+<head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://cdn.ckeditor.com/ckeditor5/36.0.0/classic/ckeditor.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+
+<style>
+    body {
+        font-family: 'Manrope', sans-serif;
+    }
+
+    h1, h2, h3 {
+        font-family: 'Manrope', sans-serif;
+    }
+    /* CKEditor Styling */
+    .ck-editor__editable {
+        min-height: 200px;
+        font-size: 1rem;
+        line-height: 1.5;
+        padding: 15px;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+    }
+
+    /* Form Container Styling */
+    .form-container {
+        background-color: #ffffff;
+        border-radius: 8px;
+        padding: 2rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+        .form-container h2 {
+            color: #333;
+            font-size: 1.8rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+    .form-group label {
+        font-weight: 600;
+        color: #555;
+    }
+
+    .form-control {
+        border-radius: 6px;
+    }
+
+    .btn-primary {
+        background-color: #4A90E2;
+        border: none;
+        font-weight: 600;
+        padding: 0.8rem 2.5rem;
+        border-radius: 6px;
+        font-size: 1rem;
+        display: block;
+        width: 100%;
+        max-width: 200px;
+        margin: 0 auto;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-primary:hover {
+            background-color: #357ABD;
+        }
+</style>
+
+<div class="container mt-5">
+    <div class="form-container">
+        <h2><i class="fas fa-edit"></i> Chỉnh sửa công việc</h2>
+
+        <form asp-action="EditJob" method="post">
+            <div class="form-group mb-3">
+                <label for="JobTitle"><i class="fas fa-briefcase"></i> Vị trí cần tuyển</label>
+                <input asp-for="JobTitle" class="form-control" placeholder="Nhập vị trí cần tuyển" />
+                <span asp-validation-for="JobTitle" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="JobDescription"><i class="fas fa-file-alt"></i> Mô tả công việc</label>
+                <textarea asp-for="JobDescription" class="form-control" placeholder="Nhập mô tả công việc"></textarea>
+                <span asp-validation-for="JobDescription" class="text-danger"></span>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="SalaryMin"><i class="fas fa-money-bill-wave"></i> Lương từ</label>
+                    <div class="input-group">
+                        <input asp-for="SalaryMin" class="form-control" 
+                               value="@(Model.SalaryMin.HasValue ? Model.SalaryMin.Value.ToString("N0") : "")"
+                               placeholder="Lương tối thiểu" 
+                               oninput="formatCurrency(this)" />
+                        <div class="input-group-append">
+                            <span class="input-group-text">VNĐ</span>
+                        </div>
+                    </div>
+                    <span asp-validation-for="SalaryMin" class="text-danger"></span>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="SalaryMax"><i class="fas fa-money-bill-wave"></i> Đến</label>
+                    <div class="input-group">
+                        <input asp-for="SalaryMax" class="form-control" 
+                               value="@(Model.SalaryMax.HasValue ? Model.SalaryMax.Value.ToString("N0") : "")"
+                               placeholder="Lương tối đa" 
+                               oninput="formatCurrency(this)" />
+                        <div class="input-group-append">
+                            <span class="input-group-text">VNĐ</span>
+                        </div>
+                    </div>
+                    <span asp-validation-for="SalaryMax" class="text-danger"></span>
+                </div>
+            </div>
+
+
+            <div class="form-group mb-3">
+                <label for="JobRequirements"><i class="fas fa-tasks"></i> Yêu cầu công việc</label>
+                <textarea asp-for="JobRequirements" class="form-control" placeholder="Mô tả yêu cầu công việc"></textarea>
+                <span asp-validation-for="JobRequirements" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="Education"><i class="fas fa-graduation-cap"></i> Trình độ học vấn</label>
+                <textarea asp-for="Education" class="form-control" placeholder="Mô tả trình độ học vấn"></textarea>
+                <span asp-validation-for="Education" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="Benefits"><i class="fas fa-gift"></i> Quyền lợi</label>
+                <textarea asp-for="Benefits" class="form-control" placeholder="Mô tả quyền lợi"></textarea>
+                <span asp-validation-for="Benefits" class="text-danger"></span>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="HiringQuantity"><i class="fas fa-users"></i> Số lượng cần tuyển</label>
+                    <input asp-for="HiringQuantity" type="number" class="form-control" placeholder="Số lượng" min="0" />
+                    <span asp-validation-for="HiringQuantity" class="text-danger"></span>
+                </div>
+
+                <div class="form-group col-md-6">
+                    <label for="Gender"><i class="fas fa-venus-mars"></i> Giới tính</label>
+                    <select asp-for="Gender" class="form-control">
+                        <option value="">-- Chọn giới tính --</option>
+                        <option value="Nam">Nam</option>
+                        <option value="Nữ">Nữ</option>
+                        <option value="Không yêu cầu">Không yêu cầu</option>
+                    </select>
+                    <span asp-validation-for="Gender" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-group mb-4">
+                <label for="JobCategoryId"><i class="fas fa-layer-group"></i> Danh mục công việc</label>
+                <select asp-for="JobCategoryId" class="form-control" id="JobCategoryId" onchange="toggleCategoryInput()">
+                    <option value="">-- Chọn danh mục công việc --</option>
+                    @foreach (var category in ViewBag.JobCategories)
+                    {
+                        <option value="@category.Id" selected="@(category.Id == Model.JobCategoryId)">
+                            @category.CategoryName
+                        </option>
+                    }
+                    <option value="-1">Khác</option> 
+                </select>
+                <span asp-validation-for="JobCategoryId" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-4" id="OtherCategoryInput" style="display: none;">
+                <label for="OtherCategoryName"><i class="fas fa-pen"></i> Nhập danh mục công việc mới</label>
+                <input type="text" asp-for="OtherCategoryName" class="form-control" id="OtherCategoryName" placeholder="Nhập danh mục công việc mới">
+                <span asp-validation-for="OtherCategoryName" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-4">
+                <label for="DistrictId"><i class="fas fa-map-marker-alt"></i> Quận/Huyện</label>
+                <select id="DistrictId" asp-for="DistrictId" class="form-control">
+                    <option value="">-- Chọn quận/huyện --</option>
+                    @foreach (var district in Model.Districts)
+                    {
+                        <option value="@district.Id" selected="@(district.Id == Model.DistrictId)">
+                            @district.Name
+                        </option>
+                    }
+                </select>
+                <span asp-validation-for="DistrictId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-4">
+                <label for="WardId"><i class="fas fa-map-marker"></i> Phường/Xã</label>
+                <select id="WardId" asp-for="WardId" class="form-control">
+                    <option value="">-- Chọn phường/xã --</option>
+                    @foreach (var ward in Model.Wards)
+                    {
+                        <option value="@ward.Id" selected="@(ward.Id == Model.WardId)">
+                            @ward.Name
+                        </option>
+                    }
+                </select>
+                <span asp-validation-for="WardId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="Address"><i class="fas fa-address-card"></i> Địa chỉ</label>
+                <input asp-for="Address" class="form-control" placeholder="Nhập địa chỉ" />
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-4">
+                <label for="WorkingTime"><i class="fas fa-clock"></i> Thời gian làm việc</label>
+                <select id="WorkingTimeSelect" asp-for="WorkingTime" class="form-control" data-selected="@Model.WorkingTime" onchange="toggleCustomWorkingTime()">
+                    <option value="">-- Chọn thời gian làm việc --</option>
+                    <option value="Sáng (8:00 - 12:00)">Sáng (8:00 - 12:00)</option>
+                    <option value="Chiều (13:00 - 17:00)">Chiều (13:00 - 17:00)</option>
+                    <option value="Tối (18:00 - 22:00)">Tối (18:00 - 22:00)</option>
+                    <option value="Thứ 2 - Thứ 4 (18:00 - 22:00)">Thứ 2 - Thứ 4 (18:00 - 22:00)</option>
+                    <option value="Thứ 6 - Chủ Nhật (9:00 - 13:00)">Thứ 6 - Chủ Nhật (9:00 - 13:00)</option>
+                    <option value="Thứ 7 - Chủ Nhật (14:00 - 18:00)">Thứ 7 - Chủ Nhật (14:00 - 18:00)</option>
+                    <option value="Khác">Khác</option>
+                </select>
+
+                <!-- Input for custom working time -->
+                <input type="text" id="CustomWorkingTime" name="CustomWorkingTime" class="form-control mt-2" placeholder="Nhập thời gian tùy chọn" style="display:none;" />
+                <span asp-validation-for="WorkingTime" class="text-danger"></span>
+            </div>
+
+
+            <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-save"></i> Lưu thay đổi</button>
+        </form>
+    </div>
+</div>
+
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#DistrictId').change(function () {
+            var districtId = $(this).val();
+            if (districtId) {
+                $.ajax({
+                    url: '@Url.Action("GetWardsByDistrict")',
+                    type: 'GET',
+                    data: { districtId: districtId },
+                    success: function (wards) {
+                        var wardSelect = $('#WardId');
+                        wardSelect.empty();
+                        wardSelect.append('<option value="">-- Chọn phường/xã --</option>');
+                        $.each(wards, function (index, ward) {
+                            wardSelect.append('<option value="' + ward.id + '">' + ward.name + '</option>');
+                        });
+                    }
+                });
+            } else {
+                $('#WardId').empty().append('<option value="">-- Chọn phường/xã --</option>');
+            }
+        });
+    });
+
+    function toggleCustomWorkingTime() {
+        var select = document.getElementById("WorkingTimeSelect");
+        var customInput = document.getElementById("CustomWorkingTime");
+
+        // Hiển thị trường tùy chỉnh khi chọn "Khác"
+        if (select.value === "Khác") {
+            customInput.style.display = "block";
+            customInput.required = true;
+        } else {
+            customInput.style.display = "none";
+            customInput.required = false;
+            customInput.value = ""; // Xóa giá trị khi ẩn
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+    var select = document.getElementById("WorkingTimeSelect");
+    var customInput = document.getElementById("CustomWorkingTime");
+    var workingTime = select.getAttribute("data-selected"); // Giá trị ban đầu của WorkingTime
+
+    // Nếu giá trị không nằm trong các option mặc định, chọn "Khác" và hiển thị giá trị tùy chỉnh
+    var options = Array.from(select.options).map(option => option.value);
+    if (!options.includes(workingTime)) {
+        select.value = "Khác";
+        customInput.style.display = "block";
+        customInput.required = true;
+        customInput.value = workingTime; // Gán giá trị tùy chỉnh
+    }
+});
+
+    // Đảm bảo gửi đúng giá trị custom khi form submit
+    document.querySelector("form").addEventListener("submit", function (e) {
+        var select = document.getElementById("WorkingTimeSelect");
+        var customInput = document.getElementById("CustomWorkingTime");
+
+        // Kiểm tra nếu "Khác" được chọn và CustomWorkingTime có giá trị
+        if (select.value === "Khác" && customInput.value.trim() !== "") {
+            var hiddenInput = document.createElement("input");
+            hiddenInput.type = "hidden";
+            hiddenInput.name = "WorkingTime";
+            hiddenInput.value = customInput.value;
+            select.parentNode.appendChild(hiddenInput); // Thêm vào form
+            select.disabled = true; // Vô hiệu hóa trường select để không gửi giá trị "Khác"
+        }
+    });
+
+
+    function formatCurrency(input) {
+    let value = input.value.replace(/,/g, ''); // Loại bỏ dấu phẩy
+    if (!isNaN(value) && value !== "") {
+        input.value = parseFloat(value).toLocaleString('en'); // Thêm lại dấu phẩy
+    }
+}
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+        ClassicEditor.create(document.querySelector('textarea[name="JobDescription"]')).catch(error => console.error(error));
+        ClassicEditor.create(document.querySelector('textarea[name="JobRequirements"]')).catch(error => console.error(error));
+        ClassicEditor.create(document.querySelector('textarea[name="Education"]')).catch(error => console.error(error));
+        ClassicEditor.create(document.querySelector('textarea[name="Benefits"]')).catch(error => console.error(error));
+    });
+
+    function toggleCategoryInput() {
+        const selectedValue = document.getElementById("JobCategoryId").value;
+        const otherCategoryInput = document.getElementById("OtherCategoryInput");
+        if (selectedValue === "-1") {
+            otherCategoryInput.style.display = "block";
+        } else {
+            otherCategoryInput.style.display = "none";
+        }
+    }
+
+</script>

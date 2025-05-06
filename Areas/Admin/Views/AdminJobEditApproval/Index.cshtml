@@ -1,0 +1,163 @@
+﻿@model IEnumerable<dynamic>
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&display=swap" rel="stylesheet" />
+    <title>Quản lý yêu cầu chỉnh sửa công việc</title>
+    <style>
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: #f4f6f9;
+        }
+
+        .table-container {
+            margin-top: 70px;
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        h2 {
+            text-align: center;
+            margin-top: 20px;
+            font-weight: 600;
+            padding-bottom: 35px;
+        }
+
+        .table {
+            width: 100%;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Header styling without hover */
+        .table-dark th {
+            color: #ffffff;
+            background-color: #343a40;
+        }
+
+        /* Apply hover effect only to table body rows */
+        .table-hover tbody tr:hover {
+            background-color: #f1f3f5;
+        }
+
+        /* Animation for Pending Edit */
+        @@keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .status-pending {
+            color: #dc3545 !important; /* Màu đỏ */
+            font-weight: 600; /* Đậm */
+            animation: pulse 1s infinite; /* Animation nhấp nháy */
+        }
+
+
+        .pagination .page-item .page-link {
+            color: #343A40;
+            background-color: transparent;
+            border: 1px solid #343A40;
+            transition: all 0.3s ease;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: #343A40;
+            color: #FFFFFF;
+            border-color: #343A40;
+        }
+
+        .pagination .page-item .page-link:hover {
+            background-color: #343A40;
+            color: #FFFFFF;
+        }
+    </style>
+</head>
+<body>
+    <div class="table-container">
+        <h2 class="text-center">Quản lý yêu cầu chỉnh sửa công việc <i class="fas fa-tasks"></i></h2>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th><i class="fas fa-envelope"></i> Email nhà tuyển dụng</th>
+                        <th><i class="fas fa-user-tie"></i> Tên nhà tuyển dụng</th>
+                        <th><i class="fas fa-edit"></i> Yêu cầu chỉnh sửa</th>
+                        <th><i class="fas fa-tasks"></i> Tất cả yêu cầu</th>
+                        <th><i class="fas fa-cogs"></i> Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center">Không có yêu cầu chỉnh sửa công việc nào.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var user in Model)
+                        {
+                            <tr>
+                                <td>@user.User.Email</td>
+                                <td>@user.User.Name</td>
+                                <td class="text-center @(user.PendingEditCount > 0 ? "status-pending" : "")">
+                                    <i class="fas fa-edit"></i> @user.PendingEditCount
+                                </td>
+
+
+                                <td class="text-center">
+                                    @user.TotalEditCount
+                                </td>
+                                <td class="text-center">
+                                    <a href="@Url.Action("EditJobsByUser", new { userId = user.User.Id })" class="btn btn-info btn-sm">
+                                        <i class="fas fa-eye"></i> Xem chi tiết
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-center mt-4">
+                <nav>
+                    <ul class="pagination">
+                        @if (ViewBag.CurrentPage > 1)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="?page=@(ViewBag.CurrentPage - 1)">Trước</a>
+                            </li>
+                        }
+
+                        @for (int i = Math.Max(1, ViewBag.CurrentPage - 2); i <= Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2); i++)
+                        {
+                            <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                <a class="page-link" href="?page=@i">@i</a>
+                            </li>
+                        }
+
+                        @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="?page=@(ViewBag.CurrentPage + 1)">Tiếp</a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+</body>
+</html>

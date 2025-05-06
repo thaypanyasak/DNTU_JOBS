@@ -1,0 +1,131 @@
+﻿@page
+@model RegisterConfirmationModel
+@{
+    ViewData["Title"] = "Xác nhận đăng ký";
+}
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&display=swap" rel="stylesheet" />
+<style>
+    body {
+        font-family: 'Manrope', sans-serif;
+        background-color: #f4f8fb;
+        margin: 0;
+        padding: 0;
+        color: #333;
+    }
+
+    .confirmation-wrapper {
+        max-width: 700px;
+        margin: 50px auto;
+        padding: 40px;
+        background-color: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        border: 1px solid #dfe4ea;
+        text-align: center;
+        overflow: hidden;
+    }
+
+    .confirmation-header {
+        font-size: 30px;
+        font-weight: 700;
+        color: #0056b3;
+        margin-bottom: 10px;
+    }
+
+    .confirmation-body {
+        font-size: 16px;
+        line-height: 1.8;
+        color: #555;
+        margin: 20px 0 30px;
+    }
+
+        .confirmation-body p {
+            margin: 10px 0;
+        }
+
+    .email-highlight {
+        font-weight: 600;
+        color: #007bff;
+    }
+
+    .illustration {
+        width: 100px;
+        height: 100px;
+        margin: 20px auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+    }
+
+        .illustration img {
+            width: 80%;
+            height: auto;
+        }
+
+    .confirmation-footer {
+        margin-top: 30px;
+        font-size: 14px;
+        color: #777;
+        border-top: 1px solid #dfe4ea;
+        padding-top: 20px;
+    }
+
+        .confirmation-footer a {
+            color: #007bff;
+            text-decoration: none;
+            margin: 0 5px;
+        }
+
+            .confirmation-footer a:hover {
+                text-decoration: underline;
+            }
+
+    .open-email-button {
+        display: inline-block;
+        padding: 12px 20px;
+        font-size: 16px;
+        font-weight: 600;
+        color: #ffffff;
+        background-color: #007bff;
+        text-decoration: none;
+        border-radius: 6px;
+        margin-top: 20px;
+        transition: background-color 0.3s ease;
+    }
+
+        .open-email-button:hover {
+            background-color: #0056b3;
+        }
+</style>
+
+<div class="confirmation-wrapper">
+    <div class="illustration">
+        <img src="/img/icon/dntuLogo.png" alt="Email Confirmation">
+    </div>
+    <div class="confirmation-header">
+        Đăng ký thành công!
+    </div>
+    <div class="confirmation-body">
+        <p>
+            Một email xác nhận đã được gửi tới: <span class="email-highlight">@Model.Email</span>.
+        </p>
+        <p>
+            Vui lòng kiểm tra hộp thư đến hoặc thư mục spam để tìm email kích hoạt tài khoản.
+        </p>
+        <p>
+            Nếu bạn không nhận được email, hãy thử gửi lại hoặc <a href="/support">liên hệ với chúng tôi</a> để được hỗ trợ.
+        </p>
+        <p>
+            <a href="https://mail.google.com" target="_blank" class="open-email-button">Mở Email</a>
+        </p>
+    </div>
+    <div class="confirmation-footer">
+        <p>© 2024 DNTU Jobs. Mọi quyền được bảo lưu.</p>
+        <p>
+            <a href="/support">Hỗ trợ</a> |
+            <a href="/terms">Điều khoản</a> |
+            <a href="/privacy">Chính sách bảo mật</a>
+        </p>
+    </div>
+</div>

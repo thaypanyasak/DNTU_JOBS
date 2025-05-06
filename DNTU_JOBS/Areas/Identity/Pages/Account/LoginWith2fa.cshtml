@@ -1,0 +1,258 @@
+﻿@page
+@model LoginWith2faModel
+@{
+    ViewData["Title"] = "Xác thực hai yếu tố";
+}
+
+<style>
+    /* Container tổng thể */
+    .twofa-container {
+        max-width: 450px;
+        margin: 80px auto;
+        background-color: #ffffff;
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        padding: 40px 30px;
+        font-family: 'Roboto', sans-serif;
+    }
+
+    .twofa-container h2{
+        text-align: center;
+        margin-top:70px;
+    }
+    /* Tiêu đề chính */
+    .twofa-title {
+        text-align: center;
+        font-size: 2rem;
+        color: #333333;
+        font-weight: 700;
+        margin-bottom: 15px;
+        position: relative;
+    }
+
+        .twofa-title i {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: -40px;
+            font-size: 3rem;
+            background: linear-gradient(135deg, #AD0514, #D32F2F);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            border-radius: 50%;
+            padding: 10px;
+            margin-top: 20px;
+        }
+
+
+    /* Mô tả */
+    .twofa-description {
+        font-size: 1rem;
+        color: #555555;
+        text-align: center;
+        margin-bottom: 30px;
+        line-height: 1.5;
+    }
+
+    /* Form nhóm */
+    .form-group {
+        margin-bottom: 25px;
+        position: relative;
+    }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+            .form-group input:focus {
+                border-color: #007bff;
+                box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+                outline: none;
+            }
+
+        .form-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #007bff;
+            font-size: 1.4rem;
+        }
+
+    /* Ghi nhớ thiết bị */
+    .remember-machine {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.9rem;
+        color: #555555;
+        margin-bottom: 20px;
+    }
+
+        .remember-machine input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+    /* Nút đăng nhập */
+    .btn-submit {
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, #AD0514, #D32F2F);
+        border: none;
+        border-radius: 10px;
+        color: white;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s;
+    }
+
+        .btn-submit:hover {
+            background: linear-gradient(135deg, #FF6F61, #FFA07A);
+            border: solid 2px #D32F2F;
+            transform: translateY(-2px);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+    /* Gửi lại mã */
+    .resend-code {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 0.9rem;
+        color: #007bff;
+    }
+
+        .resend-code button {
+            background: none;
+            border: none;
+            color: #007bff;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+            .resend-code button:hover {
+                color: #0056b3;
+            }
+
+    /* Liên kết mã khôi phục */
+    .recovery-link {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 0.9rem;
+    }
+
+        .recovery-link a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+            .recovery-link a:hover {
+                text-decoration: underline;
+            }
+
+    /* Cảnh báo lỗi */
+    .alert-message {
+        color: #dc3545;
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+    }
+</style>
+
+<div class="twofa-container">
+    <h1 class="twofa-title">
+        <i class="fas fa-shield-alt"></i> 
+    </h1>
+    <h2>Xác thực hai yếu tố</h2>
+    <p class="twofa-description">
+        Để tiếp tục, vui lòng nhập mã xác thực từ ứng dụng xác thực của bạn.
+    </p>
+
+    <form method="post" asp-route-returnUrl="@Model.ReturnUrl">
+        <input asp-for="RememberMe" type="hidden" />
+
+        <div asp-validation-summary="ModelOnly" class="alert-message"></div>
+
+        <div class="form-group">
+            <i class="fas fa-key" style="
+                background: linear-gradient(135deg, #AD0514, #D32F2F);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;">
+            </i>
+
+            <input asp-for="Input.TwoFactorCode" class="form-control" autocomplete="off" placeholder="Nhập mã xác thực" />
+            <span asp-validation-for="Input.TwoFactorCode" class="alert-message"></span>
+        </div>
+
+        <div class="remember-machine">
+            <input asp-for="Input.RememberMachine" id="rememberMachine" />
+            <label for="rememberMachine">@Html.DisplayNameFor(m => m.Input.RememberMachine)</label>
+        </div>
+
+        <button type="submit" class="btn-submit">
+            <i class="fas fa-sign-in-alt"></i> Đăng nhập
+        </button>
+
+        <div class="resend-code">
+            <p>Không nhận được mã? <button type="button" onclick="sendCode()">Gửi lại</button>.</p>
+        </div>
+    </form>
+
+    <p class="recovery-link">
+        Không thể truy cập ứng dụng xác thực? Bạn có thể
+        <a href="javascript:void(0);" onclick="sendOtp()">đăng nhập bằng mã khôi phục</a>.
+    </p>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function sendOtp() {
+            Swal.fire({
+                title: 'Gửi mã OTP',
+                text: 'Bạn có muốn nhận mã OTP qua Email không?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Gửi mã',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch('/Identity/Account/LoginWith2fa?handler=SendOtp', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                        .then(response => response.json()) 
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire('Thành công', data.message, 'success');
+                            } else {
+                                Swal.fire('Thất bại', data.message || 'Không thể gửi mã OTP. Vui lòng thử lại.', 'error');
+                            }
+                        })
+                        .catch(error => {
+                            Swal.fire('Lỗi', 'Đã xảy ra lỗi. Vui lòng thử lại.', 'error');
+                        });
+                }
+            });
+        }
+
+
+
+    </script>
+}

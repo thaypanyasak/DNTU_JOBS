@@ -1,0 +1,358 @@
+﻿@model DNTU_JOBS.Models.JobTable
+@{
+    Layout = null;
+}
+
+<head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&display=swap" rel="stylesheet" />
+</head>
+
+<style>
+    body {
+        font-family: 'Manrope', sans-serif;
+        background-color: #f4f6f9;
+    }
+
+    .custom-container {
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .job-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+        .job-header h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #343a40;
+
+        }
+
+        .job-header p {
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+
+    .back-button {
+        color: #495057;
+        font-size: 1.2rem;
+        padding: 8px 12px;
+        border-radius: 5px;
+        background-color: #e9ecef;
+        transition: background-color 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+        .back-button:hover {
+            background-color: #d6d8db;
+            color: #333;
+        }
+
+    .card-header {
+        background-color: #343a40;
+        color: white;
+        font-weight: 600;
+        padding: 12px 15px;
+        font-size: 1.1rem;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+        font-size: 1rem;
+    }
+
+    .status, .gender {
+        font-weight: bold;
+    }
+
+    .badge {
+        font-size: 0.9rem;
+        font-weight: normal;
+    }
+
+    .approve-reject-buttons {
+        margin-top: 20px;
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+    }
+
+    .btn-success, .btn-danger {
+        font-weight: 600;
+        font-size: 0.9rem;
+        border: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+</style>
+
+<div class="custom-container">
+    <!-- Back Button -->
+    <a href="javascript:history.back()" class="back-button" title="Back to Previous">
+        <i class="fas fa-arrow-left"></i> Quay lại
+    </a>
+
+    <!-- Job Header -->
+    <div class="job-header">
+        <h2>Chi tiết công việc: @Model.JobTitle</h2>
+    </div>
+
+    <!-- Job Information Card -->
+    <div class="card">
+        <div class="card-header">
+            <h5><i class="fas fa-info-circle"></i> Thông tin công việc</h5>
+        </div>
+        <div class="card-body">
+            <!-- Basic Info Row -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <strong><i class="fas fa-user"></i> Người đăng:</strong> <span>@Model.ApplicationUser?.Name</span>
+                </div>
+                <div class="col-md-6">
+                    <strong><i class="fas fa-calendar-alt"></i> Ngày tạo:</strong> <span>@Model.CreationDate.ToString("g")</span>
+                </div>
+            </div>
+
+            <!-- Job Description Row -->
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <strong><i class="fas fa-file-alt"></i> Mô tả:</strong>
+                    <div>@Html.Raw(Model.JobDescription)</div>
+                </div>
+            </div>
+
+            <!-- Requirements and Education Row -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <strong><i class="fas fa-clipboard-list"></i> Yêu cầu:</strong>
+                    <div>@Html.Raw(Model.JobRequirements)</div>
+                </div>
+                <div class="col-md-6">
+                    <strong><i class="fas fa-graduation-cap"></i> Trình độ học vấn:</strong>
+                    <div>@Html.Raw(Model.Education)</div>
+                </div>
+            </div>
+
+            <!-- Benefits Row -->
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <strong><i class="fas fa-gift"></i> Quyền lợi:</strong>
+                    <div>@Html.Raw(Model.Benefits)</div>
+                </div>
+            </div>
+
+            <!-- Salary and Location Row -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <strong><i class="fas fa-money-bill-wave"></i> Lương:</strong>
+                    <span>
+                        @if (Model.SalaryMin.HasValue && Model.SalaryMax.HasValue)
+                        {
+                            @($"{Model.SalaryMin.Value:N0} - {Model.SalaryMax.Value:N0} VND")
+                        }
+                        else
+                        {
+                            <span class="text-muted">Liên hệ để biết mức lương</span>
+                        }
+                    </span>
+                </div>
+                <div class="col-md-6">
+                    <strong><i class="fas fa-map-marker-alt"></i> Địa điểm:</strong>
+                    <span>
+                        @if (Model.District != null && Model.Ward != null)
+                        {
+                            @($"{Model.District.Name}, {Model.Ward.Name}")
+                        }
+                        else if (Model.District != null)
+                        {
+                            @Model.District.Name
+                        }
+                        else if (Model.Ward != null)
+                        {
+                            @Model.Ward.Name
+                        }
+                        else
+                        {
+                            <span class="text-muted">Địa điểm không xác định</span>
+                        }
+                    </span>
+                </div>
+            </div>
+
+            <!-- Additional Information -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <strong><i class="fas fa-clock"></i> Thời gian làm việc:</strong>
+                    <span>@(string.IsNullOrEmpty(Model.WorkingTime) ? "Không xác định" : Model.WorkingTime)</span>
+                </div>
+                <div class="col-md-6">
+                    <strong><i class="fas fa-users"></i> Số lượng tuyển:</strong>
+                    <span>@(Model.HiringQuantity > 0 ? Model.HiringQuantity.ToString() : "Không xác định")</span>
+                </div>
+            </div>
+
+            <!-- Status and Gender Row -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <strong><i class="fas fa-layer-group"></i> Danh mục công việc:</strong>
+                    @if (Model.JobCategory != null)
+                    {
+                        @Model.JobCategory.CategoryName
+                    }
+                    else
+                    {
+                        <span class="text-muted">Không xác định</span>
+                    }
+                </div>
+                <div class="col-md-6">
+                    <strong><i class="fas fa-venus-mars"></i> Giới tính:</strong>
+                    <span>@(string.IsNullOrEmpty(Model.Gender) ? "Không xác định" : Model.Gender)</span>
+                </div>
+            </div>
+
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <strong><i class="fas fa-info-circle"></i> Trạng thái:</strong>
+                    <span>
+                        @switch (Model.Status)
+                        {
+                            case ApprovalStatus.Pending:
+                                <span class="badge bg-warning text-dark"><i class="fas fa-clock"></i> Đang chờ duyệt</span>
+                                break;
+                            case ApprovalStatus.Approved:
+                                <span class="badge bg-success"><i class="fas fa-check-circle"></i> Hoạt động</span>
+                                break;
+                            case ApprovalStatus.Rejected:
+                                <span class="badge bg-danger"><i class="fas fa-times-circle"></i> Từ chối</span>
+                                break;
+                            case ApprovalStatus.PendingEdit:
+                                <span class="badge bg-info text-dark"><i class="fas fa-edit"></i> Đang chờ duyệt sửa</span>
+                                break;
+                            case ApprovalStatus.ApprovedEdit:
+                                <span class="badge bg-success"><i class="fas fa-check-double"></i> Hoạt động</span>
+                                break;
+                            case ApprovalStatus.RejectedEdit:
+                                <span class="badge bg-danger"><i class="fas fa-ban"></i> Từ chối bài sửa</span>
+                                break;
+                            case ApprovalStatus.Break:
+                                <span class="badge bg-dark text-white"> <i class="fas fa-pause-circle"></i> Tạm ngừng</span>
+                                break;
+                            case ApprovalStatus.Working:
+                                <span class="badge bg-success"><i class="fas fa-check-double"></i> Hoạt động</span>
+                                break;
+                            default:
+                                <span class="badge bg-secondary">Không xác định</span>
+                                break;
+
+
+                        }
+                    </span>
+                </div>
+                </div>
+            <!-- Number of Applicants Row -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <strong><i class="fas fa-users"></i> Số người ứng tuyển:</strong>
+                    <span>@ViewBag.NumberOfApplicants</span>
+                </div>
+            </div>
+
+
+            <!-- Approve/Reject Buttons -->
+            @if (Model.Status == ApprovalStatus.Pending)
+            {
+                <div class="approve-reject-buttons">
+                    <!-- Approve Button -->
+                    <form asp-action="ApproveJob" method="post" id="approveForm">
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <button type="button" class="btn btn-success" onclick="approveJob()">
+                            <i class="fas fa-check-circle"></i> Duyệt
+                        </button>
+                    </form>
+
+                    <!-- Reject Button -->
+                    <form asp-action="RejectJob" method="post" id="rejectForm">
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <button type="button" class="btn btn-danger" onclick="rejectJob()">
+                            <i class="fas fa-times-circle"></i> Từ chối
+                        </button>
+                    </form>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+<script>
+    // Approve Job
+    function approveJob() {
+        Swal.fire({
+            title: 'Xác nhận phê duyệt công việc?',
+            text: "Bạn có chắc chắn muốn phê duyệt công việc này?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#28a745',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Phê duyệt',
+            cancelButtonText: 'Hủy'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Gửi form duyệt công việc
+                document.getElementById('approveForm').submit();
+            }
+        });
+    }
+
+    // Reject Job
+    function rejectJob() {
+        Swal.fire({
+            title: 'Từ chối công việc',
+            input: 'textarea',
+            inputPlaceholder: 'Nhập lý do từ chối...',
+            inputAttributes: {
+                'aria-label': 'Nhập lý do từ chối'
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Từ chối',
+            cancelButtonText: 'Hủy',
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            preConfirm: (reason) => {
+                if (!reason) {
+                    Swal.showValidationMessage('Lý do từ chối là bắt buộc!');
+                }
+                return reason;
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Thêm lý do từ chối vào form
+                const rejectForm = document.getElementById('rejectForm');
+                const reasonInput = document.createElement('input');
+                reasonInput.type = 'hidden';
+                reasonInput.name = 'reason';
+                reasonInput.value = result.value;
+                rejectForm.appendChild(reasonInput);
+
+                // Gửi form từ chối công việc
+                rejectForm.submit();
+            }
+        });
+    }
+</script>

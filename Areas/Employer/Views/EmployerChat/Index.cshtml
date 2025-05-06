@@ -1,0 +1,1470 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.13.216/pdf.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.13.216/pdf_viewer.min.css">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+
+    <title>Chat Room with Functionality</title>
+    <style>
+        /* Reset default margin and padding */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Full-screen layout */
+        html, body {
+            height: 100%;
+            font-family: 'Poppins', sans-serif; /* Áp dụng font Poppins */
+            background: linear-gradient(135deg, #e74c3c, #ff6b81, #f1c40f, #2ecc71, #3498db, #9b59b6, #34495e);
+        }
+
+        /* General container setup */
+        section {
+            height: 100%;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: transparent; /* Để nền của `section` trong suốt để thấy gradient của body */
+            margin-top: 50px;
+        }
+
+        .chat-container {
+            width: 95%;
+            max-width: 1100px;
+            height: 90vh;
+            background-color: #fff;
+            border-radius: 20px;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.1);
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Sidebar - user list */
+        .user-list {
+            width: 30%;
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            border-radius: 20px 0 0 20px;
+        }
+
+            .user-list .search-box {
+                margin-bottom: 20px;
+            }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 30px;
+            border: none;
+            outline: none;
+            font-size: 1rem;
+            background-color: #34495e;
+            color: #ecf0f1;
+        }
+
+            .search-box input::placeholder {
+                color: #bdc3c7;
+            }
+
+        .users {
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+            .users ul {
+                list-style: none;
+            }
+
+            .users li {
+                display: flex;
+                align-items: center;
+                margin-bottom: 15px;
+                padding: 10px;
+                border-radius: 15px;
+                cursor: pointer;
+                transition: background 0.3s ease;
+            }
+
+                .users li:hover {
+                    background-color: #16a085;
+                }
+
+            .users img {
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                object-fit: cover;
+                margin-right: 15px;
+            }
+
+            .users p {
+                margin: 0;
+            }
+
+            .users .user-name {
+                font-weight: bold;
+                font-size: 1.2rem;
+            }
+
+            .users .last-message {
+                font-size: 0.9rem;
+                color: #bdc3c7;
+            }
+
+        /* Chat content area */
+        .chat-content {
+            width: 70%;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            background-color: #f7f9fc;
+        }
+
+            .chat-content .chat-header {
+                font-weight: bold;
+                font-size: 1.5rem;
+                color: #2c3e50;
+                margin-bottom: 20px;
+            }
+
+        .messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 10px;
+            margin-bottom: 20px;
+        }
+
+            .messages .message {
+                margin-bottom: 20px;
+                display: flex;
+                align-items: flex-end;
+                padding: 10px;
+                transition: transform 0.2s ease;
+            }
+
+                .messages .message:hover {
+                    transform: scale(1.02);
+                }
+
+        .message.received .message-bubble {
+            background-color: #dfe6e9;
+            border-radius: 15px 15px 15px 0;
+            padding: 15px;
+            color: #2d3436;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .message.sent .message-bubble {
+            background-color: #0984e3;
+            color: white;
+            border-radius: 15px 15px 0 15px;
+            padding: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .message-bubble {
+            max-width: 65%;
+            word-wrap: break-word;
+        }
+
+        /* Chat footer */
+        .chat-footer input {
+            flex-grow: 1;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 20px;
+            background-color: #e0e0e5; /* Màu nền cho input xám nhẹ */
+            color: #333; /* Màu chữ đậm */
+            margin: 0 10px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+            .chat-footer input::placeholder {
+                color: #999; /* Màu placeholder nhạt hơn */
+            }
+
+        .chat-footer button {
+            background: none;
+            border: none;
+            color: #333; /* Màu nút xám đậm */
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .chat-footer .send-button {
+            background-color: #4db6ac; /* Màu xanh ngọc cho nút gửi */
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease;
+        }
+
+            .chat-footer .send-button:hover {
+                background-color: #009688; /* Xanh đậm hơn khi hover */
+            }
+
+        .chat-footer .attach-button,
+        .chat-footer .emoji-button {
+            color: #666; /* Màu icon xám đậm */
+            padding: 10px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+            .chat-footer .attach-button:hover,
+            .chat-footer .emoji-button:hover {
+                color: #333; /* Màu icon khi hover */
+            }
+
+        li:hover {
+            background-color: #34495e;
+            box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Mobile responsive adjustments */
+        media (max-width: 768px) {
+            .chat-container
+
+        {
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .user-list {
+            width: 100%;
+            height: 30%;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .chat-content {
+            width: 100%;
+            height: 70%;
+        }
+
+        }
+
+        /* Tùy chỉnh giao diện chung cho popup Emoji Picker */
+        .emoji-picker {
+            background-color: #ffffff; /* Màu nền trắng */
+            border-radius: 15px; /* Bo góc mềm mại */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); /* Bóng đổ tinh tế */
+            padding: 15px; /* Khoảng cách bên trong */
+            max-width: 400px; /* Độ rộng tối đa */
+            width: 100%; /* Độ rộng đầy đủ */
+            z-index: 10000; /* Đảm bảo luôn nổi trên các phần tử khác */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Tùy chỉnh cho phần header của emoji picker */
+        .emoji-picker__header {
+            font-size: 18px;
+            font-weight: bold;
+            color: #3498db;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        /* Tùy chỉnh phần danh mục emoji */
+        .emoji-picker__categories {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            width: 100%;
+            padding: 0 10px;
+        }
+
+        /* Mỗi danh mục emoji */
+        .emoji-picker__category {
+            cursor: pointer;
+            font-size: 18px;
+            color: #bdc3c7;
+            transition: color 0.3s ease;
+        }
+
+            .emoji-picker__category:hover {
+                color: #2ecc71; /* Hiệu ứng hover */
+            }
+
+        /* Vùng hiển thị các emoji */
+        .emoji-picker__emojis {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+            gap: 10px;
+            padding: 10px;
+            justify-content: center;
+        }
+
+            /* Tùy chỉnh từng emoji */
+            .emoji-picker__emojis .emoji {
+                font-size: 24px;
+                cursor: pointer;
+                transition: transform 0.2s ease, background-color 0.2s ease;
+            }
+
+                .emoji-picker__emojis .emoji:hover {
+                    background-color: #ecf0f1;
+                    border-radius: 50%; /* Hiệu ứng khi hover làm mềm emoji */
+                    transform: scale(1.2); /* Phóng to emoji khi hover */
+                    padding: 5px;
+                }
+
+            /* Tùy chỉnh thanh cuộn cho emoji */
+            .emoji-picker__emojis::-webkit-scrollbar {
+                width: 8px;
+            }
+
+            .emoji-picker__emojis::-webkit-scrollbar-thumb {
+                background-color: #95a5a6; /* Màu của thanh cuộn */
+                border-radius: 10px;
+            }
+
+                .emoji-picker__emojis::-webkit-scrollbar-thumb:hover {
+                    background-color: #7f8c8d;
+                }
+
+        /* Tùy chỉnh container của ô tìm kiếm */
+        .emoji-picker__search-container {
+            width: 100%;
+            padding: 8px 15px;
+            background-color: #ecf0f1; /* Màu nền mềm mại */
+            border-radius: 30px; /* Bo góc thanh tìm kiếm */
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1); /* Bóng đổ nhẹ */
+            border: 1px solid #bdc3c7; /* Đường viền nhẹ */
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+            /* Tùy chỉnh input bên trong ô tìm kiếm */
+            .emoji-picker__search-container input {
+                flex-grow: 1;
+                padding: 10px;
+                border: none; /* Xóa đường viền mặc định */
+                outline: none; /* Xóa outline khi focus */
+                background-color: transparent; /* Nền trong suốt */
+                font-size: 16px;
+                color: #2c3e50; /* Màu chữ tối dễ đọc */
+            }
+
+                /* Placeholder của input */
+                .emoji-picker__search-container input::placeholder {
+                    color: #7f8c8d; /* Màu placeholder tinh tế */
+                }
+
+            /* Icon tìm kiếm bên trong ô tìm kiếm */
+            .emoji-picker__search-container .emoji-picker__search-icon {
+                font-size: 18px;
+                color: #95a5a6;
+                margin-right: 10px;
+            }
+
+            /* Hiệu ứng khi hover vào ô tìm kiếm */
+            .emoji-picker__search-container:hover {
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            }
+
+            /* Khi người dùng focus vào ô tìm kiếm */
+            .emoji-picker__search-container input:focus {
+                border: none;
+            }
+
+            /* Khi người dùng nhập văn bản, đổi màu icon tìm kiếm */
+            .emoji-picker__search-container input:not(:placeholder-shown) + .emoji-picker__search-icon {
+                color: #3498db; /* Màu của icon khi có văn bản */
+            }
+
+        .emoji-picker__preview {
+            display: none;
+        }
+
+        /* Thiết lập font và font-size cho tin nhắn đã tải và tin nhắn gửi */
+        .message-bubble p {
+            font-family: 'Poppins', sans-serif; /* Đảm bảo dùng cùng font với toàn bộ trang */
+            font-size: 1rem; /* Kích thước chữ chuẩn */
+            color: #333; /* Màu chữ chuẩn */
+            margin: 0; /* Loại bỏ khoảng cách mặc định */
+        }
+
+        /* Kích thước chữ cho phần thời gian gửi */
+        .message-bubble .small {
+            font-size: 0.75rem;
+            color: #999;
+        }
+
+        .chat-footer {
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            background-color: #f5f7fa;
+            border-radius: 30px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 100%;
+        }
+
+        #image-preview {
+            display: none;
+            position: relative;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .image-item {
+            position: relative;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        #image-preview img {
+            width: 70px;
+            height: 70px;
+        }
+
+        .preview-img {
+            width: 70px;
+            height: 70px;
+            border-radius: 10px;
+            object-fit: cover;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .image-item:hover .trash-icon {
+            opacity: 1;
+        }
+
+        .image-item:hover .preview-img {
+            opacity: 0.6; /* Làm mờ hình ảnh khi hover */
+        }
+
+        #trash-icon {
+            position: relative; /* Thay đổi thành absolute */
+            top: -19px; /* Điều chỉnh vị trí dọc */
+            right: 22px; /* Điều chỉnh vị trí ngang */
+            color: #AD0514;
+            font-size: 20px;
+            cursor: pointer;
+            opacity: 0; /* Mặc định ẩn */
+            transition: opacity 0.3s ease; /* Thêm hiệu ứng chuyển đổi */
+        }
+
+
+
+        /* Styles for the enlarged image modal */
+        /* Styles for the enlarged image modal */
+        #modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 180px;
+            top: 40px;
+            width: 80%; /* Giảm chiều rộng modal */
+            height: 93%; /* Giảm chiều cao modal */
+            overflow: hidden; /* Ẩn thanh cuộn */
+            background-color: rgba(0, 0, 0, 1);
+            justify-content: center;
+            align-items: center;
+        }
+
+        #modal-content {
+            position: relative;
+            width: 100%; /* Đặt chiều rộng của nội dung modal */
+            height: 100%; /* Đặt chiều cao của nội dung modal */
+        }
+
+            #modal-content img {
+                width: 100%; /* Chiếm đầy chiều rộng của modal nội dung */
+                height: auto; /* Đặt chiều cao tự động */
+                max-height: 100%; /* Đảm bảo chiều cao không vượt quá chiều cao của modal */
+                object-fit: contain; /* Giữ tỷ lệ và làm hình ảnh vừa với khung mà không bị cắt */
+                border-radius: 10px; /* Bo góc cho hình ảnh */
+            }
+
+
+
+
+        .close-button {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            padding: 5px 10px;
+            font-size: 16px;
+        }
+
+        .attach-button, .emoji-button, .send-button {
+            background: none;
+            border: none;
+            color: #7f8c8d;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        input[type="text"] {
+            flex-grow: 1;
+            padding: 10px 15px;
+            border-radius: 20px;
+            border: 1px solid #ddd;
+            background-color: #f0f2f5;
+        }
+
+        .send-button {
+            background-color: #26a69a;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+            .send-button:hover {
+                background-color: #1b8078;
+            }
+
+        .emoji-button i, .attach-button i {
+            color: #7f8c8d;
+        }
+
+        #modal-file .btn {
+            padding: 6px 10px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+
+
+        #modal-file h5 {
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #pdf-canvas {
+            border-radius: 5px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+    </style>
+</head>
+<body>
+    <section>
+        <div class="chat-container">
+            <!-- User List Sidebar -->
+            <div class="user-list">
+                <div class="search-box">
+                    <input type="text" placeholder="Tìm kiếm người dùng...">
+                </div>
+                <div class="users">
+                    <ul id="user-list">
+                        <!-- Danh sách người dùng sẽ được tải vào đây -->
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Chat Content Area -->
+            <div class="chat-content">
+                <div class="chat-header">
+                    <span id="chat-header-text">CHAT ROOM</span>
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <div class="messages" id="chat-content">
+                    <!-- Tin nhắn sẽ được tải vào đây -->
+                </div>
+                <div class="chat-footer" style="display: flex; flex-direction: column; padding: 10px; background-color: #f5f7fa; border-radius: 30px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); width: 100%;">
+                    <!-- Image preview section (Trash icon shows on hover) -->
+                    <div id="image-preview" style="display: none; flex-wrap: wrap; gap: 10px;">
+                        <img id="preview-img" src="" alt="Image Preview" style="width: 70px; height: 70px; border-radius: 10px; object-fit: cover;">
+                        <i id="trash-icon" class="fa-solid fa-trash"></i>
+                    </div>
+
+                    <!-- Hidden file input for image upload -->
+                    <div style="display: flex; align-items: center;">
+                        <input type="file" id="imageUpload" style="display: none;" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" multiple>
+
+
+                        <button id="attachButton" class="attach-button" style="background: none; border: none; cursor: pointer; margin-right: 10px;">
+                            <i class="fas fa-paperclip" style="font-size: 1.5rem; color: #7f8c8d;"></i>
+                        </button>
+
+                        <!-- Chat input and emoji button -->
+                        <input type="text" id="chatMessage" placeholder="Type your message..." style="flex-grow: 1; padding: 10px 15px; border-radius: 20px; border: 1px solid #ddd; background-color: #f0f2f5; margin-right: 10px;">
+
+                        <button class="emoji-button" style="background: none; border: none; cursor: pointer; margin-right: 10px;">
+                            <i class="far fa-smile" style="font-size: 1.5rem; color: #7f8c8d;"></i>
+                        </button>
+
+                        <button id="sendMessageButton" class="send-button" style="background-color: #26a69a; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal for enlarged image -->
+    <div id="modal">
+        <div id="modal-content">
+            <button class="close-button">X</button>
+            <img id="modal-img" src="" alt="Enlarged Image">
+        </div>
+    </div>
+
+    <div id="modal-file" style="display: none; position: fixed; top: 5%; left: 5%; width: 90%; height: 90%; background: #fff; z-index: 1000; border-radius: 8px; box-shadow: 0px 0px 10px rgba(0,0,0,0.2);">
+        <div style="padding: 10px; display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; border-bottom: 1px solid #ddd;">
+            <h5 style="margin: 0;"><i class="fas fa-file-pdf text-danger"></i> PDF Viewer</h5>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <button id="prev-page" class="btn btn-light btn-sm" title="Previous Page">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button id="next-page" class="btn btn-light btn-sm" title="Next Page">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+                <span style="font-size: 0.9rem;">
+                    <i class="fas fa-file-alt"></i> <span id="current-page"></span> / <span id="total-pages"></span>
+                </span>
+                <button id="zoom-in" class="btn btn-light btn-sm" title="Zoom In">
+                    <i class="fas fa-search-plus"></i>
+                </button>
+                <button id="zoom-out" class="btn btn-light btn-sm" title="Zoom Out">
+                    <i class="fas fa-search-minus"></i>
+                </button>
+                <a id="download-pdf" href="#" class="btn btn-light btn-sm" download title="Download PDF">
+                    <i class="fas fa-download"></i>
+                </a>
+                <button class="btn btn-light btn-sm" onclick="$('#modal-file').fadeOut();" title="Close">
+                    <i class="fas fa-times text-danger"></i>
+                </button>
+            </div>
+        </div>
+        <div id="modal-file-content" style="height: calc(100% - 50px); overflow: auto; display: flex; justify-content: center; align-items: center;">
+            <div id="pdf-scroll-container" style="position: relative; overflow: auto; height: 100%; width: 100%;">
+                <canvas id="pdf-canvas" style="border: 1px solid #ccc; display: block; margin: 0 auto;"></canvas>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <!-- FontAwesome for icons -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/emoji-button@latest/dist/index.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.0/signalr.min.js"></script>
+
+
+    <script>
+        $(document).ready(function () {
+            const connection = new signalR.HubConnectionBuilder().withUrl("/ChatHub").build();
+
+
+            var selectedFiles = []; // Tạm lưu trữ ảnh khi người dùng chọn
+
+            connection.start()
+                .then(() => {
+                    console.log("Connected to SignalR for Employer");
+                    loadUserList(); // Load user list after connecting to SignalR
+                })
+                .catch(err => {
+                    console.error("SignalR Connection Error for Employer:", err);
+                });
+
+            // Listen for new messages from SignalR
+            
+
+            var currentActiveUserId = null;
+
+
+            connection.off("ReceiveMessage"); // Xóa tất cả các sự kiện cũ
+            connection.on("ReceiveMessage", function (data) {
+                console.log("Received SignalR data:", data);
+
+                // Nếu tin nhắn không dành cho Employer đang active
+                if (data.senderId !== currentActiveUserId && data.receiverId !== currentActiveUserId) {
+                    console.log("Tin nhắn này không thuộc user đang active. Bỏ qua.");
+
+                    // Cập nhật badge và tin nhắn cuối cho người không active
+                    const userBadge = $(`.user-item[data-user-id="${data.senderId}"] .unread-badge`);
+                    const lastMessage = $(`.user-item[data-user-id="${data.senderId}"] .last-message`);
+
+                    // Chỉ cập nhật tin nhắn cuối nếu người nhận tin nhắn không phải là người đang active
+                    if (!lastMessage.text().includes('Nhấp để xem tin nhắn...')) {
+                        lastMessage.text(data.message || 'Tin nhắn mới');
+                    }
+
+                    // Hiển thị hoặc tăng badge chưa đọc
+                    if (userBadge.length > 0) {
+                        const currentCount = parseInt(userBadge.text(), 10) || 0;
+                        userBadge.text(currentCount + 1).show();
+                    } else {
+                        $(`.user-item[data-user-id="${data.senderId}"]`).append(`
+                        <span class="badge bg-danger rounded-pill unread-badge" style="font-size: 0.85rem; padding: 5px 10px;">1</span>
+                    `);
+                    }
+
+                    return; 
+                }
+
+                // Nếu tin nhắn thuộc Employer đang active, hiển thị tin nhắn
+                displayReceivedMessage(data);
+            });
+
+            // Hàm hiển thị tin nhắn
+            function displayReceivedMessage(data) {
+                const chatBox = $('#chat-content');
+                const isSenderEmployer = data.senderId === currentActiveUserId; // Kiểm tra nếu người gửi là Employer
+                const sentAt = new Date(data.sentAt).toLocaleTimeString();
+
+                // Kiểm tra người dùng có đang ở cuối chat không
+                const isAtBottom = chatBox.scrollTop() + chatBox.innerHeight() >= chatBox[0].scrollHeight;
+
+                // Tạo container chính cho tin nhắn
+                const messageContainer = $('<div>')
+                    .addClass(`d-flex flex-row justify-content-${isSenderEmployer ? 'end' : 'start'} mb-3`);
+
+                // Avatar của người gửi
+                const avatarHtml = `
+            <img src="${data.avatar || '/img/logo/default-avatar.png'}" alt="avatar"
+                 class="rounded-circle" style="width: 40px; height: 40px; border: 2px solid #fff;
+                 box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.05);">
+            `;
+
+                // Nội dung chính (tin nhắn văn bản, hình ảnh hoặc file)
+                const contentHtml = $('<div>')
+                    .addClass(`d-flex flex-column ${isSenderEmployer ? 'align-items-end' : 'align-items-start'}`)
+                    .css('margin', isSenderEmployer ? '0 15px 0 0' : '0 0 0 15px');
+
+                // Nếu có tin nhắn văn bản
+                if (data.message && data.message.trim() !== '') {
+                    contentHtml.append(`
+                <p class="small p-3 ${isSenderEmployer ? 'me-3' : 'ms-3'} mb-1 rounded-4"
+                   style="background-color: ${isSenderEmployer ? '#E0E0E0' : '#FFFFFF'}; color: #333;
+                          box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05); max-width: 250px; font-size: 1rem;
+                          border-radius:20px; text-align: ${isSenderEmployer ? 'right' : 'left'};">
+                    ${data.message}
+                </p>
+                <p class="small text-muted ${isSenderEmployer ? 'me-3' : 'ms-3'} mb-0" style="font-size: 0.75rem;">
+                    ${sentAt}
+                </p>
+                `);
+                }
+
+                // Hiển thị hình ảnh nếu có
+                if (data.imageUrls && data.imageUrls.length > 0) {
+                    const uniqueImageUrls = [...new Set(data.imageUrls)];
+                    uniqueImageUrls.forEach(function (imageUrl) {
+                        contentHtml.append(`
+                    <div class="p-3 ${isSenderEmployer ? 'me-3' : 'ms-3'} mb-1">
+                        <img src="${imageUrl}" alt="Image" class="message-image"
+                             style="max-width: 200px; border-radius: 10px; box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.1); cursor: pointer;">
+                    </div>
+                    `);
+                    });
+                }
+
+                // Hiển thị file nếu có
+                if (data.fileUrls && data.fileUrls.length > 0) {
+                    data.fileUrls.forEach(function (file) {
+                        let iconHtml = '';
+                        let actionHtml = '';
+
+                        // Xử lý các loại file khác nhau
+                        switch (file.fileType) {
+                            case 'application/pdf':
+                                iconHtml = '<i class="fas fa-file-pdf" style="font-size: 20px; color: #e74c3c;"></i>';
+                                actionHtml = `<button class="btn btn-link" onclick="viewPDF('${file.url}')">${iconHtml} ${file.fileName}</button>`;
+                                break;
+                            case 'application/msword':
+                            case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+                                iconHtml = '<i class="fas fa-file-word" style="font-size: 20px; color: #3498db;"></i>';
+                                actionHtml = `<a href="${file.url}" download="${file.fileName}" class="btn btn-link">${iconHtml} ${file.fileName}</a>`;
+                                break;
+                            case 'application/vnd.ms-excel':
+                            case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+                                iconHtml = '<i class="fas fa-file-excel" style="font-size: 20px; color: #27ae60;"></i>';
+                                actionHtml = `<a href="${file.url}" download="${file.fileName}" class="btn btn-link">${iconHtml} ${file.fileName}</a>`;
+                                break;
+                            default:
+                                iconHtml = '<i class="fas fa-file" style="font-size: 20px; color: #7f8c8d;"></i>';
+                                actionHtml = `<a href="${file.url}" target="_blank">${iconHtml} ${file.fileName || 'Download File'}</a>`;
+                        }
+
+                        contentHtml.append(`
+                    <p class="small p-3 ${isSenderEmployer ? 'me-3' : 'ms-3'} mb-1 rounded-4"
+                        style="background-color: #E0E0E0; color: #333; box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05);
+                            max-width: 250px; font-size: 1rem; border-radius:20px; text-align: ${isSenderEmployer ? 'right' : 'left'};
+                            overflow-wrap: break-word;">
+                        ${actionHtml}
+                    </p>
+                `);
+                    });
+                }
+
+
+
+                // Gắn avatar và nội dung chính vào container chính
+                if (isSenderEmployer) {
+                    messageContainer.append(contentHtml).append(avatarHtml);
+                } else {
+                    messageContainer.append(avatarHtml).append(contentHtml);
+                }
+
+                // Thêm container vào chatBox
+                chatBox.append(messageContainer);
+
+                // Nếu người dùng đang ở cuối, tự động cuộn đến tin nhắn mới
+                if (isAtBottom) {
+                    chatBox.scrollTop(chatBox.prop("scrollHeight")); // Cuộn đến cuối
+                }
+            }
+
+
+
+
+
+            var employerId = '@Model.ApplicationUserId';
+            var employerPhoto = '@Model.EmployerPhoto';
+
+
+            $('#chatMessage').on('keypress', function (e) {
+                if (e.which === 13 && !e.shiftKey) { // Check if Enter is pressed without Shift
+                    e.preventDefault(); // Prevent default newline behavior
+                    $('#sendMessageButton').click(); // Trigger the send button click event
+                }
+            });
+
+            // Mở file picker khi nhấn nút attach
+            $('#attachButton').on('click', function () {
+                $('#imageUpload').click();
+            });
+
+            // Display selected image preview
+            // Xử lý sự kiện khi chọn ảnh
+            $('#imageUpload').on('change', function (event) {
+                var files = event.target.files;
+
+                // Clear existing previews and selected files array
+                $('#image-preview').empty();
+                selectedFiles = [];
+
+                if (files.length > 0) {
+                    // Show the image preview section if there are files
+                    $('#image-preview').show();
+
+                    for (var i = 0; i < files.length; i++) {
+                        selectedFiles.push(files[i]);
+                        var file = files[i];
+                        var reader = new FileReader();
+
+                        // Use FileReader to display image preview or file icon
+                        reader.onload = (function (file) {
+                            return function (e) {
+                                var previewElement = '';
+
+                                if (file.type.startsWith('image/')) {
+                                    // If it's an image file, display it as an image
+                                    previewElement = `
+                                    <div class="image-item" style="position: relative; display: inline-block;">
+                                        <img src="${e.target.result}" class="preview-img" alt="Image Preview" style="width: 70px; height: 70px; border-radius: 10px; object-fit: cover; cursor: pointer;">
+                                        <i class="fa-solid fa-trash trash-icon" style="position: absolute; top: 5px; right: 5px; color: #AD0514; font-size: 18px; cursor: pointer; display: none;"></i>
+                                    </div>`;
+                                } else {
+                                    var iconHtml = '';
+                                    switch (file.type) {
+                                        case 'application/pdf':
+                                            iconHtml = '<i class="fas fa-file-pdf" style="font-size: 40px; color: #e74c3c;"></i>';
+                                            break;
+                                        case 'application/msword':
+                                        case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+                                            iconHtml = '<i class="fas fa-file-word" style="font-size: 40px; color: #3498db;"></i>';
+                                            break;
+                                        case 'application/vnd.ms-excel':
+                                        case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+                                            iconHtml = '<i class="fas fa-file-excel" style="font-size: 40px; color: #27ae60;"></i>';
+                                            break;
+                                        default:
+                                            iconHtml = '<i class="fas fa-file" style="font-size: 40px; color: #7f8c8d;"></i>';
+                                    }
+
+                                    previewElement = `
+                                    <div class="image-item" style="position: relative; display: inline-block;">
+                                        <div style="display: flex; align-items: center;">
+                                            ${iconHtml}
+                                            <span style="margin-left: 10px;">${file.name}</span>
+                                        </div>
+                                        <i class="fa-solid fa-trash trash-icon" style="position: absolute; top: 5px; right: 5px; color: #AD0514; font-size: 18px; cursor: pointer; display: none;"></i>
+                                    </div>`;
+                                }
+
+                                $('#image-preview').append(previewElement);
+                            };
+                        })(file);
+                        reader.readAsDataURL(file);
+                    }
+                } else {
+                    // Hide the image preview section if no files are selected
+                    $('#image-preview').hide();
+                }
+            });
+
+
+
+            // Show trash icon on hover and hide it when not hovering
+            $('#image-preview').on('mouseenter', '.image-item', function () {
+                $(this).find('.trash-icon').show();
+            });
+
+            $('#image-preview').on('mouseleave', '.image-item', function () {
+                $(this).find('.trash-icon').hide();
+            });
+
+            // Handle trash icon click to remove the image
+            $('#image-preview').on('click', '.trash-icon', function () {
+                var index = $(this).closest('.image-item').index();
+                selectedFiles.splice(index, 1); 
+                $(this).closest('.image-item').remove(); 
+
+                if (selectedFiles.length === 0) {
+                    $('#image-preview').hide();
+                    $('#imageUpload').val(''); 
+                }
+            });
+
+            $('#image-preview').on('click', '.preview-img', function () {
+                var src = $(this).attr('src');
+                $('#modal-img').attr('src', src); 
+                $('#modal').fadeIn(); 
+            });
+
+            $('.close-button').on('click', function () {
+                $('#modal').fadeOut(); 
+            });
+
+            // Close modal when clicking outside the modal content
+            $(window).on('click', function (event) {
+                if ($(event.target).is('#modal')) {
+                    $('#modal').fadeOut(); // Hide the modal
+                }
+            });
+
+            // Load user list on page load
+            loadUserList();
+
+            const emojiButton = document.querySelector('.emoji-button');
+            const chatMessageInput = document.querySelector('#chatMessage');
+
+            // Initialize Emoji Picker
+            const picker = new EmojiButton({
+                theme: 'light',
+                position: 'top-end',
+                autoHide: false,
+                rows: 6,
+                emojisPerRow: 8,
+                zIndex: 10000,
+                search: true,
+                searchPlaceholder: 'Tìm kiếm emoji...'
+            });
+
+            let isPickerVisible = false;
+
+            // Toggle emoji picker
+            emojiButton.addEventListener('click', (event) => {
+                event.stopPropagation();  // Ngăn sự kiện click này lan ra ngoài và ảnh hưởng đến các phần tử khác
+                if (isPickerVisible) {
+                    picker.hidePicker();  // Đóng picker nếu đang mở
+                } else {
+                    picker.showPicker(emojiButton);  // Mở picker nếu đang đóng
+                }
+                isPickerVisible = !isPickerVisible;  // Đảo ngược trạng thái
+            });
+
+            // When emoji is selected
+            picker.on('emoji', emoji => {
+                chatMessageInput.value += emoji;
+            });
+
+            // Ngăn picker bị tắt khi click vào input
+            chatMessageInput.addEventListener('focus', (event) => {
+                if (isPickerVisible) {
+                    picker.hidePicker();  // Đóng picker khi click vào input để gõ tin nhắn
+                    isPickerVisible = false;
+                }
+            });
+
+            // Đóng picker khi click ra ngoài emoji picker và nút emoji
+            document.addEventListener('click', (event) => {
+                if (isPickerVisible && !event.target.closest('.emoji-button') && !event.target.closest('.emoji-picker')) {
+                    picker.hidePicker();  // Đóng picker nếu click ra ngoài
+                    isPickerVisible = false;  // Cập nhật trạng thái
+                }
+            });
+
+            // Function to load user list
+            function loadUserList() {
+                $.get('/api/ChatApi/GetUserMessages/' + employerId, function (users) {
+                    var userList = $('#user-list');
+                    userList.empty();
+
+                    users.forEach(function (user) {
+                        // Kiểm tra xem người dùng hiện tại có phải là người đang active hay không
+                        var isActiveUser = user.id === currentActiveUserId;
+
+                        // Nếu là người dùng đang active, không hiển thị tin nhắn mới
+                        var lastMessage = isActiveUser ? '' : (user.lastMessage || 'Nhấp để xem tin nhắn...');
+
+                        userList.append(`
+                    <li class="p-2 mb-2 border-bottom user-item" style="background-color: #2c3e50; border-radius: 8px;" data-user-id="${user.id}">
+                        <div class="d-flex justify-content-between align-items-center" style="padding: 10px; border-radius: 8px;">
+                            <div class="d-flex flex-row align-items-center">
+                                <img src="${user.avatar}" alt="avatar" class="rounded-circle" width="50" style="box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);">
+                                <div class="pt-1">
+                                    <p class="fw-bold mb-0" style="color: #ecf0f1;">${user.name}</p>
+                                    <p class="small text-muted mb-0 last-message" style="color: #bdc3c7;">
+                                        ${lastMessage}
+                                    </p>
+                                </div>
+                            </div>
+                            <div>
+                                <!-- Chỉ hiển thị badge unread khi chưa active -->
+                                ${user.unreadMessages > 0 && !isActiveUser ? `
+                                    <span class="badge bg-danger rounded-pill unread-badge" style="font-size: 0.85rem; padding: 5px 10px;">${user.unreadMessages}</span>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </li>
+                `);
+                    });
+
+                    // Click sự kiện xử lý khi chọn người dùng
+                    $('.user-item').on('click', function () {
+                        var userId = $(this).data('user-id');
+                        currentActiveUserId = userId;
+
+                        // Tải lại tin nhắn của người dùng đã chọn
+                        loadMessages(userId);
+
+                        // Cập nhật tiêu đề header với tên người dùng
+                        $('#chat-header-text').text($(this).find('.fw-bold').text());
+
+                        // Đổi màu nền của người dùng đã chọn
+                        $('.user-item').css('background-color', '#2c3e50');
+                        $(this).css('background-color', '#2980b9');
+
+                        // Reset tin nhắn cuối
+                        $('.user-item .last-message').text('Nhấp để xem tin nhắn...');
+                        $(this).find('.last-message').text('');
+
+                        // Xóa badge unread
+                        $(this).find('.unread-badge').remove();
+
+                        // Đánh dấu tất cả tin nhắn là đã đọc
+                        markMessagesAsRead(userId);
+                    });
+                }).fail(function (xhr) {
+                    console.error("Error loading user list:", xhr.responseText);
+                });
+            }
+
+
+
+
+
+            
+
+            // Hàm đánh dấu tin nhắn là đã đọc
+            function markMessagesAsRead(userId) {
+                $.post(`/api/ChatApi/MarkMessagesAsRead/${userId}`, function () {
+                    console.log("Marked all messages as read.");
+                    $(`.user-item[data-user-id="${userId}"] .unread-badge`).remove();
+                }).fail(function (xhr) {
+                    console.error("Error marking messages as read:", xhr.responseText);
+                });
+            }
+
+
+
+
+            // Load messages between Employer and selected User
+            function loadMessages(userId) {
+                showLoadingIndicator();
+                $.get('/api/ChatApi/GetMessageForEmployer/' + userId, function (messages) {
+                    var chatBox = $('#chat-content');
+                    chatBox.empty();  // Clear the previous chat messages
+
+                    // Loop through the messages
+                    messages.forEach(function (message) {
+                        var isSenderEmployer = message.senderId === employerId;
+                        var avatarSrc = message.avatar || '/img/logo/default-avatar.png';
+                        var sentAt = new Date(message.sentAt).toLocaleTimeString() || 'Unknown time';
+
+                        var messageContent = '';
+
+                        // Text message
+                        // Text message
+                        if (message.content) {
+                            messageContent += `
+            <p class="small p-3 ${isSenderEmployer ? 'me-3' : 'ms-3'} mb-1 rounded-4"
+               style="background-color: ${isSenderEmployer ? '#E0E0E0' : '#FFFFFF'};
+                      color: #333;
+                      box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05);
+                      max-width: 250px;
+                      font-size: 1rem;
+                      border-radius: 20px;
+                      text-align: ${isSenderEmployer ? 'right' : 'left'};
+                      word-wrap: break-word;
+                      word-break: break-word;
+                      white-space: normal;
+                      overflow-wrap: break-word;">
+                ${message.content}
+            </p>`;
+                        }
+
+
+                        // Display images if any
+                        if (message.images && message.images.length > 0) {
+                            message.images.forEach(function (image) {
+                                messageContent += `
+                                <div class="p-3 ${isSenderEmployer ? 'me-3' : 'ms-3'} mb-1">
+                                    <img src="${image.imageUrl}" alt="Image" class="message-image" style="max-width: 200px; border-radius: 10px; box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.1); cursor: pointer;">
+                                </div>`;
+                            });
+                        }
+
+                        // Handle file attachments (including PDF)
+                        if (message.files && message.files.length > 0) {
+                            message.files.forEach(function (file) {
+                                var iconHtml = '';
+                                var actionHtml = '';  // This will hold the link or button for file interaction
+
+                                switch (file.fileType) {
+                                    case 'application/pdf':
+                                        iconHtml = '<i class="fas fa-file-pdf" style="font-size: 20px; color: #e74c3c;"></i>';
+                                        actionHtml = `
+                                        <button class="btn btn-link" onclick="viewPDF('${file.fileUrl}')" style="word-wrap: break-word; word-break: break-word; white-space: normal; text-align: left; max-width: 200px;">
+                                            ${iconHtml} ${file.fileName}
+                                        </button>`;
+                                        break;
+                                    case 'application/msword':
+                                    case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+                                        iconHtml = '<i class="fas fa-file-word" style="font-size: 20px; color: #3498db;"></i>';
+                                        actionHtml = `
+                                        <a href="${file.fileUrl}" download="${file.fileName}" class="btn btn-link" style="word-wrap: break-word; word-break: break-word; white-space: normal; text-align: left; max-width: 200px;">
+                                            ${iconHtml} ${file.fileName}
+                                        </a>`;
+                                        break;
+                                    case 'application/vnd.ms-excel':
+                                    case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+                                        iconHtml = '<i class="fas fa-file-excel" style="font-size: 20px; color: #27ae60;"></i>';
+                                        actionHtml = `
+                                        <a href="${file.fileUrl}" download="${file.fileName}" class="btn btn-link" style="word-wrap: break-word; word-break: break-word; white-space: normal; text-align: left; max-width: 200px;">
+                                            ${iconHtml} ${file.fileName}
+                                        </a>`;
+                                        break;
+                                    default:
+                                        iconHtml = '<i class="fas fa-file" style="font-size: 20px; color: #7f8c8d;"></i>';
+                                        actionHtml = `
+                                        <a href="${file.fileUrl}" target="_blank" class="btn btn-link" style="word-wrap: break-word; word-break: break-word; white-space: normal; text-align: left; max-width: 200px;">
+                                            ${iconHtml} ${file.fileName || 'Download File'}
+                                        </a>`;
+                                }
+
+
+                                messageContent += `
+                            <p class="small p-3 ${isSenderEmployer ? 'me-3' : 'ms-3'} mb-1 rounded-4"
+                               style="background-color: ${isSenderEmployer ? '#E0E0E0' : '#FFFFFF'}; color: #333; box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05); max-width: 250px; font-size: 1rem; border-radius:20px; text-align: ${isSenderEmployer ? 'right' : 'left'};">
+                                ${actionHtml}
+                            </p>`;
+                            });
+                        }
+
+                        // Append message content to chat box
+                        if (messageContent) {
+                            chatBox.append(`
+                            <div class="d-flex flex-row justify-content-${isSenderEmployer ? 'end' : 'start'} mb-3">
+                                ${isSenderEmployer ? `
+                                <div class="d-flex flex-row-reverse align-items-center">
+                                    <img src="${avatarSrc}" alt="avatar" class="rounded-circle" style="width: 40px; height: 40px; border: 2px solid #fff; box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.05);">
+                                    <div class="d-flex flex-column align-items-end" style="margin-right: 15px;">
+                                        ${messageContent}
+                                        <p class="small text-muted me-3 mb-0" style="font-size: 0.75rem;">${sentAt}</p>
+                                    </div>
+                                </div>` : `
+                                <div class="d-flex flex-row align-items-center">
+                                    <img src="${avatarSrc}" alt="avatar" class="rounded-circle" style="width: 40px; height: 40px; border: 2px solid #fff; box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.05);">
+                                    <div class="d-flex flex-column align-items-start" style="margin-left: 15px;">
+                                        ${messageContent}
+                                        <p class="small text-muted ms-3 mb-0" style="font-size: 0.75rem;">${sentAt}</p>
+                                    </div>
+                                </div>`}
+                            </div>`);
+                        }
+                    });
+
+                    // Scroll to the bottom after loading all messages
+                    chatBox.scrollTop(chatBox[0].scrollHeight);  // Ensure the scroll is at the bottom
+
+                    hideLoadingIndicator();
+                }).fail(function (xhr, status, error) {
+                    console.error("Error loading messages: " + status);
+                    alert("Error loading messages: " + xhr.responseText);
+                    hideLoadingIndicator();
+                });
+            }
+
+
+            function showLoadingIndicator() {
+                var chatBox = $('#chat-content');
+                chatBox.append(`
+                            <div id="loading-indicator" class="text-center my-3">
+                                <div class="spinner-border text-secondary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        `);
+            }
+
+            function hideLoadingIndicator() {
+                $('#loading-indicator').remove();
+            }
+
+
+            $('#sendMessageButton').on('click', function () {
+                var message = $('#chatMessage').val().trim();
+                var receiverId = currentActiveUserId;
+                var avatarSrc = employerPhoto || userAvatar; 
+
+                if (!message && selectedFiles.length === 0) {
+                    alert("Please enter a message or select an image before sending.");
+                    return;
+                }
+
+                var formData = new FormData();
+                formData.append('receiverId', receiverId);
+                formData.append('message', message || '');
+
+                if (selectedFiles.length > 0) {
+                    for (var i = 0; i < selectedFiles.length; i++) {
+                        formData.append('files', selectedFiles[i]);
+                    }
+                }
+
+                $.ajax({
+                    url: '/api/ChatApi/UploadImages',
+                    method: 'POST',
+                    contentType: false,
+                    processData: false,
+                    data: formData,
+                    success: function (response) {
+                        var sentAt = new Date().toLocaleTimeString();
+                        var messageHtml = `
+                    <div class="d-flex flex-row justify-content-end mb-3">
+                        <div class="d-flex flex-row-reverse align-items-center">
+                            <img src="${avatarSrc}" alt="avatar" class="rounded-circle" style="width: 40px; height: 40px; border: 2px solid #fff; box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.05);">
+                            <div class="d-flex flex-column align-items-end" style="margin-right: 15px;">`;
+
+                        // Text message content
+                        if (message) {
+                            messageHtml += `
+                        <p class="small p-3 me-3 mb-1 rounded-4" style="background-color: #E0E0E0; color: #333; box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05); max-width: 250px; font-size: 1rem; border-radius:20px; text-align: right;">
+                            ${message}
+                        </p>`;
+                        }
+
+                        // Display images
+                        response.imageUrls.forEach(function (url) {
+                            messageHtml += `
+                        <div class="p-3 me-3 mb-1">
+                            <img src="${url}" alt="Image" class="message-image" style="max-width: 200px; border-radius: 10px; box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.1); cursor: pointer;">
+                        </div>`;
+                        });
+
+                        // Display non-image files
+                        response.fileUrls.forEach(function (file) {
+                            var iconHtml = '';
+                            var actionHtml = '';  // This will hold the link or button for file interaction
+
+                            switch (file.fileType) {
+                                case 'application/pdf':
+                                    iconHtml = '<i class="fas fa-file-pdf" style="font-size: 20px; color: #e74c3c;"></i>';
+                                    // Create a button that opens the PDF in the modal
+                                    actionHtml = `<button class="btn btn-link" onclick="viewPDF('${file.url}')">
+                                    ${iconHtml} ${file.fileName || 'View PDF'}
+                                  </button>`;
+                                    break;
+                                case 'application/msword':
+                                case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+                                    iconHtml = '<i class="fas fa-file-word" style="font-size: 20px; color: #3498db;"></i>';
+                                    actionHtml = `<a href="${file.url}" download="${file.fileName}" class="btn btn-link">${iconHtml} ${file.fileName}</a>`;
+                                    break;
+                                case 'application/vnd.ms-excel':
+                                case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+                                    iconHtml = '<i class="fas fa-file-excel" style="font-size: 20px; color: #27ae60;"></i>';
+                                    actionHtml = `<a href="${file.url}" download="${file.fileName}" class="btn btn-link">${iconHtml} ${file.fileName}</a>`;
+                                    break;
+                                default:
+                                    iconHtml = '<i class="fas fa-file" style="font-size: 20px; color: #7f8c8d;"></i>';
+                                    actionHtml = `<a href="${file.url}" target="_blank">${iconHtml} ${file.fileName || 'Download File'}</a>`;
+                            }
+
+                            messageHtml += `
+            <p class="small p-3 me-3 mb-1 rounded-4"
+               style="background-color: #E0E0E0; color: #333; box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05);
+                      max-width: 250px; font-size: 1rem; border-radius:20px; text-align: right;">
+                ${actionHtml}
+            </p>`;
+                        });
+
+
+                        messageHtml += `
+                            <p class="small text-muted me-3 mb-0" style="font-size: 0.75rem;">${sentAt}</p>
+                        </div>
+                    </div>`;
+
+                        $('#chat-content').append(messageHtml);
+                        $('#chat-content').scrollTop($('#chat-content').prop("scrollHeight"));
+                        $('#chat-content .message-image').off('click').on('click', function () {
+                            var src = $(this).attr('src');
+                            $('#modal-img').attr('src', src);
+                            $('#modal').fadeIn();
+                        });
+                        $('#chatMessage').val('');
+                        $('#imageUpload').val('');
+                        $('#image-preview').hide();
+                        $('#preview-img').attr('src', '');
+                        selectedFiles = [];
+
+
+
+                        connection.invoke("SendMessage", employerId, receiverId, message, response.ImageUrls, response.FileUrls)
+                            .catch(err => console.error("Error sending message via SignalR:", err));
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error uploading images: " + error);
+                        alert("Error uploading images: " + xhr.responseText);
+                    }
+                });
+            });
+           
+
+        });
+    </script>
+
+    <script>
+        function viewPDF(url) {
+            const canvas = document.getElementById('pdf-canvas');
+            const ctx = canvas.getContext('2d');
+            let pdfDoc = null;
+            let currentPage = 1;
+            let totalPages = 0;
+            let zoom = 1;
+
+            const updatePageDisplay = () => {
+                $('#current-page').text(currentPage);
+                $('#total-pages').text(totalPages);
+            };
+
+            const renderPage = (pageNum) => {
+                pdfDoc.getPage(pageNum).then((page) => {
+                    const viewport = page.getViewport({ scale: zoom });
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+
+                    const renderContext = {
+                        canvasContext: ctx,
+                        viewport: viewport
+                    };
+                    page.render(renderContext);
+                });
+            };
+
+            const loadingTask = pdfjsLib.getDocument(url);
+            loadingTask.promise.then((pdf) => {
+                pdfDoc = pdf;
+                totalPages = pdf.numPages;
+                updatePageDisplay();
+                renderPage(currentPage);
+            }).catch((error) => {
+                console.error("Error loading PDF:", error);
+                $('#modal-file-content').html('<p>Error loading PDF.</p>');
+            });
+
+            $('#prev-page').off('click').on('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderPage(currentPage);
+                    updatePageDisplay();
+                }
+            });
+
+            $('#next-page').off('click').on('click', () => {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    renderPage(currentPage);
+                    updatePageDisplay();
+                }
+            });
+
+            $('#zoom-in').off('click').on('click', () => {
+                zoom += 0.2;
+                renderPage(currentPage);
+            });
+
+            $('#zoom-out').off('click').on('click', () => {
+                if (zoom > 0.4) {
+                    zoom -= 0.2;
+                    renderPage(currentPage);
+                }
+            });
+
+            $('#download-pdf').attr('href', url);
+            $('#modal-file').fadeIn();
+        }
+
+
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,470 @@
+﻿@model IEnumerable<DNTU_JOBS.Models.Notification>
+@{
+    Layout = null;
+}
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Add Popper.js before Bootstrap's JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<div class="notification-icon dropdown">
+    <a href="#" id="notificationBell" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="material-icons" style="font-size:30px">notifications</i>
+        @if (Model.Any(m => !m.IsRead))
+        {
+            <span class="badge badge-danger">@Model.Count(m => !m.IsRead)</span>
+        }
+    </a>
+    <div class="dropdown-menu dropdown-menu-right shadow-lg rounded-3" aria-labelledby="notificationBell" id="notificationMenu" style="display: none;">
+        <div class="header-section d-flex justify-content-between align-items-center p-3 border-bottom bg-light shadow-sm rounded-top">
+            <div class="header-title d-flex align-items-center">
+                <i class="fas fa-bell text-primary mr-2" style="font-size: 1.25rem;"></i>
+                <h6 class="dropdown-header mb-0 font-weight-bold text-dark">Thông báo</h6>
+            </div>
+        </div>
+
+
+        <div id="notificationList" class="p-2">
+            @if (Model.Any())
+            {
+
+                @foreach (var notification in Model)
+                {
+                    <div class="dropdown-item notification-item d-flex align-items-center @(!notification.IsRead ? "unread" : "")" data-id="@notification.Id">
+                        <div class="notification-icon mr-3">
+                            @{
+                                var iconClass = notification.IsRead ? "fas fa-check-circle text-secondary" : notification.Type switch
+                                {
+                                    "Approve" => "fas fa-check-circle text-success",
+                                    "Rejected" => "fas fa-times-circle text-danger",
+                                    "ApproveEdit" => "fas fa-check-double text-success",
+                                    "RejectEdit" => "fas fa-ban text-danger",
+                                    "ApplicationApproval" => "fas fa-check-circle text-success",
+                                    "ApplicationRejection" => "fas fa-times-circle text-danger",
+                                    "JobApplication" => "fas fa-briefcase text-primary", // Job Application
+                                    "JobCategoryMatch" => "fas fa-cogs text-warning", // Job Category Match
+                                    "JobStatus" => "fas fa-pause-circle text-info", // Job Status (paused or resumed)
+                                    _ => "fas fa-info-circle text-primary"
+                                };
+                            }
+                            <i class="@iconClass"></i>
+                        </div>
+                        <div class="notification-content flex-grow-1">
+                            <p class="mb-1">
+                                @if (notification.Type == "Approve")
+                                {
+                                    @Html.Raw(notification.Message.Replace("đã được duyệt", "<span class='text-success'>đã được duyệt</span>"))
+                                }
+                                else if (notification.Type == "Rejected")
+                                {
+                                    @Html.Raw(notification.Message.Replace("đã bị từ chối", "<span class='text-danger'>đã bị từ chối</span>"))
+                                }
+                                else if (notification.Type == "ApproveEdit")
+                                {
+                                    @Html.Raw(notification.Message.Replace("đã được duyệt chỉnh sửa", "<span class='text-success'>đã được duyệt chỉnh sửa</span>"))
+                                }
+                                else if (notification.Type == "RejectEdit")
+                                {
+                                    @Html.Raw(notification.Message.Replace("đã bị từ chối chỉnh sửa", "<span class='text-danger'>đã bị từ chối chỉnh sửa</span>"))
+                                }
+                                else if (notification.Type == "ApplicationApproval")
+                                {
+                                    @Html.Raw(notification.Message.Replace("đã được chấp nhận!", "<span class='text-success'>đã được chấp nhận!</span>"))
+                                }
+                                else if (notification.Type == "ApplicationRejection")
+                                {
+                                    @Html.Raw(notification.Message.Replace("đã bị từ chối", "<span class='text-danger'>đã bị từ chối</span>"))
+                                }
+                                else if (notification.Type == "JobApplication")
+                                {
+                                    @Html.Raw(notification.Message.Replace("ứng tuyển", "<span class='text-primary'>ứng tuyển</span>"))
+                                }
+                                else if (notification.Type == "JobCategoryMatch")
+                                {
+                                    @Html.Raw(notification.Message.Replace("phù hợp", "<span class='text-warning'>phù hợp</span>"))
+                                }
+                                else if (notification.Type == "JobStatus")
+                                {
+                                    @Html.Raw(notification.Message.Replace("hoạt động", "<span class='text-info'>tạm ngừng</span>"))
+                                }
+                                else
+                                {
+                                    @notification.Message
+                                }
+                            </p>
+                            <small class="text-muted">@notification.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
+                        </div>
+                        <button class="btn delete-notification p-0 rounded-circle" data-id="@notification.Id" title="Xóa thông báo">
+                            <span class="text-danger">&times;</span>
+                        </button>
+                    </div>
+                }
+
+            }
+            else
+            {
+                <span class="dropdown-item text-muted">Không có thông báo mới</span>
+            }
+        </div>
+
+        <div class="d-flex justify-content-center p-2">
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <button class="btn btn-sm btn-outline-secondary mx-1 page-button @(ViewBag.CurrentPage == i ? "active" : "")" onclick="loadPage(@i)">@i</button>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .notification-icon {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+        transition: box-shadow 0.3s ease;
+    }
+
+        .notification-icon i{
+            color: #343A40;
+        }
+
+        .notification-icon:hover i {
+            color: #C3171C; /* Màu icon khi hover */
+        }
+
+            .notification-icon:hover::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                border-radius: 50%;
+                background: rgba(195, 23, 28, 0.5); /* Màu nhạt hơn của #C3171C */
+                filter: blur(8px); /* Làm mờ để tạo hiệu ứng neon */
+                z-index: -1; /* Đặt phía sau icon */
+                transition: opacity 0.3s ease;
+                opacity: 1;
+            }
+
+        /* Ẩn ánh sáng neon khi không hover */
+        .notification-icon::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 50%;
+            background: rgba(195, 23, 28, 0.5);
+            filter: blur(8px);
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .notification-icon .badge {
+            position: absolute;
+            top: -5px;
+            right: -10px;
+            font-size: 0.75rem;
+            padding: 4px 6px;
+            border-radius: 50%;
+            background-color: #ff4d4d;
+            color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+            .notification-icon .badge:hover {
+                transform: scale(1.1); /* Phóng to nhẹ khi hover vào badge */
+            }
+
+    #notificationMenu {
+        width: 380px;
+        border-radius: 12px;
+        box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+        display: none; /* Để menu ẩn theo thiết lập */
+    }
+
+    .notification-item:hover {
+        background-color: #e6f7ff;
+    }
+
+    #notificationBell:hover + #notificationMenu,
+    #notificationMenu:hover {
+        display: block; /* Hiển thị menu khi hover */
+    }
+    .notification-item {
+        display: flex;
+        align-items: center;
+        padding: 12px;
+        border-bottom: 1px solid #f0f0f0;
+        transition: background-color 0.3s ease;
+    }
+
+        .notification-item.unread {
+            background-color: #f1f8ff;
+            font-weight: 500;
+        }
+
+        .notification-item:hover {
+            background-color: #C3171C;
+        }
+
+        .notification-content p {
+            margin: 0;
+            font-size: 0.95rem;
+            color: #333;
+            white-space: normal;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .notification-content small {
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        .delete-notification {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 35px;
+            height: 35px;
+            border: none;
+            background: transparent;
+            transition: background-color 0.3s ease;
+        }
+
+            .delete-notification:hover {
+                background-color: rgba(255, 0, 0, 0.1);
+                border-radius: 100%;
+            }
+
+        .header-section {
+        background-color: #f8f9fa;
+        border-radius: 8px 8px 0 0;
+        box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .header-title h6 {
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    #markAllAsRead {
+        font-size: 0.85rem;
+        color: #28a745;
+        transition: background-color 0.2s ease;
+    }
+
+    #markAllAsRead:hover {
+        background-color: #d4edda;
+    }
+    #notificationBell::after {
+            display: none; 
+        }
+
+.btn::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 101%;
+    height: 101%;
+    background: none;
+    z-index: 1;
+    border-radius: 5px;
+    transition: transform 0.5s;
+    transition-timing-function: ease;
+    transform-origin: 0 0;
+    transition-timing-function: cubic-bezier(0.5, 1.6, 0.4, 0.7);
+    transform: scaleX(0);
+    border-radius: 0;
+}
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/3.1.18/signalr.min.js"></script>
+<script type="text/javascript">
+    function loadPage(page) {
+    $.get('/Employer/Employer/LoadNotifications', { page: page }, function (data) {
+    $('#notificationList').html($(data).find('#notificationList').html());
+    $('.page-button').removeClass('active');
+    $('.page-button').filter(`[onclick="loadPage(${page})"]`).addClass('active');
+});
+
+}
+
+
+
+    document.getElementById("notificationBell").addEventListener("click", async function (event) {
+    event.preventDefault();
+    const notificationMenu = document.getElementById("notificationMenu");
+    notificationMenu.style.display = notificationMenu.style.display === 'none' ? 'block' : 'none';
+
+    if (notificationMenu.style.display === 'block') {
+        await fetch('/api/Notifications/MarkAllAsRead', { method: 'POST' })
+            .then(response => {
+                if (response.ok) {
+                    document.querySelectorAll(".notification-item.unread").forEach(item => item.classList.remove("unread"));
+                    const badge = document.querySelector(".notification-icon .badge");
+                    if (badge) badge.remove();
+                }
+            })
+            .catch(console.error);
+    }
+});
+
+document.getElementById("notificationList").addEventListener("click", function (e) {
+    const notificationItem = e.target.closest(".notification-item");
+    if (notificationItem) {
+        const notificationId = notificationItem.dataset.id;
+        fetch(`/api/NotificationsApi/GetRedirectUrl/${notificationId}`)
+            .then(response => response.json())
+            .then(data => window.location.href = data.redirectUrl)
+            .catch(console.error);
+    }
+});
+
+
+
+    // Hide the notification menu when clicking outside of it
+    document.addEventListener("click", function (event) {
+        const notificationMenu = document.getElementById("notificationMenu");
+        const notificationBell = document.getElementById("notificationBell");
+        if (!notificationMenu.contains(event.target) && !notificationBell.contains(event.target)) {
+            notificationMenu.style.display = 'none';
+        }
+    });
+    
+    document.getElementById("markAllAsRead").addEventListener("click", function () {
+    fetch('/api/Notifications/markAllAsRead', { method: 'POST' })
+        .then(response => {
+            if (response.ok) {
+                // Update each unread notification to mark it as read
+                document.querySelectorAll(".notification-item.unread").forEach(item => {
+                    item.classList.remove("unread"); // Remove unread styling
+
+                    // Force update icon to 'fas fa-info-circle text-primary'
+                    const iconElement = item.querySelector(".notification-icon i");
+                    if (iconElement) {
+                        iconElement.className = "fas fa-check-circle text-secondary"; // Set icon class directly
+                    }
+                });
+
+                // Remove the unread count badge if it exists
+                const badge = document.querySelector(".notification-icon .badge");
+                if (badge) {
+                    badge.remove();
+                }
+            } else {
+                console.error("Error marking all as read");
+            }
+        })
+        .catch(error => console.error("Request failed: ", error));
+});
+
+
+
+
+
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/notificationHub")
+        .build();
+
+    connection.start().catch(err => console.error("Connection failed: ", err.toString()));
+
+    connection.on("ReceiveNotification", function (message) {
+        updateNotificationBadge();
+        addNotificationToMenu(message);
+    });
+
+    function updateNotificationBadge() {
+        let badge = document.querySelector(".notification-icon .badge");
+        if (badge) {
+            badge.innerText = parseInt(badge.innerText) + 1;
+        } else {
+            document.getElementById("notificationBell").insertAdjacentHTML("beforeend", '<span class="badge badge-danger">1</span>');
+        }
+    }
+
+    function addNotificationToMenu(message) {
+        const notificationList = document.getElementById("notificationList");
+        const newNotification = `
+                        <div class="dropdown-item notification-item d-flex align-items-start unread">
+                            <div class="notification-icon mr-3">
+                                <i class="fas fa-info-circle text-primary"></i>
+                            </div>
+                            <div class="notification-content flex-grow-1">
+                                <p class="mb-1">${message}</p>
+                                <small class="text-muted">Vừa nhận</small>
+                            </div>
+                            <button class="btn btn-link p-0 delete-notification rounded-circle" title="Xóa thông báo">
+                                <span class="text-danger">&times;</span>
+                            </button>
+                        </div>`;
+
+        if (notificationList.querySelector(".text-muted")) {
+            notificationList.innerHTML = "";
+        }
+        notificationList.insertAdjacentHTML("afterbegin", newNotification);
+    }
+
+
+    document.getElementById("notificationList").addEventListener("click", async function (e) {
+        const notificationItem = e.target.closest(".notification-item");
+        if (notificationItem) {
+            const notificationId = notificationItem.dataset.id;
+
+            try {
+                // Gửi yêu cầu đến API để lấy Role
+                const roleResponse = await fetch('/api/Notifications/GetCurrentUserRole');
+
+                // Kiểm tra nếu phản hồi không thành công
+                if (!roleResponse.ok) {
+                    throw new Error(`HTTP error! status: ${roleResponse.status}`);
+                }
+
+                // Chuyển đổi JSON từ phản hồi
+                const data = await roleResponse.json();
+
+                if (!data || !data.Role) {
+                    throw new Error("Invalid role data");
+                }
+
+                // Điều hướng dựa trên Role
+                if (data.Role === "Employer") {
+                    window.location.href = "/Employer/EmployerDashBoard/Index";
+                } else if (data.Role === "User") {
+                    window.location.href = "/User/UserProfile/Index";
+                } else {
+                    console.error("Unknown role:", data.Role);
+                }
+            } catch (error) {
+                console.error("Error during redirection:", error.message);
+            }
+        }
+    });
+    document.querySelectorAll('.delete-notification').forEach(button => {
+        button.addEventListener('click', function (e) {
+            const notificationId = e.target.closest('.notification-item').dataset.id;
+            // Gọi API để xóa thông báo từ cơ sở dữ liệu
+            fetch(`/api/Notifications/deleteNotification/${notificationId}`, { method: 'DELETE' })
+                .then(response => {
+                    if (response.ok) {
+                        e.target.closest('.notification-item').remove();  // Xóa khỏi giao diện
+                    } else {
+                        alert("Có lỗi khi xóa thông báo.");
+                    }
+                })
+                .catch(console.error);
+
+        });
+    });
+
+
+</script>

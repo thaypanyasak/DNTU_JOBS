@@ -1,0 +1,293 @@
+﻿@page
+@model ExternalLoginModel
+@{
+    ViewData["Title"] = "Đăng Ký";
+    Layout = null;
+}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&display=swap" rel="stylesheet" />
+
+<style>
+    /* CSS Tùy chỉnh */
+    body {
+        background: linear-gradient(to bottom, #6a11cb, #2575fc);
+        font-family: 'Manrope', sans-serif;
+        color: #333;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        margin: 0;
+    }
+    header{
+        display:none;
+    }
+    footer{
+        display:none;
+    }
+
+    .card {
+        background: #fff;
+        border-radius: 20px;
+        padding: 50px 40px;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        max-width: 600px;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Enhanced Header */
+    .card-header {
+        text-align: center;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eaeaea;
+    }
+
+    .card-header img {
+        width: 80px;
+        height: 80px;
+        object-fit: contain;
+        margin-bottom: 10px;
+    }
+
+    .card-header .header-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #6a11cb;
+        font-family: 'Manrope', sans-serif;
+        margin: 0;
+    }
+
+    .card-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #6a11cb;
+        text-align: center;
+        margin-top: 20px;
+        margin-bottom: 1rem;
+    }
+
+    .text-description {
+        font-size: 1rem;
+        color: #555;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .form-floating {
+        position: relative;
+        margin-bottom: 1.8rem;
+    }
+
+        .form-floating input,
+        .form-floating select {
+            width: 100%;
+            padding: 15px 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background: #f9f9f9;
+            font-size: 0.95rem;
+            outline: none;
+            color: #333;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            font-family: 'Manrope', sans-serif;
+        }
+
+        .form-floating input:focus,
+        .form-floating select:focus {
+            border-color: #6a11cb;
+            box-shadow: 0 0 0 2px rgba(106, 17, 203, 0.3);
+        }
+
+    .form-floating label {
+        position: absolute;
+        top: -10px;
+        left: 20px;
+        background: #fff;
+        padding: 0 5px;
+        font-size: 0.85rem;
+        color: #555;
+        pointer-events: none;
+    }
+
+    /* Enhanced Icons */
+    .form-floating label .icon {
+        margin-right: 8px;
+        color: #6a11cb;
+        vertical-align: middle;
+        font-size: 1.1rem;
+        transition: color 0.3s;
+    }
+
+    .form-floating label .icon:hover {
+        color: #2575fc;
+    }
+
+    /* Button Styles */
+    .btn-primary {
+        display: block;
+        width: 100%;
+        padding: 14px 20px;
+        border: none;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: bold;
+        color: #fff;
+        background: linear-gradient(to right, #6a11cb, #2575fc);
+        transition: background 0.3s ease, box-shadow 0.3s ease;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(to right, #2575fc, #6a11cb);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-primary .icon {
+        margin-right: 8px;
+        font-size: 1.2rem;
+    }
+
+    /* Error Messages */
+    .text-danger {
+        font-size: 0.85rem;
+        color: #d9534f;
+        margin-top: 5px;
+    }
+
+    /* Back Button Enhancements */
+    .btn-back {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        color: #6a11cb;
+        font-size: 30px;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        transition: color 0.3s;
+    }
+
+    .btn-back:hover {
+        color: #2575fc;
+    }
+
+    /* Style cho trường Email không chỉnh sửa */
+    .form-floating input[readonly] {
+        background-color: #e9ecef;
+        font-weight: bold;
+        color: #495057;
+        border: 2px solid #6c757d;
+        cursor: not-allowed;
+    }
+
+    .form-floating input[readonly]:focus {
+        box-shadow: none;
+        border-color: #6c757d;
+    }
+
+    /* Responsive */
+    @@media (max-width: 576px) {
+        .card {
+            padding: 30px 20px;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+        }
+
+        .btn-back {
+            font-size: 25px;
+        }
+
+        .card-header .header-title {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+
+<section class="position-relative">
+    <!-- Nút Quay lại -->
+    <button onclick="window.history.back()" class="btn-back" title="Quay lại">
+        <i class="bi bi-arrow-left-circle-fill"></i>
+    </button>
+
+    <div class="card">
+        <!-- Header with Logo and Title -->
+        <div class="card-header">
+            <img src="~/img/icon/dntuLogo.png" alt="Logo" />
+            <h2 class="header-title">DNTU Jobs</h2>
+        </div>
+
+        <h1 class="card-title">@ViewData["Title"]</h1>
+        <p class="text-description">
+            Bạn đã xác thực thành công bằng tài khoản <strong>@Model.ProviderDisplayName</strong>. <br />
+            Vui lòng chọn vai trò và hoàn thành biểu mẫu dưới đây để hoàn tất đăng ký.
+        </p>
+        <form asp-page-handler="Confirmation" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-4" role="alert"></div>
+
+            <!-- Họ và Tên -->
+            <div class="form-floating mb-4">
+                <input asp-for="Input.Name" class="form-control" readonly placeholder="Họ và Tên" />
+                <label asp-for="Input.Name"><i class="bi bi-person-fill icon"></i> Họ và Tên</label>
+                <span asp-validation-for="Input.Name" class="text-danger"></span>
+            </div>
+
+            <!-- Email -->
+            <div class="form-floating mb-4">
+                <input asp-for="Input.Email" class="form-control" readonly placeholder="Email" />
+                <label asp-for="Input.Email"><i class="bi bi-envelope-fill icon"></i> Email</label>
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+
+            <!-- Mật khẩu -->
+            <div class="form-floating mb-4">
+                <input asp-for="Input.Password" type="password" class="form-control" placeholder="Mật khẩu" />
+                <label asp-for="Input.Password"><i class="bi bi-lock-fill icon"></i> Mật khẩu</label>
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+
+            <!-- Xác nhận mật khẩu -->
+            <div class="form-floating mb-4">
+                <input asp-for="Input.ConfirmPassword" type="password" class="form-control" placeholder="Xác nhận mật khẩu" />
+                <label asp-for="Input.ConfirmPassword"><i class="bi bi-lock-fill icon"></i> Xác nhận mật khẩu</label>
+                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+            </div>
+
+            <!-- Vai trò -->
+            <div class="form-floating mb-5">
+                <select asp-for="Input.Role" class="form-control">
+                    <option value="" disabled selected>Chọn vai trò</option>
+                    @if (Model.Input.Roles != null && Model.Input.Roles.Any())
+                    {
+                        @foreach (var role in Model.Input.Roles)
+                        {
+                            <option value="@role.Value">@role.Text</option>
+                        }
+                    }
+                    else
+                    {
+                        <option disabled>Không có vai trò nào có sẵn</option>
+                    }
+                </select>
+                <label asp-for="Input.Role"><i class="bi bi-people-fill icon"></i> Vai Trò</label>
+                <span asp-validation-for="Input.Role" class="text-danger"></span>
+            </div>
+
+            <!-- Nút Đăng Ký -->
+            <button type="submit" class="btn-primary btn-lg w-100 mt-3">
+                <i class="bi bi-check-circle icon"></i> Đăng Ký
+            </button>
+        </form>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

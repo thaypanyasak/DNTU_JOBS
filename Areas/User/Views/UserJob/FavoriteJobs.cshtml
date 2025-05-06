@@ -1,0 +1,39 @@
+﻿@model IEnumerable<DNTU_JOBS.ViewModel.FavoriteJobViewModel>
+
+@{
+    ViewData["Title"] = "Favorite Jobs";
+}
+
+<h2>Favorite Jobs</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Job Title</th>
+            <th>Company</th>
+            <th>Salary Range</th>
+            <th>Posted Date</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var job in Model)
+        {
+            <tr>
+                <td>@job.JobTitle</td>
+                <td>@job.CompanyName</td>
+                <td>
+                    @job.SalaryMin?.ToString("C0", new System.Globalization.CultureInfo("vi-VN")) -
+                    @job.SalaryMax?.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))
+                </td>
+                <td>@job.CreationDate.ToString("d")</td>
+                <td>
+                    <a href="@Url.Action("JobDetail", "UserJob", new { id = job.JobId })" class="btn btn-primary">View Job</a>
+                    <form method="post" action="@Url.Action("RemoveFromFavorites", "UserJob", new { jobId = job.JobId })" style="display:inline-block;">
+                        <button type="submit" class="btn btn-danger">Remove</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

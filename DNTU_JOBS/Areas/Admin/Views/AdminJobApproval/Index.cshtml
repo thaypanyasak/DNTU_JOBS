@@ -1,0 +1,166 @@
+﻿@model IEnumerable<dynamic>
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&display=swap" rel="stylesheet" />
+    <title>Người dùng có bài đăng chờ duyệt</title>
+    <style>
+        body {
+            font-family: 'Manrope', sans-serif;
+        }
+
+        h2 {
+            font-family: 'Manrope', sans-serif;
+            margin-top: 20px;
+            font-weight: 600;
+            padding-bottom: 35px;
+        }
+
+        .table-container {
+            margin-top: 30px;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .table {
+            width: 100%;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+        }
+
+            .table th, .table td {
+                vertical-align: middle;
+                padding: 15px;
+                text-align: center;
+            }
+
+        .table-dark th {
+            color: #ffffff;
+            background-color: #343a40;
+        }
+
+        .btn-info {
+            background-color: #17a2b8;
+            border-color: #17a2b8;
+        }
+
+            .btn-info:hover {
+                background-color: #138496;
+                border-color: #117a8b;
+            }
+
+        .text-danger.fw-bold {
+            color: #dc3545 !important;
+            font-weight: 600;
+            animation: pulse 1s infinite;
+        }
+
+        @@keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .pagination .page-item .page-link {
+            color: #343A40;
+            background-color: transparent;
+            border: 1px solid #343A40;
+            transition: all 0.3s ease;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: #343A40;
+            color: #FFFFFF;
+            border-color: #343A40;
+        }
+
+        .pagination .page-item .page-link:hover {
+            background-color: #343A40;
+            color: #FFFFFF;
+        }
+    </style>
+</head>
+<body>
+    <div class="table-container">
+        <h2 class="text-center">Người dùng có bài đăng chờ duyệt <i class="fas fa-users"></i></h2>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th><i class="fas fa-envelope"></i> Email Người dùng</th>
+                        <th><i class="fas fa-user-tie"></i> Tên Nhà tuyển dụng</th>
+                        <th><i class="fas fa-hourglass-half"></i> Công việc chờ duyệt</th>
+                        <th><i class="fas fa-briefcase"></i> Tổng số công việc</th>
+                        <th><i class="fas fa-tools"></i> Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center">Không tìm thấy người dùng nào có bài đăng chờ duyệt.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var user in Model)
+                        {
+                            <tr>
+                                <td>@user.User.Email</td>
+                                <td>@user.User.Name</td>
+                                <td class="text-center @((user.PendingJobCount > 0) ? "text-danger fw-bold" : "text-black")">
+                                    <i class="fas fa-clock"></i> @user.PendingJobCount
+                                </td>
+                                <td class="text-center"><i class="fas fa-briefcase"></i> @user.TotalJobCount</td>
+                                <td class="text-center">
+                                    <a href="@Url.Action("JobsByUser", new { userId = user.User.Id })" class="btn btn-info btn-sm">
+                                        <i class="fas fa-eye"></i> Xem công việc
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-center mt-4">
+                <nav>
+                    <ul class="pagination">
+                        @if (ViewBag.CurrentPage > 1)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="?page=@(ViewBag.CurrentPage - 1)">Trước</a>
+                            </li>
+                        }
+
+                        @for (int i = Math.Max(1, ViewBag.CurrentPage - 2); i <= Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2); i++)
+                        {
+                            <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                <a class="page-link" href="?page=@i">@i</a>
+                            </li>
+                        }
+
+                        @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="?page=@(ViewBag.CurrentPage + 1)">Tiếp</a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+</body>
+</html>

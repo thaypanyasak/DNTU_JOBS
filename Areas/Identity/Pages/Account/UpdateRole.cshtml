@@ -1,0 +1,36 @@
+﻿@page
+@model DNTU_JOBS.Areas.Identity.Pages.Account.UpdateRoleModel
+
+<h2>Cập nhật thông tin tài khoản</h2>
+
+@if (Model.ErrorMessage != null)
+{
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+}
+
+<form method="post">
+    <div class="form-group">
+        <label asp-for="Input.Name">Họ và tên</label>
+        <input type="text" asp-for="Input.Name" class="form-control" disabled />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Input.Phone">Số điện thoại</label>
+        <input type="text" asp-for="Input.Phone" class="form-control" disabled />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Input.Email">Email</label>
+        <input type="email" asp-for="Input.Email" class="form-control" disabled />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Input.Role">Vai trò</label>
+        <select asp-for="Input.Role" class="form-control">
+            <option value="Employer">Employer</option>
+            <option value="User">User</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Cập nhật</button>
+</form>

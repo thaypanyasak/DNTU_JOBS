@@ -1,0 +1,343 @@
+﻿@model IEnumerable<DNTU_JOBS.Models.JobTable>
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&display=swap" rel="stylesheet" />
+    <title>Quản lý chỉnh sửa công việc</title>
+    <style>
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: #f4f6f9;
+            margin-top: 30px;
+        }
+
+        .table-container {
+            max-width: 1300px;
+            margin: auto;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .back-button:hover {
+            color: #0056b3;
+        }
+
+        h2 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .table {
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .table th, .table td {
+            vertical-align: middle;
+            text-align: center;
+            padding: 15px;
+        }
+
+        .table th {
+            background-color: #343a40;
+            color: #fff;
+        }
+
+        /* Animation cho trạng thái Pending */
+        @@keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .status-pending {
+            color: #dc3545 !important;
+            font-weight: 600;
+            animation: pulse 1s infinite;
+        }
+
+        .btn {
+            font-weight: 600;
+            padding: 8px 12px;
+        }
+
+        .pagination .page-item .page-link {
+            color: #343A40;
+            background-color: transparent;
+            border: 1px solid #343A40;
+            transition: all 0.3s ease;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: #343A40;
+            color: #FFFFFF;
+            border-color: #343A40;
+        }
+
+        .pagination .page-item .page-link:hover {
+            background-color: #343A40;
+            color: #FFFFFF;
+        }
+    </style>
+</head>
+<body>
+    <div class="table-container">
+        <!-- Nút Quay lại -->
+        <a asp-action="Index" class="btn btn-light mb-3" title="Quay lại">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+
+        <h2>Danh sách công việc đã chỉnh sửa cho @Model.FirstOrDefault()?.ApplicationUser.Email</h2>
+
+        @if (!Model.Any())
+        {
+            <div class="alert alert-warning text-center">
+                <i class="fas fa-exclamation-circle"></i> Không có công việc nào được chỉnh sửa bởi nhà tuyển dụng này.
+            </div>
+        }
+        else
+        {
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th><i class="fas fa-briefcase"></i> Tiêu đề công việc</th>
+                        <th><i class="fas fa-calendar-alt"></i> Ngày sửa</th>
+                        <th><i class="fas fa-dollar-sign"></i> Mức lương</th>
+                        <th><i class="fas fa-map-marker-alt"></i> Địa điểm</th>
+                        <th><i class="fas fa-info-circle"></i> Trạng thái</th>
+                        <th><i class="fas fa-check-circle"></i> Phê duyệt</th>
+                        <th><i class="fas fa-times-circle"></i> Từ chối</th>
+                        <th><i class="fas fa-eye"></i> Chi tiết</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var job in Model)
+                    {
+                        <tr>
+                            <td>@job.JobTitle</td>
+                            <td>
+                                @if (job.UpdatedAt.HasValue)
+                                {
+                                    @job.UpdatedAt.Value.ToString("dd/MM/yyyy HH:mm:ss")
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Chưa được chỉnh sửa</span>
+                                }
+                            </td>
+                            <td>
+                                @if (job.SalaryMin.HasValue && job.SalaryMax.HasValue)
+                                {
+                                    @($"{job.SalaryMin.Value:n0} - {job.SalaryMax.Value:n0} VND")
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Liên hệ để biết lương</span>
+                                }
+                            </td>
+                            <td>
+                                @if (job.District != null && job.Ward != null)
+                                {
+                                    @($"{job.District.Name}, {job.Ward.Name}")
+                                }
+                                else if (job.District != null)
+                                {
+                                    @job.District.Name
+                                }
+                                else if (job.Ward != null)
+                                {
+                                    @job.Ward.Name
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Địa điểm chưa xác định</span>
+                                }
+                            </td>
+                            <td>
+                                @switch (job.Status)
+                                {
+                                    case ApprovalStatus.PendingEdit:
+                                        <span class="badge status-pending"><i class="fas fa-edit"></i> Chờ duyệt chỉnh sửa</span>
+                                        break;
+                                    case ApprovalStatus.ApprovedEdit:
+                                        <span class="badge badge-success"><i class="fas fa-check-circle"></i>Hoạt động</span>
+                                        break;
+                                    case ApprovalStatus.RejectedEdit:
+                                        <span class="badge badge-danger"><i class="fas fa-times-circle"></i> Bị từ chối chỉnh sửa</span>
+                                        break;
+                                    case ApprovalStatus.Filled:
+                                        <span class="badge badge-secondary"><i class="fas fa-users"></i> Đã đủ</span>
+                                        break;
+
+                                    case ApprovalStatus.Pending:
+                                        <span class="badge status-pending"><i class="fas fa-edit"></i> Chờ duyệt</span>
+                                        break;
+                                    case ApprovalStatus.Approved:
+                                        <span class="badge badge-success"><i class="fas fa-check-circle"></i> Hoạt động</span>
+                                        break;
+                                    case ApprovalStatus.Working:
+                                        <span class="badge status-pending"><i class="fas fa-edit"></i> Hoạt động</span>
+                                        break;
+                                    case ApprovalStatus.Break:
+                                        <span class="badge badge-danger"><i class="fas fa-times-circle"></i> </span>
+                                        break;
+                                }
+                            </td>
+                            <td>
+                                @if (job.Status == ApprovalStatus.PendingEdit)
+                                {
+                                    <button type="button" class="btn btn-success btn-sm" onclick="approveEditedJob(@job.Id)">
+                                        <i class="fas fa-check-circle"></i> Phê duyệt
+                                    </button>
+                                }
+                            </td>
+                            <td>
+                                @if (job.Status == ApprovalStatus.PendingEdit)
+                                {
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="rejectEditedJob(@job.Id)">
+                                        <i class="fas fa-times-circle"></i> Từ chối
+                                    </button>
+                                }
+                            </td>
+                            <td>
+                                <a asp-action="EditJobDetails" asp-route-id="@job.Id" class="btn btn-info btn-sm">
+                                    <i class="fas fa-info-circle"></i> Xem chi tiết
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-center mt-4">
+                <nav>
+                    <ul class="pagination">
+                        @if (ViewBag.CurrentPage > 1)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="?page=@(ViewBag.CurrentPage - 1)">
+                                    <i class="fas fa-arrow-left"></i> Trước
+                                </a>
+                            </li>
+                        }
+
+                        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                <a class="page-link" href="?page=@i">@i</a>
+                            </li>
+                        }
+
+                        @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="?page=@(ViewBag.CurrentPage + 1)">
+                                    Tiếp <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            </div>
+        }
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+</body>
+</html>
+
+<script>
+    // Function for approving edited job with SweetAlert2
+    function approveEditedJob(jobId) {
+        Swal.fire({
+            title: 'Bạn có chắc chắn phê duyệt chỉnh sửa công việc này?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#28a745',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Phê duyệt',
+            cancelButtonText: 'Hủy'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.post('/Admin/AdminJobEditApproval/ApproveEditedJob', { id: jobId })
+                    .done(function () {
+                        Swal.fire(
+                            'Phê duyệt thành công!',
+                            'Công việc đã được phê duyệt chỉnh sửa.',
+                            'success'
+                        ).then(() => location.reload());
+                    })
+                    .fail(function () {
+                        Swal.fire(
+                            'Lỗi!',
+                            'Đã xảy ra lỗi khi phê duyệt chỉnh sửa công việc.',
+                            'error'
+                        );
+                    });
+            }
+        });
+    }
+
+    // Function for rejecting edited job with SweetAlert2
+    // Function to reject edited job with SweetAlert2
+    function rejectEditedJob(jobId) {
+        Swal.fire({
+            title: 'Lý do từ chối chỉnh sửa công việc',
+            input: 'textarea',
+            inputPlaceholder: 'Nhập lý do từ chối...',
+            inputAttributes: {
+                'aria-label': 'Nhập lý do từ chối'
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Từ chối',
+            cancelButtonText: 'Hủy',
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            preConfirm: (reason) => {
+                if (!reason) {
+                    Swal.showValidationMessage('Lý do từ chối là bắt buộc');
+                }
+                return reason;
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.post('/Admin/AdminJobEditApproval/RejectEditedJob', { id: jobId, reason: result.value })
+                    .done(function () {
+                        Swal.fire(
+                            'Đã từ chối!',
+                            'Công việc đã bị từ chối chỉnh sửa.',
+                            'success'
+                        ).then(() => location.reload());
+                    })
+                    .fail(function () {
+                        Swal.fire(
+                            'Lỗi!',
+                            'Đã xảy ra lỗi khi từ chối chỉnh sửa công việc.',
+                            'error'
+                        );
+                    });
+            }
+        });
+    }
+
+
+</script>

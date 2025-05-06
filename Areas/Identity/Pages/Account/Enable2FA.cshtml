@@ -1,0 +1,21 @@
+﻿@page
+@model Enable2FAModel
+@{
+    ViewData["Title"] = "Enable 2FA";
+}
+
+<h1>Enable Two-Factor Authentication</h1>
+
+<p>Scan the QR code below with your authenticator app (e.g., Google Authenticator, Microsoft Authenticator):</p>
+<img src="https://chart.googleapis.com/chart?chs=200x200&chld=M|0&cht=qr&chl=@Model.AuthenticatorUri" />
+
+<p>Or enter this key into your app manually:</p>
+<pre>@Model.SharedKey</pre>
+
+<form method="post">
+    <div class="form-group">
+        <label for="VerificationCode">Enter the code from your app:</label>
+        <input type="text" id="VerificationCode" name="VerificationCode" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Verify and Enable</button>
+</form>

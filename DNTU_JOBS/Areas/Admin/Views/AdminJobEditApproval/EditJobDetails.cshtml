@@ -1,0 +1,397 @@
+﻿@model DNTU_JOBS.Models.JobTable
+@{
+    Layout = null;
+}
+
+<head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&display=swap" rel="stylesheet" />
+</head>
+
+<style>
+    body {
+        font-family: 'Manrope', sans-serif;
+        background-color: #f4f6f9;
+    }
+
+    .custom-container {
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .job-header {
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+        .job-header h2 {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #C3171C;
+        }
+
+    .back-button {
+        font-size: 1.2rem;
+        color: #007bff;
+        text-decoration: none;
+        padding: 5px 10px;
+    }
+
+        .back-button:hover {
+            color: #0056b3;
+        }
+
+    .card-header {
+        background-color: #C3171C;
+        color: white;
+        font-weight: bold;
+        padding: 10px 15px;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+        font-size: 1rem;
+        background-color: #f9f9f9;
+    }
+
+    .badge {
+        font-weight: normal;
+    }
+
+    .text-muted {
+        color: #6c757d !important;
+    }
+</style>
+
+<div class="custom-container mt-5">
+    <!-- Back Button with Icon Only -->
+    <a href="javascript:history.back()" class="btn btn-light mb-3" title="Back to Edited Jobs">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+
+    <!-- Job Header -->
+    <div class="job-header">
+        <h2>Chi tiết chỉnh sửa công việc: @Model.JobTitle</h2>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5><i class="fas fa-info-circle"></i> Thông tin công việc</h5>
+        </div>
+        <div class="card-body">
+            <!-- Basic Info Row -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <strong><i class="fas fa-calendar-alt"></i> Ngày tạo:</strong> @Model.CreationDate.ToString("g")
+                </div>
+                <div class="col-md-6">
+                    <strong><i class="fas fa-user"></i> Người đăng:</strong> @Model.ApplicationUser?.Name
+                </div>
+
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <strong><i class="fas fa-edit"></i> Ngày sửa:</strong>
+                    @if (Model.UpdatedAt.HasValue)
+                    {
+                        @Model.UpdatedAt.Value.ToString("g")
+                    }
+                    else
+                    {
+                        <span class="text-muted">Chưa được chỉnh sửa</span>
+                    }
+                </div>
+            </div>
+
+            <!-- Job Description -->
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <strong><i class="fas fa-file-alt"></i> Mô tả:</strong>
+                    <div>@Html.Raw(Model.JobDescription)</div>
+                </div>
+            </div>
+
+            <!-- Requirements and Education -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <strong><i class="fas fa-clipboard-list"></i> Yêu cầu:</strong>
+                    <div>@Html.Raw(Model.JobRequirements)</div>
+                </div>
+                <div class="col-md-6">
+                    <strong><i class="fas fa-graduation-cap"></i> Trình độ học vấn:</strong>
+                    <div>@Html.Raw(Model.Education)</div>
+                </div>
+            </div>
+
+            <!-- Benefits -->
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <strong><i class="fas fa-gift"></i> Quyền lợi:</strong>
+                    <div>@Html.Raw(Model.Benefits)</div>
+                </div>
+            </div>
+
+            <!-- Salary and Location -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <strong><i class="fas fa-money-bill-wave"></i> Lương:</strong>
+                    <span>
+                        @if (Model.SalaryMin.HasValue && Model.SalaryMax.HasValue)
+                        {
+                            @($"{Model.SalaryMin.Value:n0} - {Model.SalaryMax.Value:n0} VND")
+                        }
+                        else
+                        {
+                            <span class="text-muted">Liên hệ để biết mức lương</span>
+                        }
+                    </span>
+                </div>
+                <div class="col-md-6">
+                    <strong><i class="fas fa-map-marker-alt"></i> Địa điểm:</strong>
+                    <span>
+                        @if (Model.District != null && Model.Ward != null)
+                        {
+                            @($"{Model.District.Name}, {Model.Ward.Name}")
+                        }
+                        else if (Model.District != null)
+                        {
+                            @Model.District.Name
+                        }
+                        else if (Model.Ward != null)
+                        {
+                            @Model.Ward.Name
+                        }
+                        else
+                        {
+                            <span class="text-muted">Địa điểm không xác định</span>
+                        }
+                    </span>
+                </div>
+            </div>
+
+            <!-- Working Hours and Hiring Info -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <strong><i class="fas fa-clock"></i> Thời gian làm việc:</strong> @Model.WorkingTime
+                </div>
+                <div class="col-md-6">
+                    <strong><i class="fas fa-users"></i> Số lượng tuyển:</strong> @Model.HiringQuantity
+                </div>
+            </div>
+
+            <!-- Gender Requirement -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <strong><i class="fas fa-venus-mars"></i> Giới tính yêu cầu:</strong>
+                    @if (!string.IsNullOrEmpty(Model.Gender))
+                    {
+                        @Model.Gender
+                    }
+                    else
+                    {
+                        <span class="text-muted">Không yêu cầu</span>
+                    }
+                </div>
+                <div class="col-md-6">
+                    <strong><i class="fas fa-layer-group"></i> Danh mục công việc:</strong>
+                    @if (Model.JobCategory != null)
+                    {
+                        @Model.JobCategory.CategoryName
+                    }
+                    else
+                    {
+                        <span class="text-muted">Không xác định</span>
+                    }
+                </div>
+            </div>
+
+            <!-- Status -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <strong><i class="fas fa-info-circle"></i> Trạng thái:</strong>
+                    <span>
+                        @switch (Model.Status)
+                        {
+                            case ApprovalStatus.PendingEdit:
+                                <span class="badge bg-info text-dark"><i class="fas fa-clock"></i> Đang chờ duyệt chỉnh sửa</span>
+                                break;
+                            case ApprovalStatus.ApprovedEdit:
+                                <span class="badge bg-success"><i class="fas fa-check-circle"></i> Đã duyệt chỉnh sửa</span>
+                                break;
+                            case ApprovalStatus.RejectedEdit:
+                                <span class="badge bg-danger"><i class="fas fa-times-circle"></i> Từ chối chỉnh sửa</span>
+                                break;
+                            default:
+                                <span class="badge bg-secondary">Không xác định</span>
+                                break;
+                        }
+                    </span>
+                </div>
+            </div>
+
+            <!-- Edit Request Details -->
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <strong><i class="fas fa-edit"></i> Chi tiết yêu cầu chỉnh sửa:</strong>
+                    <div>
+                        @if (!string.IsNullOrEmpty(Model.JobEditRequestDetails))
+                        {
+                            var editDetails = Model.JobEditRequestDetails.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                            <table class="table table-bordered mt-3">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th><i class="fas fa-list"></i> Trường</th>
+                                        <th><i class="fas fa-history"></i> Dữ liệu cũ</th>
+                                        <th><i class="fas fa-sync"></i> Dữ liệu mới</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var detail in editDetails)
+                                    {
+                                        var parts = detail.Split(new[] { ':' }, 2); // Tách trường và nội dung
+                                        if (parts.Length == 2)
+                                        {
+                                            var fieldName = parts[0];
+                                            var fieldValues = parts[1].Split(new[] { " → " }, StringSplitOptions.None); // Tách dữ liệu cũ và mới
+                                            var oldValue = fieldValues.Length > 0 ? fieldValues[0].Trim() : "Không có";
+                                            var newValue = fieldValues.Length > 1 ? fieldValues[1].Trim() : "Không có";
+
+                                            // Thêm icon theo từng trường
+                                            string icon = fieldName.Trim() switch
+                                            {
+                                                "Tiêu đề" => "<i class='fas fa-heading'></i>",
+                                                "Yêu cầu công việc" => "<i class='fas fa-tasks'></i>",
+                                                "Mô tả công việc" => "<i class='fas fa-file-alt'></i>",
+                                                "Trình độ học vấn" => "<i class='fas fa-graduation-cap'></i>",
+                                                "Mức lương" => "<i class='fas fa-money-bill-wave'></i>",
+                                                "Phúc lợi" => "<i class='fas fa-gift'></i>",
+                                                "Địa chỉ" => "<i class='fas fa-map-marker-alt'></i>",
+                                                "Thời gian làm việc" => "<i class='fas fa-clock'></i>",
+                                                "Số lượng tuyển" => "<i class='fas fa-users'></i>",
+                                                "Giới tính yêu cầu" => "<i class='fas fa-venus-mars'></i>",
+                                                "Danh mục công việc" => "<i class='fas fa-layer-group'></i>",
+                                                "Thành phố / huyện" => "<i class='fas fa-city'></i>",
+                                                "Phường" => "<i class='fas fa-map'></i>",
+                                                _ => "<i class='fas fa-question-circle'></i>"
+                                            };
+
+                                            <tr>
+                                                <td><strong>@Html.Raw(icon) @Html.Raw(fieldName)</strong></td>
+                                                <td class="text-muted">@Html.Raw(oldValue)</td>
+                                                <td class="text-success">@Html.Raw(newValue)</td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                        else
+                        {
+                            <p class="text-muted">Không có yêu cầu chỉnh sửa nào được liệt kê.</p>
+                        }
+                    </div>
+                </div>
+            </div>
+            @if (Model.Status == ApprovalStatus.PendingEdit)
+            {
+                <div class="approve-reject-buttons mt-3 d-flex justify-content-end">
+                    <!-- Approve Button -->
+                    <button type="button" class="btn btn-success mx-2" onclick="approveEditedJob(@Model.Id)">
+                        <i class="fas fa-check-circle"></i> Duyệt
+                    </button>
+
+                    <!-- Reject Button -->
+                    <button type="button" class="btn btn-danger" onclick="rejectEditedJob(@Model.Id)">
+                        <i class="fas fa-times-circle"></i> Từ chối
+                    </button>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script>
+    // Approve Edited Job
+    function approveEditedJob(jobId) {
+        Swal.fire({
+            title: 'Xác nhận phê duyệt?',
+            text: 'Bạn có chắc chắn muốn phê duyệt chỉnh sửa công việc này?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Phê duyệt',
+            cancelButtonText: 'Hủy',
+            confirmButtonColor: '#28a745',
+            cancelButtonColor: '#d33'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Gửi yêu cầu phê duyệt qua POST
+                $.post('/Admin/AdminJobEditApproval/ApproveEditedJob', { id: jobId })
+                    .done(function () {
+                        Swal.fire(
+                            'Thành công!',
+                            'Công việc đã được phê duyệt chỉnh sửa.',
+                            'success'
+                        ).then(() => location.reload());
+                    })
+                    .fail(function () {
+                        Swal.fire(
+                            'Lỗi!',
+                            'Đã xảy ra lỗi khi phê duyệt.',
+                            'error'
+                        );
+                    });
+            }
+        });
+    }
+
+    // Reject Edited Job
+    function rejectEditedJob(jobId) {
+        Swal.fire({
+            title: 'Nhập lý do từ chối',
+            input: 'textarea',
+            inputPlaceholder: 'Nhập lý do từ chối...',
+            inputAttributes: {
+                'aria-label': 'Nhập lý do từ chối'
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Từ chối',
+            cancelButtonText: 'Hủy',
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            preConfirm: (reason) => {
+                if (!reason) {
+                    Swal.showValidationMessage('Lý do từ chối là bắt buộc!');
+                }
+                return reason;
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Gửi yêu cầu từ chối qua POST
+                $.post('/Admin/AdminJobEditApproval/RejectEditedJob', { id: jobId, reason: result.value })
+                    .done(function () {
+                        Swal.fire(
+                            'Thành công!',
+                            'Công việc đã bị từ chối chỉnh sửa.',
+                            'success'
+                        ).then(() => location.reload());
+                    })
+                    .fail(function () {
+                        Swal.fire(
+                            'Lỗi!',
+                            'Đã xảy ra lỗi khi từ chối.',
+                            'error'
+                        );
+                    });
+            }
+        });
+    }
+</script>
+

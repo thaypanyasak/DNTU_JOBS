@@ -1,0 +1,49 @@
+﻿@page
+@model AccessDeniedModel
+@{
+    ViewData["Title"] = "Access denied";
+        Layout= null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@ViewData["Title"]</title>
+    <style>
+        body1 {
+            font-family: Arial, sans-serif;
+            background-color: white;
+            color: white;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 50vh;
+        }
+
+        header1 {
+            text-align: center;
+            padding: 50px;
+            background-color: black;
+            color: white;
+            border-radius: 5px;
+        }
+
+            header1 h1 {
+                color: red;
+            }
+
+            header1 p {
+                color: white;
+            }
+    </style>
+</head>
+<body1>
+    <header1>
+        <h1>APOLOGIZE</h1>
+        <p>Bạn không thể vào tới trang quản lý</p>
+    </header1>
+</body1>
+</html>

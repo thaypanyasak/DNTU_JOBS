@@ -1,0 +1,430 @@
+﻿@model List<UserViewModel>
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    ViewData["Title"] = $"Users in Role: {ViewData["Role"]}";
+    Layout = null;
+    var successMessage = TempData["CreateSuccessMessage"] as string;
+}
+
+<head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&display=swap" rel="stylesheet" />
+    <!-- SweetAlert2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.0/dist/sweetalert2.min.css" rel="stylesheet">
+
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.0/dist/sweetalert2.all.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: #f4f6f9;
+            color: #495057;
+        }
+
+        h2 {
+            color: #343a40;
+            font-weight: 600;
+            text-align: center;
+            padding-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        .table-container {
+            width: 85%;
+            margin: 20px auto;
+        }
+
+        .back-button-container {
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .table {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+            .table thead {
+                background-color: #343a40;
+                color: #ffffff;
+            }
+
+            .table th, .table td {
+                vertical-align: middle;
+                padding: 15px;
+            }
+
+            .table tbody tr:hover {
+                background-color: #f9f9f9;
+            }
+
+        .btn-info, .btn-danger, .btn-secondary-icon {
+            border-radius: 8px;
+            font-weight: 600;
+            padding: 6px 12px;
+        }
+
+        .btn-info {
+            background-color: #28a745;
+            border: none;
+        }
+
+            .btn-info:hover {
+                background-color: #218838;
+            }
+
+        .btn-danger {
+            background-color: #dc3545;
+            border: none;
+        }
+
+            .btn-danger:hover {
+                background-color: #c82333;
+            }
+
+        .btn-secondary-icon {
+            color: #6c757d;
+            border: none;
+            font-size: 1.5rem;
+            padding: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+            .btn-secondary-icon:hover {
+                color: #495057;
+                transform: scale(1.1);
+            }
+
+            .btn-secondary-icon i {
+                transition: transform 0.2s ease;
+            }
+
+        .swal2-popup {
+            width: 500px !important; /* Đặt chiều rộng cho modal */
+            padding: 20px; /* Thêm khoảng cách xung quanh */
+            font-size: 16px;
+            border-radius: 10px; /* Bo góc cho modal */
+        }
+
+        .swal2-title {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .swal2-input {
+            font-size: 16px;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+
+        .swal2-confirm, .swal2-cancel {
+            font-size: 16px;
+            padding: 10px 20px;
+        }
+
+            /* Tùy chỉnh icon trên button */
+            .swal2-confirm i, .swal2-cancel i {
+                margin-left: 10px;
+            }
+
+    </style>
+</head>
+
+
+
+<body>
+    <div class="table-container">
+        <h2>Users in Role: @ViewData["Role"]</h2>
+        @if (TempData["CreateSuccessMessage"] != null)
+        {
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: '@Html.Raw(TempData["CreateSuccessMessage"])'
+                });
+            </script>
+        }
+
+        @if (TempData["EditSuccessMessage"] != null)
+        {
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: '@Html.Raw(TempData["EditSuccessMessage"])'
+                });
+            </script>
+        }
+
+        <a asp-action="Index" class="btn btn-light mb-3" title="Back to Index">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <div style="padding-bottom:20px">
+            <a asp-action="Create" asp-route-role="@ViewData["Role"]" class="btn btn-success">
+                <i class="fas fa-user-plus"></i> Create New User
+            </a>
+        </div>
+        <table class="table table-striped text-center">
+            <thead>
+                <tr>
+                    <th>UserID</th>
+                    <th>Email</th>
+                    <th>Name</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                    <th>Lock/Unlock</th>
+                    <th>Reset Password</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model)
+                {
+                    <tr id="user-@user.Id">
+                        <td>@user.Id</td>
+                        <td>@user.Email</td>
+                        <td>@user.Name</td>
+                        <td>
+                            <span class="@(user.IsLockedOut ? "text-danger" : "text-success")">
+                                @(user.IsLockedOut ? "Locked" : "Active")
+                            </span>
+                        </td>
+                        <td>
+                            <!-- Edit Button -->
+                            <a asp-action="Edit" asp-route-id="@user.Id" class="btn btn-info">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <!-- Delete Button (using SweetAlert2) -->
+                            <button class="btn btn-danger delete-user" data-id="@user.Id">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                        <td>
+                            <!-- Lock/Unlock Buttons -->
+                            @if (user.IsLockedOut)
+                            {
+                                <form asp-action="UnlockAccount" method="post" style="display:inline;">
+                                    <input type="hidden" name="id" value="@user.Id" />
+                                    <input type="hidden" name="role" value="@ViewData["Role"]" />
+                                    <button type="submit" class="btn btn-warning unlock-account">
+                                        <i class="fas fa-unlock"></i>
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <form asp-action="LockAccount" method="post" style="display:inline;">
+                                    <input type="hidden" name="id" value="@user.Id" />
+                                    <input type="hidden" name="role" value="@ViewData["Role"]" />
+                                    <button type="submit" class="btn btn-danger lock-account">
+                                        <i class="fas fa-lock"></i> Lock
+                                    </button>
+                                </form>
+                            }
+                        </td>
+
+                        <!-- Reset Password Button -->
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="openResetPasswordModal('@user.Id', '@ViewData["Role"]')">
+                                <i class="fas fa-key"></i> Reset Password
+                            </button>
+                        </td>
+
+
+
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</body>
+
+
+
+
+
+
+
+<script>
+    function openResetPasswordModal(userId, role) {
+        Swal.fire({
+            title: '<i class="fas fa-lock"></i> Enter New Password',  // Thêm icon vào title
+            html: `
+                    <input id="newPassword" type="password" class="swal2-input" placeholder="Enter new password" style="width: 100%; padding: 10px; font-size: 16px;">
+                    <input id="confirmPassword" type="password" class="swal2-input" placeholder="Confirm new password" style="width: 100%; padding: 10px; font-size: 16px;">
+                `,
+            showCancelButton: true,
+            confirmButtonText: 'Reset Password <i class="fas fa-check"></i>',  // Thêm icon vào button
+            cancelButtonText: 'Cancel <i class="fas fa-times"></i>',
+            customClass: {
+                container: 'my-swal-container',  // Thêm class tùy chỉnh cho modal
+                popup: 'my-swal-popup'           // Thêm class tùy chỉnh cho popup
+            },
+            preConfirm: () => {
+                const newPassword = document.getElementById('newPassword').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+
+                // Kiểm tra sự khớp của mật khẩu và xác nhận
+                if (newPassword !== confirmPassword) {
+                    Swal.showValidationMessage('Passwords do not match!');
+                    return false;
+                }
+                return { newPassword };
+            }
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const { newPassword } = result.value;
+
+                // Get CSRF Token from the meta tag
+                const csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+                try {
+                    // Gửi yêu cầu POST để reset mật khẩu
+                    const response = await fetch('@Url.Action("AdminResetPassword", "UserManager")', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': csrfToken // Gửi CSRF token
+                        },
+                        body: JSON.stringify({
+                            UserId: userId,
+                            NewPassword: newPassword,
+                            Role: role
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Password Reset Successful',
+                            text: data.message
+                        }).then(() => {
+                            window.location.reload(); // Reload page after successful reset
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.message || 'Something went wrong, please try again.'
+                        });
+                    }
+                } catch (error) {
+                    console.error("Error resetting password:", error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while resetting the password.'
+                    });
+                }
+            }
+        });
+    }
+    $(document).ready(function () {
+        // Xử lý nút Lock
+        $('.lock-account').click(function (e) {
+            e.preventDefault();
+            var form = $(this).closest('form'); // Lấy form bao quanh nút
+            var userName = $(this).data('username'); // Lấy tên tài khoản từ data-username
+            var url = form.attr('action'); // Lấy URL action của form
+
+            Swal.fire({
+                title: 'Bạn chắc chắn khóa tài khoản?',
+                text: "Bạn có muốn khóa tài khoản: " + userName + " không?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Có, khóa tài khoản!',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit(); // Gửi form nếu người dùng xác nhận
+                }
+            });
+        });
+
+        // Xử lý nút Unlock
+        $('.unlock-account').click(function (e) {
+            e.preventDefault();
+            var form = $(this).closest('form'); // Lấy form bao quanh nút
+            var userName = $(this).data('username'); // Lấy tên tài khoản từ data-username
+            var url = form.attr('action'); // Lấy URL action của form
+
+            Swal.fire({
+                title: 'Bạn chắc chắn mở khóa tài khoản?',
+                text: "Bạn có muốn mở khóa tài khoản: " + userName + " không?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Có, mở khóa tài khoản!',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit(); // Gửi form nếu người dùng xác nhận
+                }
+            });
+        });
+
+        $(document).ready(function () {
+            // Kiểm tra xem đã hiển thị thông báo xóa hay chưa
+            if (!sessionStorage.getItem("deleteMessageShown")) {
+                $('.delete-user').click(function (e) {
+                    e.preventDefault();
+                    var userId = $(this).data('id');
+                    var row = $(this).closest('tr');
+
+                    Swal.fire({
+                        title: 'Bạn chắc chắn muốn xóa người dùng này?',
+                        text: "Bạn sẽ không thể khôi phục lại sau khi xóa!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Có, xóa người dùng!',
+                        cancelButtonText: 'Hủy'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Gửi yêu cầu AJAX để xóa người dùng
+                            $.ajax({
+                                url: '@Url.Action("DeleteAjax", "UserManager")',
+                                type: 'POST',
+                                data: { id: userId },  // Truyền ID người dùng
+                                success: function (response) {
+                                    if (response.success) {
+                                        Swal.fire('Đã xóa!', 'Người dùng đã được xóa thành công.', 'success');
+                                        row.remove();  // Xóa dòng khỏi bảng
+                                        sessionStorage.setItem("deleteMessageShown", "true");  // Lưu trạng thái đã hiển thị thông báo
+                                    } else {
+                                        Swal.fire('Lỗi!', response.message || 'Có lỗi xảy ra khi xóa người dùng.', 'error');
+                                    }
+                                },
+                                error: function () {
+                                    Swal.fire('Lỗi!', 'Có lỗi xảy ra khi xóa người dùng.', 'error');
+                                }
+                            });
+                        }
+                    });
+                });
+            }
+        });
+
+
+
+        
+
+    });
+
+</script>
+
+
+
+
+
+

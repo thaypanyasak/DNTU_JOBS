@@ -1,0 +1,26 @@
+﻿@model DNTU_JOBS.ViewModel.UserProfileViewModel
+
+
+<head>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+</head>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-4 text-center">
+            <img class="img-account-profile rounded-circle mb-2" src="@(Model.Photo != null ? $"data:image/png;base64,{Convert.ToBase64String(Model.Photo)}" : "/images/default-avatar.png")" alt="Ảnh đại diện" style="height: 10rem;" />
+        </div>
+        <div class="col-md-8">
+            <h4>@Model.Name</h4>
+            <p>Email: @Model.Email</p>
+            <p>Phone: @Model.Phone</p>
+            <p>Address: @Model.Address</p>
+            <p>Nationality: @Model.Nationality</p>
+            <p>Gender: @Model.Gender</p>
+            <p>Date of Birth: @Model.DateOfBirth?.ToString("dd/MM/yyyy")</p>
+            <p>Qualification: @Model.Qualification</p>
+            <p>Description: @Model.Description</p>
+        </div>
+    </div>
+</div>

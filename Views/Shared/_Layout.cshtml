@@ -1,0 +1,639 @@
+﻿@using Microsoft.Extensions.DependencyInjection;
+@using Microsoft.AspNetCore.Identity;
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    bool hideHeaderFooter = Context.Request.Query["iframe"] == "true";
+}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>DNTU JOB FINDER</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/x-icon" href="~/img/favicon.ico">
+
+
+    <!-- CSS here -->
+    <link rel="stylesheet" href="~/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/css/owl.carousel.min.css">
+    <link rel="stylesheet" href="~/css/flaticon.css">
+    <link rel="stylesheet" href="~/css/price_rangs.css">
+    <link rel="stylesheet" href="~/css/slicknav.css">
+    <link rel="stylesheet" href="~/css/animate.min.css">
+    <link rel="stylesheet" href="~/css/magnific-popup.css">
+    <link rel="stylesheet" href="~/css/fontawesome-all.min.css">
+    <link rel="stylesheet" href="~/css/themify-icons.css">
+    <link rel="stylesheet" href="~/css/slick.css">
+    <link rel="stylesheet" href="~/css/nice-select.css">
+    <link rel="stylesheet" href="~/css/style.css">
+    @RenderSection("Scripts", required: false)
+</head>
+<style>
+    /* Header Styling */
+    .header-icons {
+        gap: 10px; /* Đặt khoảng cách giữa các nút */
+    }
+
+    /* Styling for login/register and avatar menu */
+    .login-register-menu .nav-link {
+        background-color: #AD0514;
+        color: #ffffff !important;
+        padding: 5px 15px;
+        border-radius: 5px;
+        font-size: 0.875rem; /* Giảm kích thước chữ */
+        transition: background-color 0.3s;
+    }
+
+        .login-register-menu .nav-link:hover {
+            background-color: #ffcc00;
+            color: #333 !important;
+        }
+
+    /* Avatar and notification icon spacing */
+    .avatar-menu {
+        position: relative;
+        display: inline-block;
+    }
+
+        .avatar-menu img {
+            cursor: pointer;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            object-fit: cover;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s;
+            background-color: transparent;
+        }
+
+            .avatar-menu img:hover {
+                transform: scale(1.1);
+            }
+
+    .avatar-menu-content {
+        display: none;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #ffffff;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        border-radius: 8px;
+        width: 180px;
+        padding: 10px 0;
+        margin-top: 10px;
+        z-index: 1000;
+    }
+
+        .avatar-menu-content a,
+        .avatar-menu-content button {
+            display: block;
+            width: 100%;
+            padding: 8px 15px;
+            color: #333;
+            text-align: left;
+            background: none;
+            border: none;
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+            .avatar-menu-content a:hover,
+            .avatar-menu-content button:hover {
+                background-color: #f7f7f7;
+                color: #AD0514;
+            }
+
+            /* Đảm bảo rằng menu di động chỉ hiển thị trên các thiết bị nhỏ */
+    /* Mobile Menu - Sidebar Style */
+    /* Mobile Menu - Sidebar Style */
+    /* Mobile Menu - New Stylish Design */
+    .mobile_menu {
+        position: fixed; /* Gắn cố định bên trái màn hình */
+        top: 0;
+        left: -300px; /* Ban đầu menu sẽ ẩn ra ngoài màn hình */
+        width: 300px;
+        height: 100%;
+        background: linear-gradient(45deg, #dc3545 10%, #ffffff 10%, #ffffff 35%, #f8d7da 35%, #f8d7da 65%, #ffffff 65%, #ffffff 90%, #dc3545 90%); /* Gradient đỏ và trắng */
+        color: #333;
+        box-shadow: 4px 0 12px rgba(0, 0, 0, 0.3);
+        padding-top: 60px; /* Khoảng cách cho nút đóng */
+        transition: transform 0.5s ease, opacity 0.5s ease; /* Hiệu ứng mượt mà cho mở và đóng */
+        z-index: 9999;
+        overflow: hidden;
+        opacity: 0; /* Ban đầu menu ẩn */
+        transform: translateX(-100%); /* Menu nằm ngoài màn hình bên trái */
+    }
+
+        .mobile_menu.show {
+            left: 0; /* Di chuyển vào màn hình khi mở */
+            opacity: 1; /* Menu xuất hiện */
+            transform: translateX(0); /* Menu di chuyển vào trong */
+        }
+
+    /* Close button - Dấu X nút đóng */
+    .close-menu {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        font-size: 36px;
+        color: #2c3e50; /* Màu tối cho nút đóng */
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+
+        .close-menu:hover {
+            color: #DB3545; /* Đổi màu khi hover */
+        }
+
+    /* Điều chỉnh các mục menu di động */
+    .mobile_menu ul {
+        list-style: none;
+        padding-left: 0;
+        margin: 0;
+    }
+
+        .mobile_menu ul li {
+            text-align: center;
+            padding: 20px;
+            border-bottom: 2px solid #ecf0f1;
+            opacity: 0; /* Ban đầu các mục menu ẩn */
+            transform: translateX(-100%); /* Mục menu nằm ngoài màn hình */
+            transition: transform 0.5s ease, opacity 0.5s ease; /* Hiệu ứng mượt mà */
+        }
+
+    .mobile_menu.show ul li {
+        opacity: 1; 
+        transform: translateX(0); 
+    }
+
+    /* Hiệu ứng hover khi di chuột vào menu */
+    .mobile_menu ul li:hover {
+        background-color: rgba(255, 255, 255, 0.1); /* Nền khi hover */
+    }
+
+    /* Link trong menu */
+    .mobile_menu ul li a {
+        font-size: 1.4rem;
+        color: #2c3e50;
+        text-decoration: none;
+        padding: 15px;
+        display: block;
+        transition: background-color 0.3s, color 0.3s ease;
+    }
+
+        .mobile_menu ul li a:hover {
+            color: #DB3545; /* Màu đỏ khi hover */
+            background-color: #343A40; /* Màu nền khi hover */
+        }
+
+    /* Các biểu tượng icon thay thế cho text */
+    .menu-item-icon {
+        font-size: 24px;
+        margin-right: 15px;
+        vertical-align: middle;
+        color: #2c3e50;
+    }
+
+    /* Các hiệu ứng cho menu items */
+    .mobile_menu ul li a i {
+        font-size: 22px;
+        transition: transform 0.3s ease;
+    }
+
+    .mobile_menu ul li a:hover i {
+        transform: scale(1.2); /* Hiệu ứng phóng to icon khi hover */
+        color: #DB3545;
+    }
+
+    /* Submenu - Menu con */
+    .submenu {
+        list-style: none;
+        display: none;
+        padding-left: 20px;
+        background-color: rgba(255, 255, 255, 0.1); /* Nền trong suốt */
+    }
+
+    .mobile_menu ul li:hover .submenu {
+        display: block; /* Hiển thị submenu khi hover vào item cha */
+    }
+
+    .submenu li {
+        padding: 10px;
+        border-bottom: 1px solid #ecf0f1;
+    }
+
+        .submenu li a {
+            color: #2c3e50;
+            font-size: 1.2rem;
+        }
+
+            .submenu li a:hover {
+                color: #f39c12;
+                background-color: rgba(255, 255, 255, 0.2);
+            }
+
+
+            @@media (max-width: 991px) {
+                .mobile_menu {
+                    left: -300px; /* Đảm bảo menu ẩn ngoài màn hình */
+                    opacity: 0;
+                    transform: translateX(-100%);
+                }
+
+                .mobile_menu.show {
+                    left: 0;
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+
+/* Đảm bảo menu không hiển thị trên các thiết bị có màn hình lớn hơn 991px */
+    @@media (min-width: 992px) {
+        .mobile_menu {
+        display: none;
+        }
+    }
+
+    @@media (max-width: 768px) {
+
+        .avatar-button img {
+            position: absolute;
+            top: -50px;
+        }
+
+        .position-relative {
+            position: absolute;
+            top: -50px;
+        }
+
+        .material-icons {
+
+            position: absolute;
+            top: -57px;
+        }
+
+/*             .notification-icon i {
+                color: #343A40;
+                margin-top: 8px;
+            } */
+
+
+        .avatar-button::after {
+            display:none;
+            
+        }
+
+        #newMessageNotification {
+            position: absolute;
+            left: 350px;
+        }
+
+
+        #notificationBell {
+            position: absolute;
+            left: 293px;
+            top: -15px;
+        }
+
+        .mobile-menu-toggle {
+            position: absolute;
+            top: -35px;
+        }
+
+
+        
+
+    }
+
+    .slicknav_btn {
+        display: none;
+    }
+
+    .notification-icon i {
+        color: #343A40;
+        margin-top: 8px;
+    }
+
+    .footer-area .footer-pera p {
+        text-wrap : auto;
+    }
+
+    .footer-tittle p {
+        text-wrap: auto;
+    }
+
+</style>
+
+<body>
+    <div id="preloader-active">
+        <div class="preloader d-flex align-items-center justify-content-center">
+            <div class="preloader-inner position-relative">
+                <div class="preloader-circle"></div>
+                <div class="preloader-img pere-text">
+                    <img src="./img/icon/DNTU_JOBS.png" alt="">
+                </div>
+            </div>
+        </div>
+    </div>
+    @if (!hideHeaderFooter)
+    {
+        <header>
+    <div class="header-area header-transparrent">
+        <div class="headder-top header-sticky">
+            <div class="container">
+                <div class="row align-items-center">
+                    <!-- Logo -->
+                    <div class="col-lg-3 col-md-2">
+                        <div class="logo">
+                            <a asp-area="User" asp-controller="UserJob" asp-action="Index">
+                                <img src="~/img/icon/DNTU_JOBS.png" alt="DNTU Jobs Logo">
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Navigation Menu -->
+                    <div class="col-lg-7 col-md-7">
+                        <div class="menu-wrapper">
+                            <div class="main-menu">
+                                <nav class="d-none d-lg-block">
+                                    <ul id="navigation">
+                                        <li><a asp-area="User" asp-controller="Home" asp-action="Index">Home</a></li>
+                                        <li>
+                                            <a asp-area="User" asp-controller="UserJob" asp-action="Index">FIND A JOBS</a>
+                                            <ul class="submenu">
+                                                <li><a asp-area="User" asp-controller="UserJob" asp-action="Jobs">Job Post</a></li>
+                                                <li><a asp-area="User" asp-controller="UserJob" asp-action="JobDetail">Blog Details</a></li>
+                                            </ul>
+                                        </li>
+                                        <li><a asp-controller="Home" asp-action="Contact">Contact</a></li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Notification and LoginPartial Section -->
+                    <div class="col-lg-2 col-md-3 d-flex justify-content-end align-items-center gap-2 header-icons">
+                        @await Component.InvokeAsync("Notification")
+                        @await Component.InvokeAsync("NewMessageNotification")
+                        @await Html.PartialAsync("_LoginPartial")
+                    </div>
+                    <!-- Mobile Menu Toggle -->
+                    <div class="col-12 d-block d-lg-none">
+                        <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                            <i class="fa fa-bars" style="color:black"></i> <!-- Icon hamburger -->
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+        <!-- Mobile Menu -->
+        <!-- Mobile Menu -->
+        <!-- Mobile Menu -->
+        <div class="mobile_menu">
+            <!-- Close Button -->
+            <button class="close-menu" onclick="toggleMobileMenu()">×</button>
+
+            <ul id="navigation">
+                <li>
+                    <a asp-area="User" asp-controller="Home" asp-action="Index">
+                        <i class="fas fa-home menu-item-icon"></i> Home
+                    </a>
+                </li>
+                <li>
+                    <a asp-area="User" asp-controller="UserJob" asp-action="Index">
+                        <i class="fas fa-briefcase menu-item-icon"></i> Jobs
+                    </a>
+                    <ul class="submenu">
+                        <li><a asp-area="User" asp-controller="UserJob" asp-action="Index">Job Post</a></li>
+                        <li><a asp-area="User" asp-controller="UserJob" asp-action="Index">Job Details</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a asp-area="User" asp-controller="Home" asp-action="Contact">
+                        <i class="fas fa-envelope menu-item-icon"></i> Contact
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fas fa-cogs menu-item-icon"></i> Settings
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+
+
+    }
+    <div class="container-fuild">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    @if (!hideHeaderFooter)
+    {
+        <footer>
+            <!-- Footer Start-->
+            <div class="footer-area footer-bg footer-padding">
+                <div class="container">
+                    <div class="row d-flex justify-content-between">
+                        <!-- About Section -->
+                        <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6">
+                            <div class="single-footer-caption mb-50">
+                                <div class="single-footer-caption mb-30">
+                                    <div class="footer-tittle">
+                                        <h4>About DNTU Jobs</h4>
+                                        <div class="footer-pera">
+                                            <p>
+                                                DNTU Jobs - A leading job search platform, accompanying you in your journey to find your ideal job.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Contact Information -->
+                        <div class="col-xl-3 col-lg-3 col-md-4 col-sm-5">
+                            <div class="single-footer-caption mb-50">
+                                <div class="footer-tittle">
+                                    <h4>Contact Information</h4>
+                                    <ul>
+                                        <li>
+                                            <p>Headquarters: Đ. Nguyễn Khuyến, Khu Phố 5, Thành phố Biên Hòa, Đồng Nai, Việt Nam</p>
+                                        </li>
+                                        <li><a href="#">Phone : +8880 44338899</a></li>
+                                        <li><a href="#">Email : info@colorlib.com</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Useful Links -->
+                        <div class="col-xl-3 col-lg-3 col-md-4 col-sm-5">
+                            <div class="single-footer-caption mb-50">
+                                <div class="footer-tittle">
+                                    <h4>Useful Links</h4>
+                                    <ul>
+                                        <li><a href="#">View Plan</a></li>
+                                        <li><a href="#">Contact Us</a></li>
+                                        <li><a href="#">Support</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Newsletter Section -->
+                        <div class="col-xl-3 col-lg-3 col-md-4 col-sm-5">
+                            <div class="single-footer-caption mb-50">
+                                <div class="footer-tittle">
+                                    <h4>Newsletter</h4>
+                                    <div class="footer-pera footer-pera2">
+                                        <p>Stay updated with the latest job opportunities and career trends through our job search platform.</p>
+                                    </div>
+                                    <!-- Form -->
+                                    <div class="footer-form">
+                                        <div id="mc_embed_signup">
+                                            <form target="_blank" action="https://spondonit.us12.list-manage.com/subscribe/post?u=1462626880ade1ac87bd9c93a&amp;id=92a4423d01" method="get" class="subscribe_form relative mail_part">
+                                                <input type="email" name="email" id="newsletter-form-email" placeholder="Email Address" class="placeholder hide-on-focus" onfocus="this.placeholder = ''" onblur="this.placeholder = ' Email Address '">
+                                                <div class="form-icon">
+                                                    <button type="submit" name="submit" id="newsletter-submit" class="email_icon newsletter-submit button-contactForm">
+                                                        <img src="~/img/icon/form.png" alt="">
+                                                    </button>
+                                                </div>
+                                                <div class="mt-10 info"></div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Footer Statistics -->
+                    <div class="row footer-wejed justify-content-between">
+                        <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6">
+                            <!-- Logo -->
+                            <div class="footer-logo mb-20">
+                                <a href="index.html"><img src="~/img/icon/DNTU_JOBS_2.png" alt="DNTU Jobs Logo"></a>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-lg-3 col-md-4 col-sm-5">
+                            <div class="footer-tittle-bottom">
+                                <span>5000+</span>
+                                <p>Trusted Employers</p>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-lg-3 col-md-4 col-sm-5">
+                            <div class="footer-tittle-bottom">
+                                <span>451</span>
+                                <p>Jobs Connected</p>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-lg-3 col-md-4 col-sm-5">
+                            <div class="footer-tittle-bottom">
+                                <span>568</span>
+                                <p>Leading Companies</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Footer Bottom Area -->
+            <div class="footer-bottom-area footer-bg">
+                <div class="container">
+                    <div class="footer-border">
+                        <div class="row d-flex justify-content-between align-items-center">
+                            <div class="col-xl-10 col-lg-10">
+                                <div class="footer-copy-right">
+                                    <p>
+                                        Copyright &copy;<script>document.write(new Date().getFullYear());</script> DNTU JOBS.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-xl-2 col-lg-2">
+                                <div class="footer-social f-right">
+                                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                                    <a href="#"><i class="fab fa-twitter"></i></a>
+                                    <a href="#"><i class="fas fa-globe"></i></a>
+                                    <a href="#"><i class="fab fa-behance"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    }
+
+    <!-- JS here -->
+    <!-- All JS Custom Plugins Link Here here -->
+    <script src="~/js/vendor/modernizr-3.5.0.min.js"></script>
+    <!-- Jquery, Popper, Bootstrap -->
+    <script src="~/js/vendor/jquery-1.12.4.min.js"></script>
+    <script src="~/js/popper.min.js"></script>
+    <script src="~/js/bootstrap.min.js"></script>
+    <!-- Jquery Mobile Menu -->
+    <script src="~/js/jquery.slicknav.min.js"></script>
+
+    <!-- Jquery Slick , Owl-Carousel Plugins -->
+    <script src="~/js/owl.carousel.min.js"></script>
+    <script src="~/js/slick.min.js"></script>
+    <script src="~/js/price_rangs.js"></script>
+
+    <!-- One Page, Animated-HeadLin -->
+    <script src="~/js/wow.min.js"></script>
+    <script src="~/js/animated.headline.js"></script>
+    <script src="~/js/jquery.magnific-popup.js"></script>
+
+    <!-- Scrollup, nice-select, sticky -->
+    <script src="~/js/jquery.scrollUp.min.js"></script>
+    <script src="~/js/jquery.nice-select.min.js"></script>
+    <script src="~/js/jquery.sticky.js"></script>
+
+    <!-- contact js -->
+    <script src="~/js/contact.js"></script>
+    <script src="~/js/jquery.form.js"></script>
+    <script src="~/js/jquery.validate.min.js"></script>
+    <script src="~/js/mail-script.js"></script>
+    <script src="~/js/jquery.ajaxchimp.min.js"></script>
+
+    <!-- Jquery Plugins, main Jquery -->
+    <script src="~/js/plugins.js"></script>
+    <script src="~/js/main.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@1"></script>
+@*     @await RenderSectionAsync("Scripts", required: false) *@
+</body>
+</html>
+
+
+
+<script>
+    function toggleMobileMenu() {
+        var mobileMenu = document.querySelector('.mobile_menu');
+        if (mobileMenu) {
+            mobileMenu.classList.toggle('show');
+        }
+    }
+
+    // Kiểm tra kích thước cửa sổ khi tải trang hoặc thay đổi kích thước cửa sổ
+    window.addEventListener('resize', function () {
+        var mobileMenu = document.querySelector('.mobile_menu');
+        if (window.innerWidth > 991 && mobileMenu && mobileMenu.classList.contains('show')) {
+            // Nếu kích thước cửa sổ lớn hơn 991px và menu đang mở, đóng menu
+            mobileMenu.classList.remove('show');
+        }
+    });
+
+
+
+
+
+</script>

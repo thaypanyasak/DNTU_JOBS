@@ -1,0 +1,272 @@
+﻿<!-- Add Font Awesome CDN link for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+@{
+    Layout = null;
+}
+@model IEnumerable<JobTable>
+<head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&display=swap" rel="stylesheet" />
+</head>
+<h2 class="mb-4">Danh sách công việc</h2>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i> @TempData["Message"]
+    </div>
+}
+
+<style>
+    /* Apply Manrope font to the entire page */
+    body {
+        font-family: 'Manrope', sans-serif;
+        margin-top: 25px;
+    }
+
+    /* Center content with a max width */
+    .table-container {
+        max-width: 90%;
+        margin: 0 auto;
+    }
+
+    /* Style for heading */
+    h2 {
+        font-family: 'Manrope', sans-serif;
+        font-weight: 600;
+        color: #333;
+        text-align: center;
+    }
+
+    /* Button styles for actions */
+    .custom-btn-edit, .custom-btn-delete, .custom-btn-view {
+        width: 40px;
+        height: 40px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        font-weight: bold;
+        border-radius: 8px;
+        transition: background-color 0.3s ease;
+        color: white;
+        border: none;
+        margin-right: 8px;
+        cursor: pointer;
+    }
+
+    .custom-btn-edit {
+        background-color: #ffc107;
+    }
+
+        .custom-btn-edit:hover {
+            background-color: #e0a800;
+        }
+
+    .custom-btn-delete {
+        background-color: #dc3545;
+    }
+
+        .custom-btn-delete:hover {
+            background-color: #c82333;
+        }
+
+    .custom-btn-view {
+        background-color: #17a2b8;
+    }
+
+        .custom-btn-view:hover {
+            background-color: #138496;
+        }
+
+    .custom-icon-spacing {
+        margin-right: 5px;
+    }
+
+
+    /* Table styling */
+    table.table {
+        font-size: 16px;
+    }
+
+        table.table th {
+            font-weight: 600;
+            color: #ffffff;
+            background-color: #343a40;
+        }
+
+        table.table td {
+            color: #333;
+            padding: 10px;
+            vertical-align: middle;
+        }
+
+        /* Table row styling */
+        table.table tbody tr {
+            transition: background-color 0.2s;
+        }
+
+            table.table tbody tr:hover {
+                background-color: #f9f9f9;
+            }
+
+    /* Button styling for creating new job post */
+    .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+        font-weight: 600;
+    }
+
+        .btn-success:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+        }
+
+    /* Alert styling */
+    .alert-info {
+        font-size: 16px;
+    }
+
+</style>
+
+<div class="table-container">
+    <!-- Create Job Post Button with icon -->
+    <a asp-action="PostJob" asp-controller="JobPost" class="btn btn-success mb-4">
+        <i class="fas fa-plus"></i> Tạo bài đăng công việc
+    </a>
+
+    <!-- Job Table -->
+    <table class="table table-striped table-bordered shadow-sm">
+        <thead class="table-dark">
+            <tr>
+                <th><i class="fas fa-briefcase"></i> Tiêu đề công việc</th>
+                <th><i class="fas fa-money-bill-wave"></i> Lương từ thấp đến cao</th>
+                <th><i class="fas fa-clipboard-check"></i> Trạng thái</th>
+                <th><i class="fas fa-tasks"></i> Hành động</th>
+                <th><i class="fas fa-eye"></i> Xem chi tiết</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Any())
+            {
+                foreach (var job in Model)
+                {
+                    <tr>
+                        <td>@job.JobTitle</td>
+                        <td>
+                            @if (job.SalaryMin.HasValue && job.SalaryMax.HasValue)
+                            {
+                                @($"{job.SalaryMin.Value.ToString("N0")} - {job.SalaryMax.Value.ToString("N0")} VND")
+                            }
+                            else
+                            {
+                                <span>Chưa xác định</span>
+                            }
+                        </td>
+                        <td>
+                            @if (job.HiringQuantity <= 0)
+                            {
+                                <span class="text-muted"><i class="fas fa-check-circle"></i> Đã đủ số lượng tuyển</span>
+                            }
+                            else
+                            {
+                                @switch (job.Status)
+                                {
+                                    case ApprovalStatus.Pending:
+                                        <span class="d-flex align-items-center text-warning">
+                                            <i class="fas fa-clock custom-icon-spacing"></i> Đang chờ duyệt
+                                        </span>
+                                        break;
+                                    case ApprovalStatus.Approved:
+                                        <span class="d-flex align-items-center text-success">
+                                            <i class="fas fa-check-circle custom-icon-spacing"></i> Đã duyệt
+                                        </span>
+                                        break;
+                                    case ApprovalStatus.Working:
+                                        <span class="d-flex align-items-center text-success">
+                                            <i class="fas fa-check-circle custom-icon-spacing"></i> Đã duyệt
+                                        </span>
+                                        break;
+                                    case ApprovalStatus.Rejected:
+                                        <span class="d-flex align-items-center text-danger">
+                                            <i class="fas fa-times-circle custom-icon-spacing"></i> Từ chối
+                                        </span>
+                                        break;
+                                    case ApprovalStatus.Break:
+                                        <span class="d-flex align-items-center text-danger">
+                                            <i class="fas fa-times-circle custom-icon-spacing"></i> Tạm ngừng
+                                        </span>
+                                        break;
+                                    case ApprovalStatus.PendingEdit:
+                                        <span class="d-flex align-items-center text-info">
+                                            <i class="fas fa-edit custom-icon-spacing"></i> Đang chờ duyệt sửa
+                                        </span>
+                                        break;
+                                    case ApprovalStatus.ApprovedEdit:
+                                        <span class="d-flex align-items-center text-success">
+                                            <i class="fas fa-check-circle custom-icon-spacing"></i> Đã duyệt bài sửa
+                                        </span>
+                                        break;
+                                    case ApprovalStatus.RejectedEdit:
+                                        <span class="d-flex align-items-center text-danger">
+                                            <i class="fas fa-times-circle custom-icon-spacing"></i> Từ chối bài sửa
+                                        </span>
+                                        break;
+                                    default:
+                                        <span class="d-flex align-items-center text-muted">
+                                            <i class="fas fa-question-circle custom-icon-spacing"></i> Không xác định
+                                        </span>
+                                        break;
+                                }
+
+                            }
+                        </td>
+                        <td>
+                            @if (job.Status == ApprovalStatus.Approved || job.Status == ApprovalStatus.ApprovedEdit
+                           || job.Status == ApprovalStatus.Rejected || job.Status == ApprovalStatus.RejectedEdit || job.Status == ApprovalStatus.Filled || job.Status == ApprovalStatus.Break || job.Status == ApprovalStatus.Working)
+                            {
+                                <a asp-action="EditJob" asp-route-id="@job.Id" class="custom-btn-edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            }
+                            <form asp-action="DeleteJob" method="post" asp-route-id="@job.Id" style="display:inline;"
+                                  onsubmit="return confirm('Bạn có chắc chắn muốn xóa công việc này?');">
+                                <button type="submit" class="custom-btn-delete">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </form>
+                        </td>
+                        <td>
+                            <a asp-action="JobDetail" asp-route-id="@job.Id" class="custom-btn-view">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="5" class="text-center"><i class="fas fa-exclamation-circle"></i> Không tìm thấy công việc nào.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- Pagination buttons -->
+    <div class="d-flex justify-content-center mt-4">
+        <nav>
+            <ul class="pagination">
+                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                {
+                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                        <a class="page-link" href="?page=@i&pageSize=@ViewBag.PageSize">@i</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    </div>
+</div>
+

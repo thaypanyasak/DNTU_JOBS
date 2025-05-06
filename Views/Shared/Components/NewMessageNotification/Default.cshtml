@@ -1,0 +1,96 @@
+﻿@model IEnumerable<DNTU_JOBS.ViewModel.MessageNotificationViewModel>
+
+<!-- Required styles and scripts for icons, jQuery, and Bootstrap dropdown functionality -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+<div id="newMessageNotification" class="dropdown" style="position: relative;">
+    <div class="notification-icon position-relative" id="notificationDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="cursor: pointer; padding: 10px;">
+        <i class="bi bi-send-fill" style="font-size: 1.5rem; color: #343A40;"></i>
+        @if (Model.Any(n => n.UnreadCount > 0))
+        {
+            <span class="badge badge-danger position-absolute" style="top: 5px; right: 5px; font-size: 0.75rem; padding: 5px 7px; border-radius: 50%;">
+                @Model.Sum(n => n.UnreadCount)
+            </span>
+        }
+    </div>
+
+    <div class="dropdown-menu dropdown-menu-right shadow-lg rounded-3" aria-labelledby="notificationDropdown" style="width: 320px; max-height: 400px; overflow-y: auto;">
+        <div class="p-3 border-bottom bg-light rounded-top" style="background-color: #f8f9fa;">
+            <h6 class="dropdown-header mb-0 font-weight-bold text-dark" style="font-size: 1rem;">Tin nhắn mới</h6>
+        </div>
+
+        <!-- Message list or placeholder if no messages -->
+        <div class="px-3 py-2">
+            @if (Model.Any())
+            {
+                @foreach (var message in Model)
+                {
+                    <a asp-area="User" asp-controller="UserChat" asp-action="Index" asp-route-senderId="@message.SenderId" class="dropdown-item d-flex align-items-center justify-content-between py-2" style="border-bottom: 1px solid #e9ecef; text-decoration: none; color: inherit;">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-person-circle" style="font-size: 1.2rem; color: #6c757d; margin-right: 10px;"></i>
+                            <div class="text-wrap">
+                                <strong class="text-dark" style="font-size: 0.95rem;">@message.SenderName</strong>
+                                @if (message.UnreadCount > 0)
+                                {
+                                    <span class="badge badge-danger ml-2" style="font-size: 0.7rem; padding: 3px 6px; border-radius: 12px;">
+                                        @message.UnreadCount
+                                    </span>
+                                }
+                                <span class="text-muted" style="font-size: 0.7rem;">đã nhắn tới bạn</span>
+                            </div>
+                        </div>
+                        <i class="bi bi-arrow-right" style="font-size: 1rem; color: #6c757d;"></i>
+                    </a>
+                }
+            }
+            else
+            {
+                <div class="dropdown-item text-muted text-center py-3" style="font-size: 0.9rem;">Không có tin nhắn mới</div>
+            }
+        </div>
+
+        <!-- Chat button at the bottom -->
+        <div class="p-3 border-top bg-light text-center" style="background-color: #f8f9fa;">
+            <a href="/User/UserChat" class="btn btn-primary btn-sm rounded-pill px-4" style="font-size: 0.9rem;">
+                <i class="bi bi-chat-dots-fill" style="margin-right: 5px;"></i> Chat
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- SignalR and event handling script -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.0/signalr.min.js"></script>
+<script>
+    const connection = new signalR.HubConnectionBuilder().withUrl("/ChatHub").build();
+
+    connection.start().then(() => {
+        console.log("Connected to SignalR for notifications.");
+    }).catch(err => {
+        console.error("SignalR Connection Error:", err);
+    });
+
+    // Update notification component on receiving a new message
+    connection.on("UpdateUnreadCount", function (unreadCount) {
+        const notificationDropdown = document.getElementById('notificationDropdown');
+        let notificationBadge = notificationDropdown.querySelector('.badge');
+
+        if (unreadCount > 0) {
+            if (notificationBadge) {
+                notificationBadge.innerText = unreadCount;
+            } else {
+                const badge = document.createElement('span');
+                badge.className = 'badge badge-danger position-absolute';
+                badge.style = 'top: 5px; right: 5px; font-size: 0.75rem; padding: 5px 7px; border-radius: 50%;';
+                badge.innerText = unreadCount;
+                notificationDropdown.appendChild(badge);
+            }
+        } else {
+            if (notificationBadge) {
+                notificationBadge.remove();
+            }
+        }
+    });
+</script>

@@ -1,0 +1,131 @@
+﻿@model UserViewModel
+@{
+    Layout = null;
+}
+
+<head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&display=swap" rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: #f4f6f9;
+            color: #495057;
+            margin-top: 50px;
+        }
+
+        .form-container {
+            background-color: #fff;
+            max-width: 600px;
+            margin: auto;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-button {
+            color: #495057;
+            font-size: 1.5rem;
+            display: inline-block;
+            margin-bottom: 20px;
+            text-decoration: none;
+        }
+
+            .back-button:hover {
+                color: #343a40;
+                transform: scale(1.1);
+            }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .form-control-icon {
+            position: absolute;
+            top: 67%;
+            left: 12px;
+            transform: translateY(-50%);
+            color: #ced4da;
+            font-size: 1.2rem;
+            pointer-events: none;
+        }
+
+        .form-control {
+            padding-left: 2.5rem;
+            height: calc(2.4em + .75rem + 2px);
+        }
+
+            .form-control:focus ~ .form-control-icon {
+                color: #495057;
+            }
+
+        .btn-primary {
+            font-weight: 600;
+            font-size: 1rem;
+            background-color: #28a745;
+            border: none;
+            padding: 0.75rem;
+        }
+
+            .btn-primary:hover {
+                background-color: #218838;
+            }
+
+        h4 {
+            font-weight: 600;
+            color: #343a40;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <a href="javascript:history.back()" class="back-button" title="Back">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+
+    <form asp-action="Edit" asp-route-id="@Model.Id" method="post" class="form-container">
+        <h4>Edit User</h4>
+
+        <input type="hidden" asp-for="Id" />
+
+        <div class="form-group">
+            <label asp-for="UserName" class="font-weight-bold"></label>
+            <input asp-for="UserName" class="form-control" placeholder="Enter username" />
+            <i class="fas fa-user form-control-icon"></i>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Email" class="font-weight-bold"></label>
+            <input asp-for="Email" type="email" class="form-control" placeholder="Enter email address" />
+            <i class="fas fa-envelope form-control-icon"></i>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Name" class="font-weight-bold"></label>
+            <input asp-for="Name" class="form-control" placeholder="Enter full name" />
+            <i class="fas fa-id-badge form-control-icon"></i>
+        </div>
+
+        @* <div class="form-group">
+            <label asp-for="Address" class="font-weight-bold"></label>
+            <input asp-for="Address" class="form-control" placeholder="Enter address" />
+            <i class="fas fa-map-marker-alt form-control-icon"></i>
+        </div> *@
+
+        <div class="form-group">
+            <label class="font-weight-bold">Role</label>
+            <select asp-for="Roles" class="form-control" asp-items="Model.RolesList ?? new List<SelectListItem>()"></select>
+            <i class="fas fa-user-tag form-control-icon"></i>
+        </div>
+
+
+        <button type="submit" class="btn btn-primary btn-block mt-4">
+            <i class="fas fa-save"></i> Save Changes
+        </button>
+    </form>
+</body>

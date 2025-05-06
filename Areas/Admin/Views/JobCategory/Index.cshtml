@@ -1,0 +1,131 @@
+﻿@model IEnumerable<JobCategoryTable>
+@{
+    Layout = null;
+}
+@{
+    ViewData["Title"] = "Job Categories";
+}
+<head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&display=swap" rel="stylesheet" />
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
+</head>
+
+<style>
+    body {
+        font-family: 'Manrope', sans-serif;
+        background-color: #f4f6f9;
+        color: #495057;
+        margin-top: 50px;
+    }
+
+    .pagination .page-item .page-link {
+        color: #343A40;
+        background-color: transparent;
+        border: 1px solid #343A40;
+        transition: all 0.3s ease;
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: #343A40;
+        color: #FFFFFF;
+        border-color: #343A40;
+    }
+
+    .pagination .page-item .page-link:hover {
+        background-color: #343A40;
+        color: #FFFFFF;
+    }
+</style>
+<div class="container mt-4">
+    <h1 class="mb-4">Job Categories</h1>
+    <a asp-action="Create" class="btn btn-success mb-3">Create New Category</a>
+    <table class="table table-bordered table-striped shadow">
+        <thead class="thead-dark">
+            <tr>
+                <th>Id</th>
+                <th>Category Name</th>
+                <th>Description</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="jobCategoryTableBody">
+            @foreach (var category in Model)
+            {
+                <tr data-id="@category.Id">
+                    <td>@category.Id</td>
+                    <td>@category.CategoryName</td>
+                    <td>@category.Description</td>
+                    <td>
+                        <a asp-area="Admin" asp-controller="JobCategory" asp-action="Edit" asp-route-id="@category.Id" class="btn btn-warning btn-sm">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <button class="btn btn-danger btn-sm delete-btn">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- Phân trang -->
+    @if (ViewBag.TotalPages > 0)
+    {
+        <div class="d-flex justify-content-center mt-4">
+            <nav>
+                <ul class="pagination">
+                    @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                            <a class="page-link" href="?page=@i">@i</a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        </div>
+    }
+    else
+    {
+        <div class="text-center mt-4">
+            <p class="text-muted">No job categories available.</p>
+        </div>
+    }
+
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+
+    <script>
+        $(document).on('click', '.delete-btn', function () {
+            var row = $(this).closest('tr');
+            var id = row.data('id');
+
+            $.ajax({
+                url: '@Url.Action("DeleteAjax", "JobCategory", new { area = "Admin" })',
+                type: 'POST',
+                data: { id: id },
+                headers: {
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function (result) {
+                    if (result.success) {
+                        row.fadeOut();
+                        Swal.fire("Deleted!", "Category deleted successfully.", "success");
+                    } else {
+                        Swal.fire("Error!", "Unable to delete category.", "error");
+                    }
+                },
+                error: function () {
+                    Swal.fire("Error!", "An error occurred.", "error");
+                }
+            });
+        });
+
+

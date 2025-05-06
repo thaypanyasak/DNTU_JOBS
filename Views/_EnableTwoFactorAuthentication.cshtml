@@ -1,0 +1,35 @@
+﻿<h4>Kích hoạt 2FA</h4>
+<p>Quét mã QR bằng ứng dụng xác thực (e.g., Google Authenticator, Microsoft Authenticator):</p>
+<img src="@ViewBag.QrCodeUri" alt="QR Code" />
+
+<p>Hoặc nhập mã khóa sau vào ứng dụng của bạn:</p>
+<pre>@ViewBag.SharedKey</pre>
+
+<div class="form-group">
+    <label for="verificationCode">Nhập mã từ ứng dụng của bạn:</label>
+    <input type="text" id="verificationCode" class="form-control" placeholder="Mã xác minh" />
+</div>
+
+<button class="btn btn-primary" onclick="verifyTwoFactorAuthentication()">Xác minh và kích hoạt</button>
+
+<script>
+    function verifyTwoFactorAuthentication() {
+        const verificationCode = document.getElementById('verificationCode').value;
+
+        fetch('/User/UserProfile/VerifyTwoFactorAuthentication', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ verificationCode })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+</script>
