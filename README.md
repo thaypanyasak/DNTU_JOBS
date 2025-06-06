@@ -97,13 +97,17 @@ DNTU JOBS is a fullstack web application designed to help students find part-tim
 ---
 
 ## 📁 Project Structure (MVC)
-- Controllers/
-- Models/
-- Views/
-- wwwroot/ (Static assets)
-- Data/ (Database context and seeders)
-- Services/ (Business logic)
-- Utils/ (Helper functions)
+- **Controllers/** – Handle web routes and user requests (MVC Controllers)
+- **Api/** – Handle RESTful API endpoints for frontend interactions
+- **Models/** – Data models and business entities
+- **Views/** – Razor views for rendering UI
+- **ViewComponents/** – Reusable components for dynamic sections of the UI
+- **PartialViews/** – Shared UI fragments included in multiple views
+- **wwwroot/** – Static files (CSS, JS, images, etc.)
+- **Data/** – Database context, migrations, and seed data
+- **Services/** – Business logic and service interfaces/implementations
+
+
 
 ---
 
